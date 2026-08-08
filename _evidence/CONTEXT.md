@@ -622,6 +622,61 @@ was extraction quality (100/100 auditors after repair, the "Deloitte appears 15�
 bios" false-positive trap). Re-DocRED would put a number on that instead of inferring it from
 downstream answers.
 
+### Multi-hop, compared properly — the 4 datasets side by side
+
+**"Multi-hop" means two structurally different things**, and they exercise different parts of
+a graph. Conflating them is how you pick the wrong dataset.
+
+- **CHAIN (depth)** — *A → B → C.* You cannot start hop 2 until hop 1 resolves. This is graph
+  **traversal**. Our Tier B is this: *"The company that appointed John Ternus as CEO — what
+  were its total net sales?"* You must resolve Apple first.
+- **FAN-OUT (breadth)** — *A → {B₁…Bₙ}.* One question, the same attribute gathered across
+  many entities, then aggregated. This is graph **set expansion + intersection**. Our Tier C
+  is this: *"Which companies audited by KPMG are in Consumer Staples?"*
+
+Both are "7 hops" on paper. They are not the same problem.
+
+| | **MultiHop-RAG** | **PhantomWiki** | **FanOutQA** | **Re-DocRED** |
+|---|---|---|---|---|
+| hop **type** | **chain** (+ comparison, temporal) | **chain** (kinship/social) | **FAN-OUT** | intra-document relations |
+| hop **depth** | **2–4 docs** | **1–20, configurable** | ~7 entities wide, shallow per branch | 1–2 sentences |
+| **cross-document?** | ✅ yes, by construction | ✅ yes | ✅ yes | ❌ **within a single document** |
+| % of questions multi-hop | **100%** | 100% (you set it) | 100% | n/a — not QA |
+| gold reasoning path? | evidence docs labelled | ✅ **exact, from the Prolog DB** | ✅ **human-written decompositions** | ✅ gold triples |
+| maps to our tier | **Tier B** | Tier B, at any depth | **Tier C** | extraction quality |
+| what it would tell us | does the Tier-B win hold on prose? | **at what depth does the graph pull away?** | does the Tier-C win hold at 7-wide? | is our extraction actually correct? |
+
+#### What this comparison actually settles
+
+1. **Re-DocRED is not multi-hop in the sense that matters here.** Its reasoning is *within* a
+   single document, across sentences. Graph traversal across documents is the thing being
+   tested, so Re-DocRED cannot evaluate it. It remains valuable — but as an **extraction**
+   benchmark, not a multi-hop one. Do not count it as one of the multi-hop options.
+
+2. **FanOutQA's "~7 hops" is breadth, not depth.** It is the deepest number on the list and
+   the most misleading one. Seven hops *wide* with one hop per branch is a **Tier-C
+   aggregation** problem — the tier MasterGraph already beats us on (0.825 vs 0.791). It
+   would not tell us anything new about traversal.
+
+3. **Only PhantomWiki can answer the depth question.** MultiHop-RAG stops at 2–4, which is
+   roughly where our SEC corpus already sits. If the question is *"how deep before the graph
+   is clearly worth it?"* — the question a TigerGraph client actually asks — **PhantomWiki's
+   dial is the only instrument that can answer it.**
+
+4. **MultiHop-RAG is the only one that tests chain depth on REAL prose.** That is its whole
+   value, and it is not nothing: everything we know about Tier B comes from SEC filings.
+
+#### Consequence for the plan
+
+| question | dataset that answers it |
+|---|---|
+| Does the Tier-B (chain) win hold on real prose? | **MultiHop-RAG** |
+| At what hop depth does GraphRAG pull away from vector search? | **PhantomWiki** (only option) |
+| Does the Tier-C (fan-out) win hold at 7-wide? | FanOutQA — *if* it clears the contamination probe |
+| Is our KG extraction actually correct? | Re-DocRED |
+
+---
+
 ### THE DECISION (2026-08-08)
 
 **Primary: MultiHop-RAG. Control: PhantomWiki. FanOutQA deferred.**
