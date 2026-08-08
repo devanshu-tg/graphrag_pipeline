@@ -1,0 +1,42 @@
+# ── SECRETS — never commit ────────────────────────────────────────────────────
+# Credentials go on each machine by hand. mastergraph-round3/.env.example is the
+# template; copy it to .env and fill it in. See _evidence/CONTEXT.md §2.
+.env
+*.env
+!.env.example
+!*.env.example
+
+# ── The embedded git repo that broke `git add .` ──────────────────────────────
+# mastergraph-round3 shipped with its own .git, so `git add .` staged it as a
+# 160000 gitlink pointing at a commit that exists only on the original machine —
+# every clone would get an EMPTY mastergraph-round3/. Renamed to .git-disabled so
+# its files are tracked normally. Kept locally for provenance, never committed.
+.git-disabled/
+**/.git-disabled/
+
+# ── TOO BIG FOR GITHUB (>100 MB is a hard reject) ─────────────────────────────
+# All of these are REGENERATED, not authored. Rebuild instructions in CONTEXT.md §6.
+#
+#   chroma.sqlite3      822.6 MB   <- rebuild: python build/round3_tg_ingest.py / chroma_store
+#   data_level0.bin      98.7 MB   <- same
+#   corpus.jsonl        113.5 MB   <- rebuild: python build/build_round3_corpus.py
+#   documents.jsonl      85.7 MB   <- same
+#
+# The RAW SEC filings in sp100_edgar_downloader/ ARE committed, so both the corpus
+# and the Chroma index can be rebuilt from source on any machine.
+mastergraph-round3/chroma_db_round3/
+mastergraph-round3/datasets/round3/corpus.jsonl
+mastergraph-round3/datasets/round3/documents.jsonl
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ── Logs and scratch ──────────────────────────────────────────────────────────
+*.log
+.DS_Store
+Thumbs.db

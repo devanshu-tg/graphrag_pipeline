@@ -1,0 +1,38 @@
+# Virtual environment
+.venv/
+venv/
+
+# Secrets — NEVER commit
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# macOS
+.DS_Store
+
+# Logs / tmp
+*.log
+/tmp/
+
+# Bulk/regeneratable data (not the KG itself — entities/relations/edges/events ARE tracked):
+# regenerate via build/build_round3_corpus.py + build_corpus.py (README "Reproduce from scratch")
+chroma_db_round3/
+datasets/round3/corpus.jsonl
+datasets/round3/documents.jsonl
+pipeline3_round3/index/corpus.json
+pipeline3_round3/index/doc_content.json
+
+# Claude Code tooling (local only)
+.claude/
+CLAUDE.md
+
+# Kept locally, not in the public repo (per request)
+BLOG.md
+FROZEN_CONFIG.md
+P2_ABLATION.md
+dashboard.html

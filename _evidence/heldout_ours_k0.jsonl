@@ -1,0 +1,5 @@
+{"question_id": "HQ1", "arm": "OURS-v3-graphrag", "answer": "DUK, NEE, SO", "route": "set", "prompt_tokens": 214, "completion_tokens": 7, "latency_s": 3.17}
+{"question_id": "HQ2", "arm": "OURS-v3-graphrag", "answer": "CVX", "route": "vector", "prompt_tokens": 3484, "completion_tokens": 2, "latency_s": 10.73}
+{"question_id": "HQ3", "arm": "OURS-v3-graphrag", "answer": "I cannot answer this question because the provided context does not contain information about the industry sectors of the audited companies.", "route": "count", "prompt_tokens": 230, "completion_tokens": 22, "latency_s": 1.03}
+{"question_id": "HQ4", "arm": "OURS-v3-graphrag", "answer": "KPMG LLP", "route": "vector", "prompt_tokens": 3684, "completion_tokens": 3, "latency_s": 2.32}
+{"question_id": "HQ5", "arm": "OURS-v3-graphrag", "answer": "AMZN, GM, MCD, TGT", "route": "set", "prompt_tokens": 221, "completion_tokens": 9, "latency_s": 1.03}

@@ -1,0 +1,250 @@
+{"question_id": "EQ01", "arm": "p1", "tier": "A", "answer": "Based on the provided context, there is no mention of Apple's total net sales for fiscal year 2025.", "prompt_tokens": 185, "completion_tokens": 26, "routed": false, "latency_s": 1.38}
+{"question_id": "EQ02", "arm": "p1", "tier": "A", "answer": "I am sorry, but the provided context does not contain information about NVIDIA's total revenue for fiscal year 2026.", "prompt_tokens": 184, "completion_tokens": 27, "routed": false, "latency_s": 1.49}
+{"question_id": "EQ03", "arm": "p1", "tier": "A", "answer": "I cannot answer this question as the provided context is empty.", "prompt_tokens": 190, "completion_tokens": 12, "routed": false, "latency_s": 1.16}
+{"question_id": "EQ04", "arm": "p1", "tier": "A", "answer": "", "prompt_tokens": 186, "completion_tokens": 0, "routed": false, "latency_s": 1.16}
+{"question_id": "EQ05", "arm": "p1", "tier": "A", "answer": "I am sorry, but the provided context does not contain information about Coca-Cola's net operating revenues for FY2025.", "prompt_tokens": 185, "completion_tokens": 28, "routed": false, "latency_s": 1.39}
+{"question_id": "EQ06", "arm": "p1", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 184, "completion_tokens": 10, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ07", "arm": "p1", "tier": "A", "answer": "Andy Jassy", "prompt_tokens": 179, "completion_tokens": 3, "routed": false, "latency_s": 1.3}
+{"question_id": "EQ08", "arm": "p1", "tier": "A", "answer": "Amazon Web Services (AWS)", "prompt_tokens": 182, "completion_tokens": 6, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ09", "arm": "p1", "tier": "B", "answer": "John Ternus is not the CEO of any company in the provided context.", "prompt_tokens": 193, "completion_tokens": 15, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ10", "arm": "p1", "tier": "B", "answer": "Apogee Therapeutics is the company being acquired, not the acquirer. Please provide context mentioning the acquiring company.", "prompt_tokens": 186, "completion_tokens": 22, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ11", "arm": "p1", "tier": "B", "answer": "[GRAPH FACTS]", "prompt_tokens": 193, "completion_tokens": 4, "routed": false, "latency_s": 1.41}
+{"question_id": "EQ12", "arm": "p1", "tier": "B", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 192, "completion_tokens": 7, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ13", "arm": "p1", "tier": "B", "answer": "[GRAPH FACTS] JPMorgan Chase had the higher fiscal-year net income.", "prompt_tokens": 186, "completion_tokens": 15, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ14", "arm": "p1", "tier": "B", "answer": "[GRAPH FACTS] Apple: $394,328 million (2022), Walmart: $611,289 million (2023)\n\nWalmart", "prompt_tokens": 183, "completion_tokens": 40, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ15", "arm": "p1", "tier": "B", "answer": "I cannot answer this question because the necessary context is missing.", "prompt_tokens": 187, "completion_tokens": 12, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ16", "arm": "p1", "tier": "B", "answer": "I cannot answer this question because the provided context does not contain any information about Jay Hoag being appointed Chairman in 2026 or any associated share-repurchase amount.", "prompt_tokens": 198, "completion_tokens": 36, "routed": false, "latency_s": 1.54}
+{"question_id": "EQ17", "arm": "p1", "tier": "B", "answer": "Peter J. Griffith, Ernst & Young LLP", "prompt_tokens": 196, "completion_tokens": 9, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ18", "arm": "p1", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 201, "completion_tokens": 11, "routed": false, "latency_s": 1.39}
+{"question_id": "EQ19", "arm": "p1", "tier": "B", "answer": "NVIDIA and Intel", "prompt_tokens": 186, "completion_tokens": 4, "routed": false, "latency_s": 1.48}
+{"question_id": "EQ20", "arm": "p1", "tier": "B", "answer": "None", "prompt_tokens": 192, "completion_tokens": 1, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ21", "arm": "p1", "tier": "B", "answer": "I am sorry, but the provided context does not contain information about an Apple 8-K from April 2026 or appointments regarding the CEO or Tim Cook.", "prompt_tokens": 199, "completion_tokens": 35, "routed": false, "latency_s": 1.54}
+{"question_id": "EQ22", "arm": "p1", "tier": "B", "answer": "The provided context does not contain information about AMD's revolving credit facility, its administrative agent, or the facility it replaced.", "prompt_tokens": 206, "completion_tokens": 25, "routed": false, "latency_s": 1.51}
+{"question_id": "EQ23", "arm": "p1", "tier": "B", "answer": "AAPL", "prompt_tokens": 191, "completion_tokens": 1, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ24", "arm": "p1", "tier": "B", "answer": "I am sorry, but the provided context does not contain information about Caterpillar raising its quarterly dividend in a June 2026 8-K.", "prompt_tokens": 197, "completion_tokens": 31, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ25", "arm": "p1", "tier": "C", "answer": "[GRAPH FACTS] AAPL, MSFT", "prompt_tokens": 187, "completion_tokens": 9, "routed": false, "latency_s": 1.42}
+{"question_id": "EQ26", "arm": "p1", "tier": "C", "answer": "AAPL, QCOM", "prompt_tokens": 185, "completion_tokens": 4, "routed": false, "latency_s": 1.75}
+{"question_id": "EQ27", "arm": "p1", "tier": "C", "answer": "AMZN, UPS", "prompt_tokens": 186, "completion_tokens": 4, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ28", "arm": "p1", "tier": "C", "answer": "[GRAPH FACTS] Dell Technologies, United Airlines Holdings", "prompt_tokens": 183, "completion_tokens": 10, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ29", "arm": "p1", "tier": "C", "answer": "BLK, MCD", "prompt_tokens": 185, "completion_tokens": 3, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ30", "arm": "p1", "tier": "C", "answer": "CVX, XOM", "prompt_tokens": 190, "completion_tokens": 5, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ31", "arm": "p1", "tier": "C", "answer": "None", "prompt_tokens": 186, "completion_tokens": 1, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ32", "arm": "p1", "tier": "C", "answer": "", "prompt_tokens": 196, "completion_tokens": 0, "routed": false, "latency_s": 1.22}
+{"question_id": "EQ33", "arm": "p1", "tier": "C", "answer": "I am sorry, but the provided context does not contain information about consumer companies flagging GLP-1 or weight-loss drugs as a business risk.", "prompt_tokens": 194, "completion_tokens": 30, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ34", "arm": "p1", "tier": "C", "answer": "None", "prompt_tokens": 186, "completion_tokens": 1, "routed": false, "latency_s": 1.38}
+{"question_id": "EQ35", "arm": "p1", "tier": "C", "answer": "AAPL", "prompt_tokens": 190, "completion_tokens": 1, "routed": false, "latency_s": 1.38}
+{"question_id": "EQ36", "arm": "p1", "tier": "C", "answer": "[GRAPH FACTS] PG, WMT", "prompt_tokens": 183, "completion_tokens": 8, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ37", "arm": "p1", "tier": "C", "answer": "GS, MS", "prompt_tokens": 183, "completion_tokens": 3, "routed": false, "latency_s": 1.44}
+{"question_id": "EQ38", "arm": "p1", "tier": "C", "answer": "AAPL, QCOM", "prompt_tokens": 189, "completion_tokens": 4, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ39", "arm": "p1", "tier": "C", "answer": "AAPL, QCOM", "prompt_tokens": 191, "completion_tokens": 4, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ40", "arm": "p1", "tier": "C", "answer": "ELL, JNJ", "prompt_tokens": 192, "completion_tokens": 4, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ41", "arm": "p1", "tier": "C", "answer": "CVS, PFE, UNH", "prompt_tokens": 184, "completion_tokens": 8, "routed": false, "latency_s": 1.4}
+{"question_id": "EQ42", "arm": "p1", "tier": "C", "answer": "AVGO, QCOM", "prompt_tokens": 188, "completion_tokens": 5, "routed": false, "latency_s": 1.36}
+{"question_id": "EQ43", "arm": "p1", "tier": "C", "answer": "AAPL, QCOM", "prompt_tokens": 189, "completion_tokens": 4, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ44", "arm": "p1", "tier": "C", "answer": "I am sorry, but the provided context does not contain the information needed to answer this question.", "prompt_tokens": 181, "completion_tokens": 19, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ45", "arm": "p1", "tier": "D", "answer": "I am sorry, but the provided context does not contain information about Amgen's CFO transition or the specific retirement and start dates.", "prompt_tokens": 197, "completion_tokens": 27, "routed": false, "latency_s": 1.4}
+{"question_id": "EQ46", "arm": "p1", "tier": "D", "answer": "Accenture, Netflix, Morgan Stanley, Adobe", "prompt_tokens": 210, "completion_tokens": 9, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ47", "arm": "p1", "tier": "D", "answer": "I am sorry, but the provided context does not contain information about 8-K filings by Apple in April 2026.", "prompt_tokens": 201, "completion_tokens": 28, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ48", "arm": "p1", "tier": "D", "answer": "I am sorry, but the provided context does not contain information about a company that expanded a productivity/restructuring program on April 30, 2026, nor does it provide its auditor or the revised total pre-tax charge range.", "prompt_tokens": 208, "completion_tokens": 51, "routed": false, "latency_s": 1.53}
+{"question_id": "EQ49", "arm": "p1", "tier": "D", "answer": "I am sorry, but the provided context does not contain information about Cisco's May 2026 restructuring 8-K or its auditor.", "prompt_tokens": 197, "completion_tokens": 31, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ50", "arm": "p1", "tier": "D", "answer": "I am sorry, but the provided context does not contain information about a quarterly cash dividend per share declared by Costco in its July 2026 8-K.", "prompt_tokens": 192, "completion_tokens": 35, "routed": false, "latency_s": 1.44}
+{"question_id": "EQ01", "arm": "p2", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3972, "completion_tokens": 9, "routed": false, "latency_s": 1.38}
+{"question_id": "EQ02", "arm": "p2", "tier": "A", "answer": "$215,938 million", "prompt_tokens": 3734, "completion_tokens": 9, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ03", "arm": "p2", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3692, "completion_tokens": 8, "routed": false, "latency_s": 1.5}
+{"question_id": "EQ04", "arm": "p2", "tier": "A", "answer": "$332,238 million", "prompt_tokens": 4061, "completion_tokens": 9, "routed": false, "latency_s": 1.45}
+{"question_id": "EQ05", "arm": "p2", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3753, "completion_tokens": 8, "routed": false, "latency_s": 1.38}
+{"question_id": "EQ06", "arm": "p2", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3752, "completion_tokens": 10, "routed": false, "latency_s": 1.21}
+{"question_id": "EQ07", "arm": "p2", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3515, "completion_tokens": 5, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ08", "arm": "p2", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3346, "completion_tokens": 3, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ09", "arm": "p2", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3837, "completion_tokens": 9, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ10", "arm": "p2", "tier": "B", "answer": "Deloitte", "prompt_tokens": 3227, "completion_tokens": 2, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ11", "arm": "p2", "tier": "B", "answer": "AAPL", "prompt_tokens": 3577, "completion_tokens": 1, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ12", "arm": "p2", "tier": "B", "answer": "TMUS, PricewaterhouseCoopers LLP", "prompt_tokens": 3423, "completion_tokens": 9, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ13", "arm": "p2", "tier": "B", "answer": "JPMorgan Chase", "prompt_tokens": 3724, "completion_tokens": 3, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ14", "arm": "p2", "tier": "B", "answer": "Walmart", "prompt_tokens": 3793, "completion_tokens": 1, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ15", "arm": "p2", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3613, "completion_tokens": 2, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ16", "arm": "p2", "tier": "B", "answer": "$50.0 billion", "prompt_tokens": 3663, "completion_tokens": 6, "routed": false, "latency_s": 1.3}
+{"question_id": "EQ17", "arm": "p2", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3538, "completion_tokens": 8, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ18", "arm": "p2", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3439, "completion_tokens": 11, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ19", "arm": "p2", "tier": "B", "answer": "Intel, Nvidia", "prompt_tokens": 3325, "completion_tokens": 3, "routed": false, "latency_s": 1.55}
+{"question_id": "EQ20", "arm": "p2", "tier": "B", "answer": "NIKE, Inc.", "prompt_tokens": 3427, "completion_tokens": 5, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ21", "arm": "p2", "tier": "B", "answer": "Not mentioned", "prompt_tokens": 3541, "completion_tokens": 2, "routed": false, "latency_s": 1.12}
+{"question_id": "EQ22", "arm": "p2", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3538, "completion_tokens": 15, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ23", "arm": "p2", "tier": "B", "answer": "Broadcom Inc.", "prompt_tokens": 3095, "completion_tokens": 4, "routed": false, "latency_s": 1.51}
+{"question_id": "EQ24", "arm": "p2", "tier": "B", "answer": "$1.47 per share", "prompt_tokens": 3714, "completion_tokens": 7, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ25", "arm": "p2", "tier": "C", "answer": "WFC, C, GD, PFE", "prompt_tokens": 3418, "completion_tokens": 9, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ26", "arm": "p2", "tier": "C", "answer": "INTC", "prompt_tokens": 2627, "completion_tokens": 2, "routed": false, "latency_s": 1.22}
+{"question_id": "EQ27", "arm": "p2", "tier": "C", "answer": "AMZN, AAPL", "prompt_tokens": 3375, "completion_tokens": 5, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ28", "arm": "p2", "tier": "C", "answer": "Dell Technologies Inc., Goldman Sachs Group, Inc.", "prompt_tokens": 3466, "completion_tokens": 10, "routed": false, "latency_s": 1.56}
+{"question_id": "EQ29", "arm": "p2", "tier": "C", "answer": "UNH, IBM", "prompt_tokens": 3688, "completion_tokens": 4, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ30", "arm": "p2", "tier": "C", "answer": "COP, DUK", "prompt_tokens": 3269, "completion_tokens": 4, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ31", "arm": "p2", "tier": "C", "answer": "DUK", "prompt_tokens": 3280, "completion_tokens": 2, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ32", "arm": "p2", "tier": "C", "answer": "LLY, PFE, ABBV", "prompt_tokens": 3283, "completion_tokens": 7, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ33", "arm": "p2", "tier": "C", "answer": "PEP", "prompt_tokens": 3242, "completion_tokens": 1, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ34", "arm": "p2", "tier": "C", "answer": "COST", "prompt_tokens": 3499, "completion_tokens": 1, "routed": false, "latency_s": 1.46}
+{"question_id": "EQ35", "arm": "p2", "tier": "C", "answer": "[GRAPH FACTS]", "prompt_tokens": 3462, "completion_tokens": 4, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ36", "arm": "p2", "tier": "C", "answer": "PEP", "prompt_tokens": 3302, "completion_tokens": 1, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ37", "arm": "p2", "tier": "C", "answer": "WFC, GS", "prompt_tokens": 3341, "completion_tokens": 4, "routed": false, "latency_s": 1.16}
+{"question_id": "EQ38", "arm": "p2", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 2872, "completion_tokens": 4, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ39", "arm": "p2", "tier": "C", "answer": "NVDA", "prompt_tokens": 3464, "completion_tokens": 2, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ40", "arm": "p2", "tier": "C", "answer": "LLY", "prompt_tokens": 3511, "completion_tokens": 1, "routed": false, "latency_s": 1.21}
+{"question_id": "EQ41", "arm": "p2", "tier": "C", "answer": "DE", "prompt_tokens": 3627, "completion_tokens": 1, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ42", "arm": "p2", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 3264, "completion_tokens": 4, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ43", "arm": "p2", "tier": "C", "answer": "NVDA", "prompt_tokens": 3384, "completion_tokens": 2, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ44", "arm": "p2", "tier": "C", "answer": "PwC: 3, EY: 2, Deloitte: 2, KPMG: 1", "prompt_tokens": 2865, "completion_tokens": 20, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ45", "arm": "p2", "tier": "D", "answer": "August 31, 2026; July 1, 2026", "prompt_tokens": 3564, "completion_tokens": 20, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ46", "arm": "p2", "tier": "D", "answer": "Morgan Stanley, Adobe", "prompt_tokens": 3497, "completion_tokens": 4, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ47", "arm": "p2", "tier": "D", "answer": "[Passage 3] and [Passage 2] do not describe the specific events reported on April 17, 2026 and April 30, 2026, other than indicating they are Current Reports on Form 8-K.", "prompt_tokens": 3774, "completion_tokens": 57, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ48", "arm": "p2", "tier": "D", "answer": "INTC, Ernst & Young LLP, $2,191 million", "prompt_tokens": 3792, "completion_tokens": 15, "routed": false, "latency_s": 1.16}
+{"question_id": "EQ49", "arm": "p2", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3480, "completion_tokens": 7, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ50", "arm": "p2", "tier": "D", "answer": "$1.47", "prompt_tokens": 3772, "completion_tokens": 5, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ01", "arm": "grep", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3972, "completion_tokens": 9, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ02", "arm": "grep", "tier": "A", "answer": "$215,938 million", "prompt_tokens": 3734, "completion_tokens": 9, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ03", "arm": "grep", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3692, "completion_tokens": 8, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ04", "arm": "grep", "tier": "A", "answer": "332,238 million", "prompt_tokens": 4061, "completion_tokens": 8, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ05", "arm": "grep", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3753, "completion_tokens": 8, "routed": false, "latency_s": 1.56}
+{"question_id": "EQ06", "arm": "grep", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3752, "completion_tokens": 10, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ07", "arm": "grep", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3515, "completion_tokens": 5, "routed": false, "latency_s": 1.2}
+{"question_id": "EQ08", "arm": "grep", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3346, "completion_tokens": 3, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ09", "arm": "grep", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3837, "completion_tokens": 9, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ10", "arm": "grep", "tier": "B", "answer": "Deloitte", "prompt_tokens": 3227, "completion_tokens": 2, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ11", "arm": "grep", "tier": "B", "answer": "AAPL", "prompt_tokens": 3577, "completion_tokens": 1, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ12", "arm": "grep", "tier": "B", "answer": "TMUS", "prompt_tokens": 3423, "completion_tokens": 2, "routed": false, "latency_s": 1.36}
+{"question_id": "EQ13", "arm": "grep", "tier": "B", "answer": "JPMorgan Chase", "prompt_tokens": 3724, "completion_tokens": 3, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ14", "arm": "grep", "tier": "B", "answer": "Walmart", "prompt_tokens": 3793, "completion_tokens": 1, "routed": false, "latency_s": 1.27}
+{"question_id": "EQ15", "arm": "grep", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3613, "completion_tokens": 2, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ16", "arm": "grep", "tier": "B", "answer": "$50.0 billion", "prompt_tokens": 3663, "completion_tokens": 6, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ17", "arm": "grep", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3538, "completion_tokens": 8, "routed": false, "latency_s": 1.13}
+{"question_id": "EQ18", "arm": "grep", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3439, "completion_tokens": 11, "routed": false, "latency_s": 1.28}
+{"question_id": "EQ19", "arm": "grep", "tier": "B", "answer": "Intel, Nvidia", "prompt_tokens": 3325, "completion_tokens": 3, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ20", "arm": "grep", "tier": "B", "answer": "BRK", "prompt_tokens": 3427, "completion_tokens": 2, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ21", "arm": "grep", "tier": "B", "answer": "Not mentioned", "prompt_tokens": 3541, "completion_tokens": 2, "routed": false, "latency_s": 1.15}
+{"question_id": "EQ22", "arm": "grep", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3538, "completion_tokens": 15, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ23", "arm": "grep", "tier": "B", "answer": "NVDA", "prompt_tokens": 3126, "completion_tokens": 2, "routed": true, "latency_s": 1.26}
+{"question_id": "EQ24", "arm": "grep", "tier": "B", "answer": "$1.47 per share", "prompt_tokens": 3714, "completion_tokens": 7, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ25", "arm": "grep", "tier": "C", "answer": "ACN, ADBE, BNY, C, COST, EMR, GD, HD, PEP, PFE, V, WFC", "prompt_tokens": 3466, "completion_tokens": 29, "routed": true, "latency_s": 1.39}
+{"question_id": "EQ26", "arm": "grep", "tier": "C", "answer": "AMD, AVGO, INTC, NVDA, QCOM", "prompt_tokens": 2658, "completion_tokens": 13, "routed": true, "latency_s": 1.18}
+{"question_id": "EQ27", "arm": "grep", "tier": "C", "answer": "AMZN, HON", "prompt_tokens": 3398, "completion_tokens": 4, "routed": true, "latency_s": 1.32}
+{"question_id": "EQ28", "arm": "grep", "tier": "C", "answer": "AMGN, GS", "prompt_tokens": 3489, "completion_tokens": 4, "routed": true, "latency_s": 1.45}
+{"question_id": "EQ29", "arm": "grep", "tier": "C", "answer": "DE, EMR, IBM, LOW, MDT, UNH, WFC", "prompt_tokens": 3727, "completion_tokens": 17, "routed": true, "latency_s": 1.57}
+{"question_id": "EQ30", "arm": "grep", "tier": "C", "answer": "COP, CVX, XOM", "prompt_tokens": 3299, "completion_tokens": 7, "routed": true, "latency_s": 1.33}
+{"question_id": "EQ31", "arm": "grep", "tier": "C", "answer": "DUK, NEE, SO", "prompt_tokens": 3310, "completion_tokens": 7, "routed": true, "latency_s": 1.38}
+{"question_id": "EQ32", "arm": "grep", "tier": "C", "answer": "ABBV, AMGN, CVS, ISRG, LLY, MDT, MRK, PFE", "prompt_tokens": 3336, "completion_tokens": 22, "routed": true, "latency_s": 1.66}
+{"question_id": "EQ33", "arm": "grep", "tier": "C", "answer": "KO, MCD, MDLZ, PEP, SBUX", "prompt_tokens": 3295, "completion_tokens": 12, "routed": true, "latency_s": 1.39}
+{"question_id": "EQ34", "arm": "grep", "tier": "C", "answer": "COST", "prompt_tokens": 3530, "completion_tokens": 1, "routed": true, "latency_s": 1.18}
+{"question_id": "EQ35", "arm": "grep", "tier": "C", "answer": "ADBE", "prompt_tokens": 3485, "completion_tokens": 2, "routed": true, "latency_s": 1.27}
+{"question_id": "EQ36", "arm": "grep", "tier": "C", "answer": "COST, PEP", "prompt_tokens": 3329, "completion_tokens": 3, "routed": true, "latency_s": 1.37}
+{"question_id": "EQ37", "arm": "grep", "tier": "C", "answer": "BNY, C, V, WFC", "prompt_tokens": 3374, "completion_tokens": 9, "routed": true, "latency_s": 1.35}
+{"question_id": "EQ38", "arm": "grep", "tier": "C", "answer": "AMD, INTC", "prompt_tokens": 2902, "completion_tokens": 4, "routed": true, "latency_s": 1.32}
+{"question_id": "EQ39", "arm": "grep", "tier": "C", "answer": "AVGO, NVDA, QCOM", "prompt_tokens": 3500, "completion_tokens": 8, "routed": true, "latency_s": 1.26}
+{"question_id": "EQ40", "arm": "grep", "tier": "C", "answer": "ABBV, AMGN, CVS, LLY", "prompt_tokens": 3560, "completion_tokens": 10, "routed": true, "latency_s": 1.38}
+{"question_id": "EQ41", "arm": "grep", "tier": "C", "answer": "BMY, UNH", "prompt_tokens": 3659, "completion_tokens": 5, "routed": true, "latency_s": 1.35}
+{"question_id": "EQ42", "arm": "grep", "tier": "C", "answer": "AMD, CSCO, INTC, QCOM", "prompt_tokens": 3291, "completion_tokens": 10, "routed": true, "latency_s": 1.39}
+{"question_id": "EQ43", "arm": "grep", "tier": "C", "answer": "CSCO, QCOM", "prompt_tokens": 3416, "completion_tokens": 5, "routed": true, "latency_s": 1.44}
+{"question_id": "EQ44", "arm": "grep", "tier": "C", "answer": "Ernst & Young: 32, PricewaterhouseCoopers: 32, Deloitte: 24, KPMG: 12", "prompt_tokens": 2908, "completion_tokens": 30, "routed": true, "latency_s": 1.35}
+{"question_id": "EQ45", "arm": "grep", "tier": "D", "answer": "August 31, 2026, July 1, 2026", "prompt_tokens": 3564, "completion_tokens": 20, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ46", "arm": "grep", "tier": "D", "answer": "Morgan Stanley, Adobe", "prompt_tokens": 3497, "completion_tokens": 4, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ47", "arm": "grep", "tier": "D", "answer": "The provided context does not contain an 8-K filing dated April 20, 2026.", "prompt_tokens": 3774, "completion_tokens": 24, "routed": false, "latency_s": 1.3}
+{"question_id": "EQ48", "arm": "grep", "tier": "D", "answer": "Intel, Ernst & Young LLP, $2.191 billion", "prompt_tokens": 3792, "completion_tokens": 14, "routed": false, "latency_s": 1.21}
+{"question_id": "EQ49", "arm": "grep", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3480, "completion_tokens": 7, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ50", "arm": "grep", "tier": "D", "answer": "$1.47", "prompt_tokens": 3772, "completion_tokens": 5, "routed": false, "latency_s": 1.12}
+{"question_id": "EQ01", "arm": "p3", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3972, "completion_tokens": 9, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ02", "arm": "p3", "tier": "A", "answer": "$215,938 million", "prompt_tokens": 3734, "completion_tokens": 9, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ03", "arm": "p3", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3692, "completion_tokens": 8, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ04", "arm": "p3", "tier": "A", "answer": "332,238 million", "prompt_tokens": 4061, "completion_tokens": 8, "routed": false, "latency_s": 1.14}
+{"question_id": "EQ05", "arm": "p3", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3753, "completion_tokens": 8, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ06", "arm": "p3", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3752, "completion_tokens": 10, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ07", "arm": "p3", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3515, "completion_tokens": 5, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ08", "arm": "p3", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3346, "completion_tokens": 3, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ09", "arm": "p3", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3875, "completion_tokens": 9, "routed": true, "latency_s": 1.2}
+{"question_id": "EQ10", "arm": "p3", "tier": "B", "answer": "Ernst & Young LLP", "prompt_tokens": 3265, "completion_tokens": 5, "routed": true, "latency_s": 1.32}
+{"question_id": "EQ11", "arm": "p3", "tier": "B", "answer": "AAPL", "prompt_tokens": 3577, "completion_tokens": 1, "routed": false, "latency_s": 1.19}
+{"question_id": "EQ12", "arm": "p3", "tier": "B", "answer": "Deloitte & Touche LLP", "prompt_tokens": 3469, "completion_tokens": 6, "routed": true, "latency_s": 1.35}
+{"question_id": "EQ13", "arm": "p3", "tier": "B", "answer": "JPMorgan Chase", "prompt_tokens": 3724, "completion_tokens": 3, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ14", "arm": "p3", "tier": "B", "answer": "Walmart", "prompt_tokens": 3793, "completion_tokens": 1, "routed": false, "latency_s": 1.1}
+{"question_id": "EQ15", "arm": "p3", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3613, "completion_tokens": 2, "routed": false, "latency_s": 1.31}
+{"question_id": "EQ16", "arm": "p3", "tier": "B", "answer": "$5.0 billion", "prompt_tokens": 3707, "completion_tokens": 5, "routed": true, "latency_s": 1.19}
+{"question_id": "EQ17", "arm": "p3", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3538, "completion_tokens": 8, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ18", "arm": "p3", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3439, "completion_tokens": 11, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ19", "arm": "p3", "tier": "B", "answer": "Nvidia, Intel", "prompt_tokens": 3325, "completion_tokens": 4, "routed": false, "latency_s": 1.3}
+{"question_id": "EQ20", "arm": "p3", "tier": "B", "answer": "BRK", "prompt_tokens": 3427, "completion_tokens": 2, "routed": false, "latency_s": 1.46}
+{"question_id": "EQ21", "arm": "p3", "tier": "B", "answer": "Not mentioned", "prompt_tokens": 3541, "completion_tokens": 2, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ22", "arm": "p3", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3538, "completion_tokens": 15, "routed": false, "latency_s": 1.33}
+{"question_id": "EQ23", "arm": "p3", "tier": "B", "answer": "NVDA", "prompt_tokens": 3123, "completion_tokens": 2, "routed": true, "latency_s": 1.14}
+{"question_id": "EQ24", "arm": "p3", "tier": "B", "answer": "$0.02, $1.47", "prompt_tokens": 3714, "completion_tokens": 11, "routed": false, "latency_s": 1.27}
+{"question_id": "EQ25", "arm": "p3", "tier": "C", "answer": "ACN, ADBE, BNY, C, COST, EMR, GD, HD, PEP, PFE, V, WFC", "prompt_tokens": 3466, "completion_tokens": 29, "routed": true, "latency_s": 1.46}
+{"question_id": "EQ26", "arm": "p3", "tier": "C", "answer": "AMD, AVGO, NVDA, QCOM", "prompt_tokens": 2655, "completion_tokens": 10, "routed": true, "latency_s": 1.22}
+{"question_id": "EQ27", "arm": "p3", "tier": "C", "answer": "AMZN, AAPL", "prompt_tokens": 3375, "completion_tokens": 5, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ28", "arm": "p3", "tier": "C", "answer": "GS", "prompt_tokens": 3486, "completion_tokens": 1, "routed": true, "latency_s": 1.25}
+{"question_id": "EQ29", "arm": "p3", "tier": "C", "answer": "IBM, UNH", "prompt_tokens": 3714, "completion_tokens": 4, "routed": true, "latency_s": 1.41}
+{"question_id": "EQ30", "arm": "p3", "tier": "C", "answer": "COP, CVX, XOM", "prompt_tokens": 3299, "completion_tokens": 7, "routed": true, "latency_s": 2.29}
+{"question_id": "EQ31", "arm": "p3", "tier": "C", "answer": "DUK, NEE, SO", "prompt_tokens": 3310, "completion_tokens": 7, "routed": true, "latency_s": 1.25}
+{"question_id": "EQ32", "arm": "p3", "tier": "C", "answer": "ABBV, ABT, AMGN, CVS, ISRG, LLY, MDT, PFE", "prompt_tokens": 3336, "completion_tokens": 22, "routed": true, "latency_s": 1.24}
+{"question_id": "EQ33", "arm": "p3", "tier": "C", "answer": "KO, MCD, MDLZ, PEP, SBUX", "prompt_tokens": 3295, "completion_tokens": 12, "routed": true, "latency_s": 1.3}
+{"question_id": "EQ34", "arm": "p3", "tier": "C", "answer": "SO", "prompt_tokens": 3517, "completion_tokens": 1, "routed": true, "latency_s": 1.42}
+{"question_id": "EQ35", "arm": "p3", "tier": "C", "answer": "[GRAPH FACTS]", "prompt_tokens": 3462, "completion_tokens": 4, "routed": false, "latency_s": 1.37}
+{"question_id": "EQ36", "arm": "p3", "tier": "C", "answer": "COST, PEP", "prompt_tokens": 3329, "completion_tokens": 3, "routed": true, "latency_s": 1.13}
+{"question_id": "EQ37", "arm": "p3", "tier": "C", "answer": "BNY, C, V, WFC", "prompt_tokens": 3374, "completion_tokens": 9, "routed": true, "latency_s": 1.39}
+{"question_id": "EQ38", "arm": "p3", "tier": "C", "answer": "AMD", "prompt_tokens": 2899, "completion_tokens": 1, "routed": true, "latency_s": 1.26}
+{"question_id": "EQ39", "arm": "p3", "tier": "C", "answer": "AVGO, NVDA, QCOM", "prompt_tokens": 3500, "completion_tokens": 8, "routed": true, "latency_s": 1.12}
+{"question_id": "EQ40", "arm": "p3", "tier": "C", "answer": "ABBV, ABT, AMGN, CVS, LLY", "prompt_tokens": 3563, "completion_tokens": 13, "routed": true, "latency_s": 1.2}
+{"question_id": "EQ41", "arm": "p3", "tier": "C", "answer": "BMY, UNH", "prompt_tokens": 3659, "completion_tokens": 5, "routed": true, "latency_s": 1.33}
+{"question_id": "EQ42", "arm": "p3", "tier": "C", "answer": "AMD, CSCO, INTC", "prompt_tokens": 3288, "completion_tokens": 7, "routed": true, "latency_s": 1.39}
+{"question_id": "EQ43", "arm": "p3", "tier": "C", "answer": "CSCO", "prompt_tokens": 3413, "completion_tokens": 2, "routed": true, "latency_s": 1.25}
+{"question_id": "EQ44", "arm": "p3", "tier": "C", "answer": "Ernst & Young: 32, PricewaterhouseCoopers: 32, Deloitte: 24, KPMG: 12", "prompt_tokens": 2908, "completion_tokens": 30, "routed": true, "latency_s": 1.36}
+{"question_id": "EQ45", "arm": "p3", "tier": "D", "answer": "August 31, 2026; July 1, 2026", "prompt_tokens": 3564, "completion_tokens": 20, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ46", "arm": "p3", "tier": "D", "answer": "Adobe, Morgan Stanley", "prompt_tokens": 3497, "completion_tokens": 4, "routed": false, "latency_s": 1.15}
+{"question_id": "EQ47", "arm": "p3", "tier": "D", "answer": "The provided context does not contain information about an 8-K filed on April 20, 2026.", "prompt_tokens": 3774, "completion_tokens": 26, "routed": false, "latency_s": 1.18}
+{"question_id": "EQ48", "arm": "p3", "tier": "D", "answer": "CL, PricewaterhouseCoopers LLP, $380 million to $420 million", "prompt_tokens": 3835, "completion_tokens": 20, "routed": true, "latency_s": 1.33}
+{"question_id": "EQ49", "arm": "p3", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3480, "completion_tokens": 7, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ50", "arm": "p3", "tier": "D", "answer": "$1.47", "prompt_tokens": 3772, "completion_tokens": 5, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ01", "arm": "p3off", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3972, "completion_tokens": 9, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ02", "arm": "p3off", "tier": "A", "answer": "$215,938 million", "prompt_tokens": 3734, "completion_tokens": 9, "routed": false, "latency_s": 1.27}
+{"question_id": "EQ03", "arm": "p3off", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3692, "completion_tokens": 8, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ04", "arm": "p3off", "tier": "A", "answer": "332,238 million", "prompt_tokens": 4061, "completion_tokens": 8, "routed": false, "latency_s": 1.19}
+{"question_id": "EQ05", "arm": "p3off", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3753, "completion_tokens": 8, "routed": false, "latency_s": 1.19}
+{"question_id": "EQ06", "arm": "p3off", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3752, "completion_tokens": 10, "routed": false, "latency_s": 1.27}
+{"question_id": "EQ07", "arm": "p3off", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3515, "completion_tokens": 5, "routed": false, "latency_s": 1.36}
+{"question_id": "EQ08", "arm": "p3off", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3346, "completion_tokens": 3, "routed": false, "latency_s": 1.23}
+{"question_id": "EQ09", "arm": "p3off", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3837, "completion_tokens": 9, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ10", "arm": "p3off", "tier": "B", "answer": "Deloitte", "prompt_tokens": 3227, "completion_tokens": 2, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ11", "arm": "p3off", "tier": "B", "answer": "AAPL", "prompt_tokens": 3577, "completion_tokens": 1, "routed": false, "latency_s": 1.2}
+{"question_id": "EQ12", "arm": "p3off", "tier": "B", "answer": "TMUS", "prompt_tokens": 3423, "completion_tokens": 2, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ13", "arm": "p3off", "tier": "B", "answer": "JPMorgan Chase", "prompt_tokens": 3724, "completion_tokens": 3, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ14", "arm": "p3off", "tier": "B", "answer": "Walmart", "prompt_tokens": 3793, "completion_tokens": 1, "routed": false, "latency_s": 1.4}
+{"question_id": "EQ15", "arm": "p3off", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3613, "completion_tokens": 2, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ16", "arm": "p3off", "tier": "B", "answer": "$5.0 billion", "prompt_tokens": 3663, "completion_tokens": 5, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ17", "arm": "p3off", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3538, "completion_tokens": 8, "routed": false, "latency_s": 1.5}
+{"question_id": "EQ18", "arm": "p3off", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3439, "completion_tokens": 11, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ19", "arm": "p3off", "tier": "B", "answer": "Intel, Nvidia", "prompt_tokens": 3325, "completion_tokens": 3, "routed": false, "latency_s": 1.2}
+{"question_id": "EQ20", "arm": "p3off", "tier": "B", "answer": "BRK", "prompt_tokens": 3427, "completion_tokens": 2, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ21", "arm": "p3off", "tier": "B", "answer": "The provided context does not contain any information about someone being appointed CEO or Tim Cook moving into a new role in the April 2026 8-K.", "prompt_tokens": 3541, "completion_tokens": 34, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ22", "arm": "p3off", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3538, "completion_tokens": 15, "routed": false, "latency_s": 1.37}
+{"question_id": "EQ23", "arm": "p3off", "tier": "B", "answer": "Broadcom Inc.", "prompt_tokens": 3095, "completion_tokens": 4, "routed": false, "latency_s": 1.1}
+{"question_id": "EQ24", "arm": "p3off", "tier": "B", "answer": "$1.47 per share", "prompt_tokens": 3714, "completion_tokens": 7, "routed": false, "latency_s": 1.11}
+{"question_id": "EQ25", "arm": "p3off", "tier": "C", "answer": "WFC, GD", "prompt_tokens": 3418, "completion_tokens": 4, "routed": false, "latency_s": 1.29}
+{"question_id": "EQ26", "arm": "p3off", "tier": "C", "answer": "INTC", "prompt_tokens": 2627, "completion_tokens": 2, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ27", "arm": "p3off", "tier": "C", "answer": "AMZN, AAPL", "prompt_tokens": 3375, "completion_tokens": 5, "routed": false, "latency_s": 1.25}
+{"question_id": "EQ28", "arm": "p3off", "tier": "C", "answer": "Dell Technologies Inc., Goldman Sachs Group, Inc.", "prompt_tokens": 3466, "completion_tokens": 10, "routed": false, "latency_s": 1.26}
+{"question_id": "EQ29", "arm": "p3off", "tier": "C", "answer": "UNH, IBM", "prompt_tokens": 3688, "completion_tokens": 4, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ30", "arm": "p3off", "tier": "C", "answer": "COP, DUK", "prompt_tokens": 3269, "completion_tokens": 4, "routed": false, "latency_s": 1.36}
+{"question_id": "EQ31", "arm": "p3off", "tier": "C", "answer": "DUK", "prompt_tokens": 3280, "completion_tokens": 2, "routed": false, "latency_s": 1.39}
+{"question_id": "EQ32", "arm": "p3off", "tier": "C", "answer": "PFE, LLY, ABBV", "prompt_tokens": 3283, "completion_tokens": 8, "routed": false, "latency_s": 2.16}
+{"question_id": "EQ33", "arm": "p3off", "tier": "C", "answer": "PEP", "prompt_tokens": 3242, "completion_tokens": 1, "routed": false, "latency_s": 1.46}
+{"question_id": "EQ34", "arm": "p3off", "tier": "C", "answer": "COST", "prompt_tokens": 3499, "completion_tokens": 1, "routed": false, "latency_s": 1.75}
+{"question_id": "EQ35", "arm": "p3off", "tier": "C", "answer": "[GRAPH FACTS]", "prompt_tokens": 3462, "completion_tokens": 4, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ36", "arm": "p3off", "tier": "C", "answer": "PEP", "prompt_tokens": 3302, "completion_tokens": 1, "routed": false, "latency_s": 1.36}
+{"question_id": "EQ37", "arm": "p3off", "tier": "C", "answer": "WFC, GS", "prompt_tokens": 3341, "completion_tokens": 4, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ38", "arm": "p3off", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 2872, "completion_tokens": 4, "routed": false, "latency_s": 1.43}
+{"question_id": "EQ39", "arm": "p3off", "tier": "C", "answer": "NVDA, IBM", "prompt_tokens": 3464, "completion_tokens": 4, "routed": false, "latency_s": 1.32}
+{"question_id": "EQ40", "arm": "p3off", "tier": "C", "answer": "LLY", "prompt_tokens": 3511, "completion_tokens": 1, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ41", "arm": "p3off", "tier": "C", "answer": "DE", "prompt_tokens": 3627, "completion_tokens": 1, "routed": false, "latency_s": 10.26}
+{"question_id": "EQ42", "arm": "p3off", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 3264, "completion_tokens": 4, "routed": false, "latency_s": 1.55}
+{"question_id": "EQ43", "arm": "p3off", "tier": "C", "answer": "NVDA", "prompt_tokens": 3384, "completion_tokens": 2, "routed": false, "latency_s": 2.57}
+{"question_id": "EQ44", "arm": "p3off", "tier": "C", "answer": "PwC: 3, EY: 2, Deloitte: 2, KPMG: 1", "prompt_tokens": 2865, "completion_tokens": 20, "routed": false, "latency_s": 1.44}
+{"question_id": "EQ45", "arm": "p3off", "tier": "D", "answer": "August 31, 2026; July 1, 2026", "prompt_tokens": 3564, "completion_tokens": 20, "routed": false, "latency_s": 1.22}
+{"question_id": "EQ46", "arm": "p3off", "tier": "D", "answer": "Morgan Stanley $20B, Adobe $25B", "prompt_tokens": 3497, "completion_tokens": 12, "routed": false, "latency_s": 1.34}
+{"question_id": "EQ47", "arm": "p3off", "tier": "D", "answer": "The provided context does not contain information about an 8-K filed on April 20, 2026.", "prompt_tokens": 3774, "completion_tokens": 26, "routed": false, "latency_s": 1.37}
+{"question_id": "EQ48", "arm": "p3off", "tier": "D", "answer": "Caterpillar Inc., PricewaterhouseCoopers LLP, $2.1 billion", "prompt_tokens": 3792, "completion_tokens": 17, "routed": false, "latency_s": 1.42}
+{"question_id": "EQ49", "arm": "p3off", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3480, "completion_tokens": 7, "routed": false, "latency_s": 1.98}
+{"question_id": "EQ50", "arm": "p3off", "tier": "D", "answer": "$1.47", "prompt_tokens": 3772, "completion_tokens": 5, "routed": false, "latency_s": 1.12}

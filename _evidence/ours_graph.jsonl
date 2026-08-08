@@ -1,0 +1,100 @@
+{"question_id": "EQ01", "arm": "p3", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3917, "completion_tokens": 9, "routed": false, "latency_s": 1.71}
+{"question_id": "EQ02", "arm": "p3", "tier": "A", "answer": "$215,938 million", "prompt_tokens": 3679, "completion_tokens": 9, "routed": false, "latency_s": 1.84}
+{"question_id": "EQ03", "arm": "p3", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3637, "completion_tokens": 8, "routed": false, "latency_s": 1.64}
+{"question_id": "EQ04", "arm": "p3", "tier": "A", "answer": "$332,238 million", "prompt_tokens": 4006, "completion_tokens": 9, "routed": false, "latency_s": 1.72}
+{"question_id": "EQ05", "arm": "p3", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3698, "completion_tokens": 8, "routed": false, "latency_s": 1.81}
+{"question_id": "EQ06", "arm": "p3", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3697, "completion_tokens": 10, "routed": false, "latency_s": 1.74}
+{"question_id": "EQ07", "arm": "p3", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3460, "completion_tokens": 5, "routed": false, "latency_s": 1.73}
+{"question_id": "EQ08", "arm": "p3", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3291, "completion_tokens": 3, "routed": false, "latency_s": 1.85}
+{"question_id": "EQ09", "arm": "p3", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3782, "completion_tokens": 9, "routed": false, "latency_s": 1.96}
+{"question_id": "EQ10", "arm": "p3", "tier": "B", "answer": "Deloitte", "prompt_tokens": 3172, "completion_tokens": 2, "routed": false, "latency_s": 1.73}
+{"question_id": "EQ11", "arm": "p3", "tier": "B", "answer": "AAPL", "prompt_tokens": 3522, "completion_tokens": 1, "routed": false, "latency_s": 2.28}
+{"question_id": "EQ12", "arm": "p3", "tier": "B", "answer": "Based on the provided context, there is no mention of a company forming a 50/50 joint venture with BT Group plc or identifying its auditor in relation to such an event.", "prompt_tokens": 3368, "completion_tokens": 38, "routed": false, "latency_s": 2.18}
+{"question_id": "EQ13", "arm": "p3", "tier": "B", "answer": "JPM", "prompt_tokens": 3669, "completion_tokens": 2, "routed": false, "latency_s": 1.61}
+{"question_id": "EQ14", "arm": "p3", "tier": "B", "answer": "Walmart", "prompt_tokens": 3738, "completion_tokens": 1, "routed": false, "latency_s": 1.66}
+{"question_id": "EQ15", "arm": "p3", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3558, "completion_tokens": 2, "routed": false, "latency_s": 1.89}
+{"question_id": "EQ16", "arm": "p3", "tier": "B", "answer": "I am sorry, but the provided context does not contain information about Jay Hoag being appointed as Chairman in 2026. Therefore, I cannot answer the question.", "prompt_tokens": 3608, "completion_tokens": 35, "routed": false, "latency_s": 1.72}
+{"question_id": "EQ17", "arm": "p3", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3483, "completion_tokens": 8, "routed": false, "latency_s": 1.62}
+{"question_id": "EQ18", "arm": "p3", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3384, "completion_tokens": 11, "routed": false, "latency_s": 1.68}
+{"question_id": "EQ19", "arm": "p3", "tier": "B", "answer": "Intel, Nvidia", "prompt_tokens": 3270, "completion_tokens": 3, "routed": false, "latency_s": 1.54}
+{"question_id": "EQ20", "arm": "p3", "tier": "B", "answer": "BLK", "prompt_tokens": 3372, "completion_tokens": 1, "routed": false, "latency_s": 1.66}
+{"question_id": "EQ21", "arm": "p3", "tier": "B", "answer": "Based on the provided context, there is no mention of anyone being appointed CEO or Tim Cook moving into a new role in Apple's April 2026 8-K.", "prompt_tokens": 3486, "completion_tokens": 38, "routed": false, "latency_s": 1.69}
+{"question_id": "EQ22", "arm": "p3", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3483, "completion_tokens": 15, "routed": false, "latency_s": 1.76}
+{"question_id": "EQ23", "arm": "p3", "tier": "B", "answer": "NVDA", "prompt_tokens": 3063, "completion_tokens": 2, "routed": true, "latency_s": 1.51}
+{"question_id": "EQ24", "arm": "p3", "tier": "B", "answer": "Based on the provided context, there is no mention of the specific amount by which Caterpillar raised its quarterly dividend or the new amount in the June 2026 8-K. The June 10, 2026 press release is mentioned as an exhibit (Exhibit 99.1), but its contents regarding a dividend increase are not included in the passages.", "prompt_tokens": 3659, "completion_tokens": 78, "routed": false, "latency_s": 1.76}
+{"question_id": "EQ25", "arm": "p3", "tier": "C", "answer": "ACN, ADBE, BNY, BRK.B, C, COST, GD, HD, MS, PEP, PFE, V, WFC", "prompt_tokens": 3415, "completion_tokens": 33, "routed": true, "latency_s": 1.65}
+{"question_id": "EQ26", "arm": "p3", "tier": "C", "answer": "NVDA, QCOM", "prompt_tokens": 2595, "completion_tokens": 5, "routed": true, "latency_s": 1.51}
+{"question_id": "EQ27", "arm": "p3", "tier": "C", "answer": "PepsiCo, Amazon", "prompt_tokens": 3320, "completion_tokens": 5, "routed": false, "latency_s": 1.63}
+{"question_id": "EQ28", "arm": "p3", "tier": "C", "answer": "GS", "prompt_tokens": 3431, "completion_tokens": 1, "routed": true, "latency_s": 1.65}
+{"question_id": "EQ29", "arm": "p3", "tier": "C", "answer": "UNH, IBM", "prompt_tokens": 3657, "completion_tokens": 4, "routed": true, "latency_s": 2.17}
+{"question_id": "EQ30", "arm": "p3", "tier": "C", "answer": "COP, CVX, XOM", "prompt_tokens": 3244, "completion_tokens": 7, "routed": true, "latency_s": 2.77}
+{"question_id": "EQ31", "arm": "p3", "tier": "C", "answer": "DUK, NEE, SO", "prompt_tokens": 3255, "completion_tokens": 7, "routed": true, "latency_s": 2.95}
+{"question_id": "EQ32", "arm": "p3", "tier": "C", "answer": "ABBV, ABT, AMGN, CVS, ISRG, LLY, MDT, PFE", "prompt_tokens": 3281, "completion_tokens": 22, "routed": true, "latency_s": 2.18}
+{"question_id": "EQ33", "arm": "p3", "tier": "C", "answer": "KO, MCD, MDLZ, PEP, SBUX", "prompt_tokens": 3240, "completion_tokens": 12, "routed": true, "latency_s": 2.77}
+{"question_id": "EQ34", "arm": "p3", "tier": "C", "answer": "SO", "prompt_tokens": 3462, "completion_tokens": 1, "routed": true, "latency_s": 2.85}
+{"question_id": "EQ35", "arm": "p3", "tier": "C", "answer": "Based on the provided context, there is no mention of an 8-K or a $25 billion share-repurchase program authorized via an 8-K.", "prompt_tokens": 3407, "completion_tokens": 35, "routed": false, "latency_s": 3.07}
+{"question_id": "EQ36", "arm": "p3", "tier": "C", "answer": "COST, PEP", "prompt_tokens": 3274, "completion_tokens": 3, "routed": true, "latency_s": 1.26}
+{"question_id": "EQ37", "arm": "p3", "tier": "C", "answer": "BNY, BRK.B, C, MS, V, WFC", "prompt_tokens": 3326, "completion_tokens": 16, "routed": true, "latency_s": 1.43}
+{"question_id": "EQ38", "arm": "p3", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 2817, "completion_tokens": 4, "routed": false, "latency_s": 1.55}
+{"question_id": "EQ39", "arm": "p3", "tier": "C", "answer": "NVDA, QCOM", "prompt_tokens": 3442, "completion_tokens": 5, "routed": true, "latency_s": 1.43}
+{"question_id": "EQ40", "arm": "p3", "tier": "C", "answer": "ABBV, ABT, AMGN, CVS, LLY", "prompt_tokens": 3508, "completion_tokens": 13, "routed": true, "latency_s": 1.58}
+{"question_id": "EQ41", "arm": "p3", "tier": "C", "answer": "BMY, UNH", "prompt_tokens": 3604, "completion_tokens": 5, "routed": true, "latency_s": 1.49}
+{"question_id": "EQ42", "arm": "p3", "tier": "C", "answer": "AAPL, ADBE, AMT, AVGO, CSCO, GOOGL, INTC, LLY, META, MRK, MSFT, QCOM, TSLA, TXN, VZ", "prompt_tokens": 3270, "completion_tokens": 42, "routed": true, "latency_s": 1.78}
+{"question_id": "EQ43", "arm": "p3", "tier": "C", "answer": "AVGO, CSCO, MRK, QCOM, TSLA", "prompt_tokens": 3370, "completion_tokens": 14, "routed": true, "latency_s": 1.6}
+{"question_id": "EQ44", "arm": "p3", "tier": "C", "answer": "Ernst & Young: 32, PricewaterhouseCoopers: 29, Deloitte: 19, KPMG: 13", "prompt_tokens": 2853, "completion_tokens": 30, "routed": true, "latency_s": 1.58}
+{"question_id": "EQ45", "arm": "p3", "tier": "D", "answer": "Peter H. Griffith retires on August 31, 2026 (departing in January 2027), and Thomas Dittrich starts on July 1, 2026.", "prompt_tokens": 3509, "completion_tokens": 43, "routed": false, "latency_s": 1.52}
+{"question_id": "EQ46", "arm": "p3", "tier": "D", "answer": "Adobe, Morgan Stanley", "prompt_tokens": 3442, "completion_tokens": 4, "routed": false, "latency_s": 1.5}
+{"question_id": "EQ47", "arm": "p3", "tier": "D", "answer": "Based on the provided context, the 8-K filed on April 30, 2026 includes Exhibit 99.1 which is a \"Press release issued by Apple Inc. on April 30, 2026\" (Passage 1). The provided context does not contain details about an 8-K filed on April 20, 2026 (Passage 3 shows an 8-K filed on April 17, 2026, and Passage 2 shows the 8-K filed on April 30, 2026).", "prompt_tokens": 3719, "completion_tokens": 131, "routed": false, "latency_s": 1.8}
+{"question_id": "EQ48", "arm": "p3", "tier": "D", "answer": "Based on the provided context, there is no mention of a company that expanded a productivity/restructuring program on April 30, 2026, nor any details regarding a revised total pre-tax charge range.", "prompt_tokens": 3737, "completion_tokens": 46, "routed": false, "latency_s": 1.48}
+{"question_id": "EQ49", "arm": "p3", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3425, "completion_tokens": 7, "routed": false, "latency_s": 1.59}
+{"question_id": "EQ50", "arm": "p3", "tier": "D", "answer": "$1.47", "prompt_tokens": 3717, "completion_tokens": 5, "routed": false, "latency_s": 1.42}
+{"question_id": "EQ01", "arm": "p3off", "tier": "A", "answer": "$416,161 million", "prompt_tokens": 3917, "completion_tokens": 9, "routed": false, "latency_s": 1.7}
+{"question_id": "EQ02", "arm": "p3off", "tier": "A", "answer": "$215,938 million (or $215.9 billion)", "prompt_tokens": 3679, "completion_tokens": 19, "routed": false, "latency_s": 1.56}
+{"question_id": "EQ03", "arm": "p3off", "tier": "A", "answer": "$57,048 million", "prompt_tokens": 3637, "completion_tokens": 8, "routed": false, "latency_s": 1.73}
+{"question_id": "EQ04", "arm": "p3off", "tier": "A", "answer": "$332,238 million", "prompt_tokens": 4006, "completion_tokens": 9, "routed": false, "latency_s": 1.58}
+{"question_id": "EQ05", "arm": "p3off", "tier": "A", "answer": "$47,941 million", "prompt_tokens": 3698, "completion_tokens": 8, "routed": false, "latency_s": 1.45}
+{"question_id": "EQ06", "arm": "p3off", "tier": "A", "answer": "June 30, 2025", "prompt_tokens": 3697, "completion_tokens": 10, "routed": false, "latency_s": 1.35}
+{"question_id": "EQ07", "arm": "p3off", "tier": "A", "answer": "Andrew R. Jassy", "prompt_tokens": 3460, "completion_tokens": 5, "routed": false, "latency_s": 1.62}
+{"question_id": "EQ08", "arm": "p3off", "tier": "A", "answer": "Amazon Web Services", "prompt_tokens": 3291, "completion_tokens": 3, "routed": false, "latency_s": 1.44}
+{"question_id": "EQ09", "arm": "p3off", "tier": "B", "answer": "$416,161 million", "prompt_tokens": 3782, "completion_tokens": 9, "routed": false, "latency_s": 1.57}
+{"question_id": "EQ10", "arm": "p3off", "tier": "B", "answer": "Deloitte", "prompt_tokens": 3172, "completion_tokens": 2, "routed": false, "latency_s": 1.71}
+{"question_id": "EQ11", "arm": "p3off", "tier": "B", "answer": "NFLX", "prompt_tokens": 3522, "completion_tokens": 2, "routed": false, "latency_s": 1.68}
+{"question_id": "EQ12", "arm": "p3off", "tier": "B", "answer": "Based on the provided context, there is no mention of a company forming a 50/50 joint venture with BT Group plc or who its auditor is.", "prompt_tokens": 3368, "completion_tokens": 33, "routed": false, "latency_s": 1.54}
+{"question_id": "EQ13", "arm": "p3off", "tier": "B", "answer": "JPM", "prompt_tokens": 3669, "completion_tokens": 2, "routed": false, "latency_s": 1.24}
+{"question_id": "EQ14", "arm": "p3off", "tier": "B", "answer": "Walmart", "prompt_tokens": 3738, "completion_tokens": 1, "routed": false, "latency_s": 1.17}
+{"question_id": "EQ15", "arm": "p3off", "tier": "B", "answer": "NVIDIA", "prompt_tokens": 3558, "completion_tokens": 2, "routed": false, "latency_s": 1.78}
+{"question_id": "EQ16", "arm": "p3off", "tier": "B", "answer": "I am sorry, but the provided context does not contain information about Jay Hoag being appointed as Chairman in 2026. Therefore, I cannot answer the question.", "prompt_tokens": 3608, "completion_tokens": 35, "routed": false, "latency_s": 1.68}
+{"question_id": "EQ17", "arm": "p3off", "tier": "B", "answer": "Thomas Dittrich, Ernst & Young LLP", "prompt_tokens": 3483, "completion_tokens": 8, "routed": false, "latency_s": 1.57}
+{"question_id": "EQ18", "arm": "p3off", "tier": "B", "answer": "R. Hewitt Pate, PricewaterhouseCoopers LLP", "prompt_tokens": 3384, "completion_tokens": 11, "routed": false, "latency_s": 1.7}
+{"question_id": "EQ19", "arm": "p3off", "tier": "B", "answer": "Intel, Nvidia", "prompt_tokens": 3270, "completion_tokens": 3, "routed": false, "latency_s": 1.72}
+{"question_id": "EQ20", "arm": "p3off", "tier": "B", "answer": "BRK", "prompt_tokens": 3372, "completion_tokens": 2, "routed": false, "latency_s": 1.67}
+{"question_id": "EQ21", "arm": "p3off", "tier": "B", "answer": "Based on the provided context, there is no mention of anyone being appointed CEO or Tim Cook moving into a new role in Apple's April 2026 8-K filings.", "prompt_tokens": 3486, "completion_tokens": 39, "routed": false, "latency_s": 1.8}
+{"question_id": "EQ22", "arm": "p3off", "tier": "B", "answer": "JPMorgan Chase Bank, N.A., Wells Fargo Bank, National Association", "prompt_tokens": 3483, "completion_tokens": 15, "routed": false, "latency_s": 1.78}
+{"question_id": "EQ23", "arm": "p3off", "tier": "B", "answer": "AVGO", "prompt_tokens": 3040, "completion_tokens": 2, "routed": false, "latency_s": 1.64}
+{"question_id": "EQ24", "arm": "p3off", "tier": "B", "answer": "To answer the question, please note that the provided context does not contain the specific details about the amount by which Caterpillar raised its quarterly dividend or the new amount in its June 2026 8-K (Passage 5 only mentions the press release date for June 10, 2026, without the financial figures).", "prompt_tokens": 3659, "completion_tokens": 71, "routed": false, "latency_s": 1.9}
+{"question_id": "EQ25", "arm": "p3off", "tier": "C", "answer": "WFC", "prompt_tokens": 3363, "completion_tokens": 2, "routed": false, "latency_s": 1.58}
+{"question_id": "EQ26", "arm": "p3off", "tier": "C", "answer": "INTC", "prompt_tokens": 2572, "completion_tokens": 2, "routed": false, "latency_s": 1.65}
+{"question_id": "EQ27", "arm": "p3off", "tier": "C", "answer": "PepsiCo, Amazon", "prompt_tokens": 3320, "completion_tokens": 5, "routed": false, "latency_s": 1.7}
+{"question_id": "EQ28", "arm": "p3off", "tier": "C", "answer": "Dell Technologies Inc., Goldman Sachs Group, Inc.", "prompt_tokens": 3411, "completion_tokens": 10, "routed": false, "latency_s": 1.83}
+{"question_id": "EQ29", "arm": "p3off", "tier": "C", "answer": "UNH, IBM", "prompt_tokens": 3633, "completion_tokens": 4, "routed": false, "latency_s": 1.58}
+{"question_id": "EQ30", "arm": "p3off", "tier": "C", "answer": "COP, DUK", "prompt_tokens": 3214, "completion_tokens": 4, "routed": false, "latency_s": 1.54}
+{"question_id": "EQ31", "arm": "p3off", "tier": "C", "answer": "DUK", "prompt_tokens": 3225, "completion_tokens": 2, "routed": false, "latency_s": 1.56}
+{"question_id": "EQ32", "arm": "p3off", "tier": "C", "answer": "LLY, PFE", "prompt_tokens": 3228, "completion_tokens": 4, "routed": false, "latency_s": 1.62}
+{"question_id": "EQ33", "arm": "p3off", "tier": "C", "answer": "", "prompt_tokens": 3187, "completion_tokens": 0, "routed": false, "latency_s": 1.63}
+{"question_id": "EQ34", "arm": "p3off", "tier": "C", "answer": "COST", "prompt_tokens": 3444, "completion_tokens": 1, "routed": false, "latency_s": 1.6}
+{"question_id": "EQ35", "arm": "p3off", "tier": "C", "answer": "Based on the provided context, there is no mention of an 8-K filing or a $25 billion share-repurchase program authorized via an 8-K. (Passage 1 mentions a board increasing a share repurchase authorization by an additional $15 billion, which was preceded by a $10 billion authorization, totaling $25 billion, but does not specify that it was done via an 8-K.)", "prompt_tokens": 3407, "completion_tokens": 89, "routed": false, "latency_s": 1.98}
+{"question_id": "EQ36", "arm": "p3off", "tier": "C", "answer": "PEP", "prompt_tokens": 3247, "completion_tokens": 1, "routed": false, "latency_s": 1.81}
+{"question_id": "EQ37", "arm": "p3off", "tier": "C", "answer": "WFC, GS", "prompt_tokens": 3286, "completion_tokens": 4, "routed": false, "latency_s": 1.59}
+{"question_id": "EQ38", "arm": "p3off", "tier": "C", "answer": "AMD, AAPL", "prompt_tokens": 2817, "completion_tokens": 4, "routed": false, "latency_s": 1.66}
+{"question_id": "EQ39", "arm": "p3off", "tier": "C", "answer": "NVDA", "prompt_tokens": 3409, "completion_tokens": 2, "routed": false, "latency_s": 1.76}
+{"question_id": "EQ40", "arm": "p3off", "tier": "C", "answer": "CVS", "prompt_tokens": 3456, "completion_tokens": 2, "routed": false, "latency_s": 1.77}
+{"question_id": "EQ41", "arm": "p3off", "tier": "C", "answer": "DE", "prompt_tokens": 3572, "completion_tokens": 1, "routed": false, "latency_s": 1.89}
+{"question_id": "EQ42", "arm": "p3off", "tier": "C", "answer": "AMD, QCOM", "prompt_tokens": 3209, "completion_tokens": 4, "routed": false, "latency_s": 1.77}
+{"question_id": "EQ43", "arm": "p3off", "tier": "C", "answer": "NVDA", "prompt_tokens": 3329, "completion_tokens": 2, "routed": false, "latency_s": 3.83}
+{"question_id": "EQ44", "arm": "p3off", "tier": "C", "answer": "I am unable to answer this question because the provided context does not contain a complete dataset of companies and their auditors, nor a [GRAPH FACTS] line providing this information.", "prompt_tokens": 2810, "completion_tokens": 34, "routed": false, "latency_s": 1.57}
+{"question_id": "EQ45", "arm": "p3off", "tier": "D", "answer": "August 31, 2026; July 1, 2026", "prompt_tokens": 3509, "completion_tokens": 20, "routed": false, "latency_s": 1.71}
+{"question_id": "EQ46", "arm": "p3off", "tier": "D", "answer": "Morgan Stanley, Adobe", "prompt_tokens": 3442, "completion_tokens": 4, "routed": false, "latency_s": 1.5}
+{"question_id": "EQ47", "arm": "p3off", "tier": "D", "answer": "Based on the provided context, the exact details of the events reported in the April 20, 2026 and April 30, 2026 Form 8-K filings are not fully detailed, except that the April 30, 2026 report includes a press release issued by Apple Inc. on April 30, 2026 (Exhibit 99.1). The context does not mention an 8-K filing dated April 20, 2026 (it mentions April 17 and April 30, 2026).", "prompt_tokens": 3719, "completion_tokens": 130, "routed": false, "latency_s": 1.72}
+{"question_id": "EQ48", "arm": "p3off", "tier": "D", "answer": "Based on the provided context, there is no mention of a company that expanded a productivity/restructuring program on April 30, 2026, nor any details regarding its auditor or revised total pre-tax charge range.", "prompt_tokens": 3737, "completion_tokens": 48, "routed": false, "latency_s": 1.72}
+{"question_id": "EQ49", "arm": "p3off", "tier": "D", "answer": "PricewaterhouseCoopers LLP", "prompt_tokens": 3425, "completion_tokens": 7, "routed": false, "latency_s": 1.74}
+{"question_id": "EQ50", "arm": "p3off", "tier": "D", "answer": "$1.47", "prompt_tokens": 3717, "completion_tokens": 5, "routed": false, "latency_s": 1.59}

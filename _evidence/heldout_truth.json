@@ -1,0 +1,502 @@
+{
+ "AAPL": {
+  "sector": "Information Technology",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "ABBV": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "ABT": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "ACN": {
+  "sector": "Information Technology",
+  "fy_end": "August 31, 2025",
+  "auditor": "KPMG"
+ },
+ "ADBE": {
+  "sector": "Information Technology",
+  "fy_end": "2025",
+  "auditor": "KPMG"
+ },
+ "AIG": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "AMD": {
+  "sector": "Information Technology",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "AMGN": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "AMT": {
+  "sector": "Real Estate",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "AMZN": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "AVGO": {
+  "sector": "Information Technology",
+  "fy_end": "November 2, 2025",
+  "auditor": "PwC"
+ },
+ "AXP": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "BA": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "BAC": {
+  "sector": "Financials",
+  "fy_end": "2025-12-31",
+  "auditor": "PwC"
+ },
+ "BKNG": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "BLK": {
+  "sector": "Financials",
+  "fy_end": "2025-12-31",
+  "auditor": "Deloitte"
+ },
+ "BMY": {
+  "sector": "Health Care",
+  "fy_end": "12/31/2025",
+  "auditor": "Deloitte"
+ },
+ "BNY": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "KPMG"
+ },
+ "BRK.B": {
+  "sector": "Financials",
+  "fy_end": "2025",
+  "auditor": "Deloitte"
+ },
+ "C": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "KPMG"
+ },
+ "CAT": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "CL": {
+  "sector": "Consumer Staples",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "CMCSA": {
+  "sector": "Communication Services",
+  "fy_end": "2025",
+  "auditor": "Deloitte"
+ },
+ "COF": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "COP": {
+  "sector": "Energy",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "COST": {
+  "sector": "Consumer Staples",
+  "fy_end": "August 31, 2025",
+  "auditor": "KPMG"
+ },
+ "CRM": {
+  "sector": "Information Technology",
+  "fy_end": "January 31, 2026",
+  "auditor": "EY"
+ },
+ "CSCO": {
+  "sector": "Information Technology",
+  "fy_end": "July 26, 2025",
+  "auditor": "PwC"
+ },
+ "CVS": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "CVX": {
+  "sector": "Energy",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "DE": {
+  "sector": "Industrials",
+  "fy_end": "November 2, 2025",
+  "auditor": "Deloitte"
+ },
+ "DHR": {
+  "sector": "Health Care",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "DIS": {
+  "sector": "Communication Services",
+  "fy_end": "September 27, 2025",
+  "auditor": "PwC"
+ },
+ "DUK": {
+  "sector": "Utilities",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "EMR": {
+  "sector": "Industrials",
+  "fy_end": "September 30, 2025",
+  "auditor": "KPMG"
+ },
+ "FDX": {
+  "sector": "Industrials",
+  "fy_end": "May 31, 2025",
+  "auditor": "EY"
+ },
+ "GD": {
+  "sector": "Industrials",
+  "fy_end": "December 31",
+  "auditor": "KPMG"
+ },
+ "GE": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "GILD": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "GM": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "December 31",
+  "auditor": "EY"
+ },
+ "GOOGL": {
+  "sector": "Communication Services",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "GS": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "HD": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "February 1, 2026",
+  "auditor": "KPMG"
+ },
+ "HON": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "IBM": {
+  "sector": "Information Technology",
+  "fy_end": "DECEMBER 31, 2025",
+  "auditor": "PwC"
+ },
+ "INTC": {
+  "sector": "Information Technology",
+  "fy_end": "December 27, 2025",
+  "auditor": "EY"
+ },
+ "INTU": {
+  "sector": "Information Technology",
+  "fy_end": "July 31, 2025",
+  "auditor": "EY"
+ },
+ "ISRG": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "JNJ": {
+  "sector": "Health Care",
+  "fy_end": "December 28, 2025",
+  "auditor": "PwC"
+ },
+ "JPM": {
+  "sector": "Financials",
+  "fy_end": "December 31",
+  "auditor": "PwC"
+ },
+ "KO": {
+  "sector": "Consumer Staples",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "LIN": {
+  "sector": "Materials",
+  "fy_end": "12/31/2025",
+  "auditor": "PwC"
+ },
+ "LLY": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "LMT": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "LOW": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "January 30, 2026",
+  "auditor": "Deloitte"
+ },
+ "MA": {
+  "sector": "Financials",
+  "fy_end": "2025",
+  "auditor": "PwC"
+ },
+ "MCD": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "MDLZ": {
+  "sector": "Consumer Staples",
+  "fy_end": "2025",
+  "auditor": "PwC"
+ },
+ "MDT": {
+  "sector": "Health Care",
+  "fy_end": "April 24, 2026",
+  "auditor": "PwC"
+ },
+ "MET": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "META": {
+  "sector": "Communication Services",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "MMM": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "MO": {
+  "sector": "Consumer Staples",
+  "fy_end": "December 31",
+  "auditor": "PwC"
+ },
+ "MRK": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "MS": {
+  "sector": "Financials",
+  "fy_end": "2025",
+  "auditor": "Deloitte"
+ },
+ "MSFT": {
+  "sector": "Information Technology",
+  "fy_end": "June 30, 2025",
+  "auditor": "Deloitte"
+ },
+ "NEE": {
+  "sector": "Utilities",
+  "fy_end": "2026",
+  "auditor": "Deloitte"
+ },
+ "NFLX": {
+  "sector": "Communication Services",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "NKE": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "May 31, 2026",
+  "auditor": "PwC"
+ },
+ "NOW": {
+  "sector": "Information Technology",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "NVDA": {
+  "sector": "Information Technology",
+  "fy_end": "January 25, 2026",
+  "auditor": "PwC"
+ },
+ "ORCL": {
+  "sector": "Information Technology",
+  "fy_end": "May 31, 2026",
+  "auditor": "EY"
+ },
+ "PEP": {
+  "sector": "Consumer Staples",
+  "fy_end": "December 27, 2025",
+  "auditor": "KPMG"
+ },
+ "PFE": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "KPMG"
+ },
+ "PG": {
+  "sector": "Consumer Staples",
+  "fy_end": "June 30, 2025",
+  "auditor": "Deloitte"
+ },
+ "PLTR": {
+  "sector": "Information Technology",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "PM": {
+  "sector": "Consumer Staples",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "PYPL": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "QCOM": {
+  "sector": "Information Technology",
+  "fy_end": "September 28, 2025",
+  "auditor": "PwC"
+ },
+ "RTX": {
+  "sector": "Industrials",
+  "fy_end": "2025",
+  "auditor": "PwC"
+ },
+ "SBUX": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "September 28, 2025",
+  "auditor": "Deloitte"
+ },
+ "SCHW": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "SO": {
+  "sector": "Utilities",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "SPG": {
+  "sector": "Real Estate",
+  "fy_end": "12/31/2025",
+  "auditor": "EY"
+ },
+ "T": {
+  "sector": "Communication Services",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "TGT": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "January 31, 2026",
+  "auditor": "EY"
+ },
+ "TMO": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "TMUS": {
+  "sector": "Communication Services",
+  "fy_end": "December 31",
+  "auditor": "Deloitte"
+ },
+ "TSLA": {
+  "sector": "Consumer Discretionary",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "TXN": {
+  "sector": "Information Technology",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "UBER": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ },
+ "UNH": {
+  "sector": "Health Care",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "UNP": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "UPS": {
+  "sector": "Industrials",
+  "fy_end": "December 31, 2025",
+  "auditor": "Deloitte"
+ },
+ "USB": {
+  "sector": "Financials",
+  "fy_end": "2025",
+  "auditor": "EY"
+ },
+ "V": {
+  "sector": "Financials",
+  "fy_end": "September 30, 2025",
+  "auditor": "KPMG"
+ },
+ "VZ": {
+  "sector": "Communication Services",
+  "fy_end": "December 31, 2025",
+  "auditor": "EY"
+ },
+ "WFC": {
+  "sector": "Financials",
+  "fy_end": "December 31, 2025",
+  "auditor": "KPMG"
+ },
+ "WMT": {
+  "sector": "Consumer Staples",
+  "fy_end": "January 31",
+  "auditor": "EY"
+ },
+ "XOM": {
+  "sector": "Energy",
+  "fy_end": "December 31, 2025",
+  "auditor": "PwC"
+ }
+}

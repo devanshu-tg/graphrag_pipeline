@@ -1,0 +1,5 @@
+{"question_id": "HQ1", "arm": "THEIRS-mg-graphrag", "answer": "DUK, NEE, SO\nCitations: [DUK/DEF14A_2026-03-20#body-c93], [NEE/DEF14A_2026-04-01#body-c44], [SO/DEF14A_2026-04-03#item3-c182]", "route": "aggregation", "prompt_tokens": 472, "completion_tokens": 89, "latency_s": 3.79}
+{"question_id": "HQ2", "arm": "THEIRS-mg-graphrag", "answer": "XOM\nCitations:", "route": "aggregation", "prompt_tokens": 428, "completion_tokens": 6, "latency_s": 3.26}
+{"question_id": "HQ3", "arm": "THEIRS-mg-graphrag", "answer": "4\nCitations: None", "route": "aggregation", "prompt_tokens": 530, "completion_tokens": 6, "latency_s": 3.74}
+{"question_id": "HQ4", "arm": "THEIRS-mg-graphrag", "answer": "The answer is not supported by the provided context.", "route": "lookup", "prompt_tokens": 3400, "completion_tokens": 10, "latency_s": 4.22}
+{"question_id": "HQ5", "arm": "THEIRS-mg-graphrag", "answer": "AMZN, GM, MCD, TGT\nCitations: [AMZN/DEF14A_2026-04-09#header-c73], [GM/DEF14A_2026-04-20#item1-c33], [MCD/DEF14A_2026-04-07#body-c140], [TGT/DEF14A_2026-04-27#item1c-c117]", "route": "aggregation", "prompt_tokens": 561, "completion_tokens": 121, "latency_s": 3.73}

@@ -1,0 +1,5 @@
+{"question_id": "HQ1", "arm": "OURS-v3-graphrag", "answer": "DUK, NEE, SO", "route": "set", "prompt_tokens": 620, "completion_tokens": 7, "latency_s": 11.69}
+{"question_id": "HQ2", "arm": "OURS-v3-graphrag", "answer": "CVX", "route": "vector", "prompt_tokens": 3484, "completion_tokens": 2, "latency_s": 2.22}
+{"question_id": "HQ3", "arm": "OURS-v3-graphrag", "answer": "32", "route": "count", "prompt_tokens": 580, "completion_tokens": 2, "latency_s": 2.66}
+{"question_id": "HQ4", "arm": "OURS-v3-graphrag", "answer": "KPMG LLP", "route": "vector", "prompt_tokens": 3684, "completion_tokens": 3, "latency_s": 2.68}
+{"question_id": "HQ5", "arm": "OURS-v3-graphrag", "answer": "AMZN, GM, MCD, TGT", "route": "set", "prompt_tokens": 891, "completion_tokens": 9, "latency_s": 2.47}

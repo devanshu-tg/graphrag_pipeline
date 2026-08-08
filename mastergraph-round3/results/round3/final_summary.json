@@ -1,0 +1,121 @@
+{
+  "tag": "v51final",
+  "runs": 3,
+  "pipelines": {
+    "llm_only": {
+      "strict_pass_rate": {
+        "mean": 0.1133,
+        "std": 0.0189,
+        "runs": [
+          0.14,
+          0.1,
+          0.1
+        ]
+      },
+      "graded_quality_mean": {
+        "mean": 0.2409,
+        "std": 0.0268,
+        "runs": [
+          0.2786,
+          0.2188,
+          0.2254
+        ]
+      },
+      "bertscore_f1_mean": {
+        "mean": 0.2154,
+        "std": 0.0091,
+        "runs": [
+          0.2256,
+          0.2171,
+          0.2035
+        ]
+      },
+      "avg_total_inference_tokens": {
+        "mean": 286.2667,
+        "std": 0.838,
+        "runs": [
+          285.4,
+          286.0,
+          287.4
+        ]
+      }
+    },
+    "basic_rag": {
+      "strict_pass_rate": {
+        "mean": 0.3267,
+        "std": 0.0189,
+        "runs": [
+          0.34,
+          0.3,
+          0.34
+        ]
+      },
+      "graded_quality_mean": {
+        "mean": 0.4209,
+        "std": 0.0113,
+        "runs": [
+          0.4254,
+          0.4054,
+          0.432
+        ]
+      },
+      "bertscore_f1_mean": {
+        "mean": 0.1608,
+        "std": 0.0051,
+        "runs": [
+          0.1667,
+          0.1615,
+          0.1542
+        ]
+      },
+      "avg_total_inference_tokens": {
+        "mean": 4576.9333,
+        "std": 0.2055,
+        "runs": [
+          4576.9,
+          4577.2,
+          4576.7
+        ]
+      }
+    },
+    "graphrag": {
+      "strict_pass_rate": {
+        "mean": 0.4867,
+        "std": 0.0189,
+        "runs": [
+          0.46,
+          0.5,
+          0.5
+        ]
+      },
+      "graded_quality_mean": {
+        "mean": 0.5723,
+        "std": 0.0109,
+        "runs": [
+          0.559,
+          0.5856,
+          0.5724
+        ]
+      },
+      "bertscore_f1_mean": {
+        "mean": 0.2867,
+        "std": 0.0077,
+        "runs": [
+          0.2782,
+          0.2968,
+          0.2851
+        ]
+      },
+      "avg_total_inference_tokens": {
+        "mean": 2359.1333,
+        "std": 5.5428,
+        "runs": [
+          2358.3,
+          2366.3,
+          2352.8
+        ]
+      }
+    }
+  },
+  "token_reduction_vs_rag_pct": 48.5
+}
