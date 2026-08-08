@@ -263,6 +263,35 @@ Read `mastergraph-round3/ARCHITECTURE.md` for their own account.
 
 ## 6. How to run it
 
+### FIRST RUN ON A FRESH CLONE — do this before anything else
+
+The repo does NOT contain `corpus.jsonl` (113 MB), `documents.jsonl` (86 MB) or the Chroma
+index (928 MB) — GitHub hard-rejects files over 100 MB, and all three are *regenerated*, not
+authored. The **raw SEC filings ARE committed** (`sp100_edgar_downloader/`), so everything
+rebuilds from source:
+
+```bash
+git clone https://github.com/devanshu-tg/graphrag_pipeline.git
+cd graphrag_pipeline/mastergraph-round3
+
+cp .env.example .env          # then fill in ROTATED credentials — see §2
+pip install -r requirements.txt
+pip install sentence-transformers langchain-chroma chromadb bert-score evaluate tiktoken scikit-learn
+
+export PYTHONIOENCODING=utf-8
+
+python build/build_round3_corpus.py        # rebuilds corpus.jsonl + documents.jsonl
+python build/round3_tg_ingest.py --queries-only   # reinstall TG queries, non-destructive
+python build/smoke_test_tg.py              # verify
+```
+
+The KG index (`pipeline3_round3/index/`) IS committed — it cost real API calls to extract,
+so it does not need regenerating.
+
+> The repo also carries `mastergraph-round3/.git-disabled/` — the original project's own git
+> history, renamed so `git add .` stops staging the folder as an empty gitlink. Do not
+> re-enable it inside this repo.
+
 **Always from `cd mastergraph-round3` (see §2).**
 
 ```bash
