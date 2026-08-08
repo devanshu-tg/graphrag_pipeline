@@ -557,8 +557,22 @@ case. The open question is whether GraphRAG's token efficiency survives on **pro
    corpus works: it is future-dated (2025–2026 filings), so P1 scores near zero. It is also
    why a previous hackathon's biomedical demo was meaningless — **their LLM-only baseline hit
    90%**. Any Wikipedia-sourced set must clear a contamination probe first.
-2. **Genuinely multi-hop / cross-document.** Graph traversal only pays off when the answer
-   spans documents.
+2. **Genuinely multi-hop — and measure the DEPTH, not just the fact.** Graph traversal only
+   pays off when the answer spans documents, and the *deeper* the hop the wider the gap
+   should open between GraphRAG and plain vector search. So treat hop depth as a number, not
+   a yes/no:
+
+   | hops | what it tests | our evidence |
+   |---|---|---|
+   | 1 | single fact | vector search wins — a graph adds nothing (Tier A: 6/8 for both arms) |
+   | **2–3** | **cross-document bridge** | **where the graph starts paying** (Tier B: 12/16 vs 5/16) |
+   | 4–7 | deep chains | **untested by this project — the real open question** |
+   | 8–20 | stress | only PhantomWiki can generate these |
+
+   **The SEC corpus in this repo tops out at 2–3 hops.** Tier B is 2-hop, Tier D is "3+". So
+   every claim we can currently make about GraphRAG is a claim about *shallow* multi-hop. A
+   dataset that only offers 2 hops re-tests what we already know; the value is in going
+   deeper. Rank candidates by the depth they unlock.
 3. **Textual prose, not fact/table-dense.** The complement of what this repo already has.
 4. **Corpus sized for LLM-based KG extraction** — roughly 1–5M tokens is affordable. 5M+
    passages means subsetting, which builds the corpus around the questions and weakens any
@@ -569,12 +583,12 @@ inferring it from answer quality.
 
 ### The shortlist
 
-| dataset | how to get it | size / shape | filter 1 (LLM-only fails?) | verdict |
-|---|---|---|---|---|
-| **PhantomWiki** | `pip install phantom-wiki` | generator; hop depth **1–20**, corpus 25 → 1M docs | ✅ **by construction** | **the contamination-proof option** |
-| **MultiHop-RAG** | `yixuantt/MultiHopRAG` | 609 news articles, ~1.6M tokens, **2,556 queries**, each needing 2–4 docs | ⚠️ likely — news, but public | **best real-prose option** |
-| **FanOutQA** | `pip install fanoutqa` | **1,034 questions at ~7 hops**, human-written decompositions | ❌ **Wikipedia — probe required** | highest hop count; gate it first |
-| **Re-DocRED** | `tonytan48/Re-DocRED` | 4,053 docs, 25 MB, 96 relation types with **gold triples** | n/a — not QA | scores **KG extraction quality** directly (F1 vs gold relations) |
+| dataset | how to get it | size / shape | **hops** | filter 1 (LLM-only fails?) | verdict |
+|---|---|---|---|---|---|
+| **PhantomWiki** | `pip install phantom-wiki` | generator; corpus 25 → 1M docs | **1–20 (dial)** | ✅ **by construction** | **the contamination-proof option** |
+| **MultiHop-RAG** | `yixuantt/MultiHopRAG` | 609 news articles, ~1.6M tokens, 2,556 queries | **2–4** | ⚠️ likely — news, but public | **best real-prose option** |
+| **FanOutQA** | `pip install fanoutqa` | 1,034 questions, human-written decompositions | **~7 (deepest real)** | ❌ **Wikipedia — probe required** | highest hop count; gate it first |
+| **Re-DocRED** | `tonytan48/Re-DocRED` | 4,053 docs, 96 relation types, **gold triples** | n/a | n/a — not QA | scores **KG extraction quality** directly (F1 vs gold relations) |
 
 ### Notes on each
 
@@ -607,6 +621,51 @@ against gold relation triples. That matters here because a chunk of this project
 was extraction quality (100/100 auditors after repair, the "Deloitte appears 15× in director
 bios" false-positive trap). Re-DocRED would put a number on that instead of inferring it from
 downstream answers.
+
+### THE DECISION (2026-08-08)
+
+**Primary: MultiHop-RAG. Control: PhantomWiki. FanOutQA deferred.**
+
+The two requirements — *real prose* and *LLM-only must fail* — pull in opposite directions.
+The dataset that guarantees the gate (PhantomWiki) is generated, formulaic prose; the one
+with real prose (MultiHop-RAG) has an unproven gate. No single source gives both, so run two.
+
+| | role | why |
+|---|---|---|
+| **MultiHop-RAG** | **primary** | real journalism — a client demo on synthetic data undercuts itself. 2,556 queries at 2–4 hops, ~1.6M tokens, plus **null queries as a free hallucination test**. |
+| **PhantomWiki** | **control** | LLM-only is **zero by construction**, so it proves any effect is retrieval and not memorisation. The 1–20 hop dial gives accuracy-vs-depth curves no real corpus can. |
+| **FanOutQA** | deferred | ~7 hops is the most attractive depth on offer, but Wikipedia is the highest contamination risk of the three. Revisit only after the cheaper probe passes. |
+
+#### ⚠️ Blocking prerequisite — run this BEFORE building anything
+
+**MultiHop-RAG is news from a 2023 window, and the answering model's training data covers
+it.** That is the exact opposite of why the SEC corpus works: those filings are future-dated
+to 2025–2026, so the model *cannot* have seen them. The gate is therefore **unproven**, not
+assumed.
+
+```
+Take 30 MultiHop-RAG questions. Run the LLM-only arm — no retrieval, no graph.
+  scores ~0        -> gate passes, MultiHop-RAG is primary
+  scores materially above 0 -> the benchmark measures memory. PhantomWiki becomes primary.
+```
+
+30 API calls, ~20 minutes. **Do not skip it.** A previous hackathon's biomedical demo was
+meaningless because its LLM-only baseline scored **90%** — this probe is the only thing
+standing between you and that outcome.
+
+Reason for cautious optimism: MultiHop-RAG questions require *combining* facts across
+specific named articles, which resists memorisation even when the underlying events are
+known. That is a hypothesis, not a result.
+
+#### What hop depth changes about the plan
+
+The SEC corpus tops out at 2–3 hops, so **every GraphRAG claim this project can currently
+make is about shallow multi-hop.** MultiHop-RAG at 2–4 hops largely re-tests known ground —
+its value is the prose and the null queries, not the depth. **The depth question is only
+answerable with PhantomWiki's dial (or FanOutQA, if it ever clears the gate).** Plan the
+accuracy-vs-hops curve as a PhantomWiki deliverable from the start.
+
+---
 
 ### Ruled out, and why
 
