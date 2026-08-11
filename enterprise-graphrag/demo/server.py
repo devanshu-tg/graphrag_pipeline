@@ -131,16 +131,29 @@ def textual_metrics(split: str = "tuned") -> dict:
                    "rows": [{"arm": a, "name": nm, **(_agg(rows, a, t) or {})}
                             for a, nm in arms]} for t, n in tiers],
         "notes": [
-            "Single-document questions were GraphRAG's weakest tier until the entity resolver was "
-            "fixed: seeds spelled as readable titles ('20270425 selfsignup sdr handoff') never "
-            "matched path-style ids, so all 10 silently fell back to vector search. 0.40 -> 0.80.",
-            "EVERY retrieval baseline scores 0/20 exact on multi-hop, including one given 50 chunks "
-            "and 28,593 tokens per question. The graph gets 14/20 on far fewer.",
-            "Retrieval is not missing the data: the answer text is present in 34% of top-10 results, "
-            "80% of top-50 and 94% of top-200. Given 50 chunks the model names some correct channels "
-            "inside a longer wrong list — precision 0.237, recall 0.095. It drowns rather than misses.",
-            "The LLM judge (gemini-2.5-pro, blind, lenient) agrees with the deterministic score to within 0.02.",
-            "BERTScore ranks LLM-only FIRST at 0.846 with 0/40 correct — it rewards fluent wrong answers. Do not use it.",
+            "Multi-hop is the whole story: Basic RAG scores 17% there and 100% on directory "
+            "lookups — same corpus, same model, same token budget. The only variable is whether "
+            "the question needs a join. GraphRAG holds 99% on both.",
+            "GraphRAG has ZERO complete failures here — 49 perfect, 1 partial, 0 wrong. Basic RAG "
+            "has 16 zeros. A traversal either lands on the exact set or returns nothing, so it "
+            "fails visibly; retrieval fails plausibly, which is harder to catch in production.",
+            "LLM-only scores 0.8% with no retrieval. The company is fictional, so nothing here is "
+            "answerable from model memory — that is the leak gate, and it is what makes the rest "
+            "of the numbers mean anything.",
+            "The answer key was re-derived from 20,182 RAW documents without opening the graph, "
+            "30/30 (build/verify_gold_independent.py). Gold was originally computed BY traversal, "
+            "so without this check the graph would be graded against its own representation.",
+            "On 20 held-out questions generated with a different seed and never developed against, "
+            "multi-hop scored 0.717 versus 0.700 on the tuned set — ABOVE, not below. That is the "
+            "test that caught overfitting on the SEC round, where the ranking reversed.",
+            "Every fairness fix helped the BASELINE: the BGE query prefix, an 8,192-token budget "
+            "(thinking was starving the answer), retrieval k matched to P2's, a no-empty rule, and "
+            "cross-encoder reranking which took Basic RAG 0.30 to 0.53 at the same token cost.",
+            "KNOWN GAP: all 50 questions are relationship traversals — the shape a graph is built "
+            "for. SEC has a 'bridge' tier (entity then its number) where both systems fall to ~38%. "
+            "That shape has never been tested on this data.",
+            "BERTScore is computed and DISCARDED: it ranked LLM-only FIRST at 0.858 with 0/50 "
+            "correct, because it rewards fluent wrong answers.",
         ],
     }
 
@@ -206,6 +219,20 @@ def factual_metrics() -> dict:
             "is contamination measured, and the reason the enterprise result is the one to trust.",
             "Scored by judge, not set-F1: these gold answers are numbers with commentary "
             "('$57,048M, down 2% YoY'), so name-set matching does not apply.",
+            "BY TIER — GraphRAG wins the hardest one and LOSES the easiest. Aggregation (20 q, "
+            "'every company audited by KPMG'): 73% vs 47%. Single-doc lookup (8 q, 'Exxon's "
+            "revenue'): 62% vs 99% — retrieval is simply the better tool for one number in one "
+            "filing, and the planner call is wasted overhead.",
+            "The BRIDGE tier is where both collapse (15 q, ~38% each): 'the company that "
+            "appointed John Ternus as CEO — what were its total net sales?' Hop one is a "
+            "relationship, hop two is a table cell. Neither tool does both.",
+            "SEC relations are THIN: audited_by 100 edges, uses_supplier 178, has_ceo just ONE in "
+            "the whole graph. Enterprise participated_in has 88,188. Same idea, ~800x the density "
+            "— which is why CEO bridge questions had nothing to traverse.",
+            "18 of 50 answers are a NUMBER or DATE; on the enterprise set it is 0 of 50. A graph "
+            "stores relationships, so it can point at the right filing but cannot pick the right "
+            "table row. Two failures were exactly that: $344,582M for $332,238M, and a filing "
+            "date read as the fiscal year end.",
         ],
     }
 

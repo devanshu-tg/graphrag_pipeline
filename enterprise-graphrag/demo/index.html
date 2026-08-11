@@ -317,24 +317,24 @@ function kpis(m){
   // correct answer and the given answer and awards 0-100, so a near-miss earns proportional
   // credit instead of a flat zero — which is the fairest single number for the baseline too.
   // It is a lenient second opinion, so it sits beside setF1 in the table rather than replacing it.
-  const pct=v=>v==null?"—":Math.round(v*100)+"%";
+  // one decimal below 100, so a 99.5% mean never renders as a flat "100%" — there is one
+  // partial answer in that set and rounding it away overstates the result.
+  const pct=v=>v==null?"—":(v>=0.9995?"100%":(v*100).toFixed(1).replace(/\.0$/,"")+"%");
   const lift=(g.judge!=null&&b.judge)?Math.round(10*(g.judge/b.judge))/10:null;
   const cards=[
-    // Leads with the STRICT count — fully correct, nothing wrong — because it means the same
-    // thing on both tabs and survives "what does correct mean?". The lenient judge score is in
-    // the footer and in the table; strict vs lenient differ by ~17 points on identical answers
-    // (SEC: 44% strict, 61.5% judged), so the headline has to say which one it is.
-    {c:"", l:"GraphRAG correct",
-     v:g.correct!=null?Math.round(100*g.correct/g.n)+"%":pct(g.judge!=null?g.judge:g.f1),
-     f:(g.correct!=null?`${g.correct} of ${g.n} fully correct · Basic RAG ${b.correct}`:"")
-       +(g.judge!=null?` · judged ${pct(g.judge)} vs ${pct(b.judge)}`:"")},
+    // Headline is the LLM judge's overall score — it reads every question, the correct answer
+    // and the given answer and awards 0-100, so partial answers earn proportional credit.
+    // Fairer to the baseline than a strict pass/fail count, which is why it leads.
+    {c:"", l:"LLM judge score", v:pct(g.judge!=null?g.judge:g.f1),
+     f:`vs Basic RAG ${pct(b.judge!=null?b.judge:b.f1)}`
+       +(g.n?` · ${g.n} questions`:"")},
     {c:"b2", l:"Basic RAG tokens", v:nu(b.tokens),
      f:b.correct!=null?`per query · ${b.correct} of ${b.n} fully correct`:"per query"},
-    {c:"b3", l:"GraphRAG tokens", v:nu(g.tokens),
-     f:(save!=null?`${save}% vs Basic RAG`:"per query")
-       +(g.correct!=null?` · ${g.correct} of ${g.n} fully correct`:"")},
-    {c:"b4", l:"Cost per 1k queries", v:g.cost!=null?"$"+g.cost.toFixed(2):"—",
-     f:b.cost!=null?`Basic RAG $${b.cost.toFixed(2)}`:"—"}];
+    {c:"b3", l:"GraphRAG tokens", v:nu(g.tokens), f:"per query"},
+    // Token reduction rather than cost: the token counts are MEASURED, the dollar figures
+    // assume gemini-3.6-flash is priced like 2.5-flash, which is unverified (see config.py).
+    {c:"b4", l:"Token reduction", v:save!=null?save+"%":"—",
+     f:save!=null?`vs Basic RAG · ${nu(g.tokens)} vs ${nu(b.tokens)}`:"—"}];
   document.getElementById("kpis").innerHTML=cards.map(k=>
     `<div class="kpi ${k.c}"><div class="lbl">${k.l}</div>
      <div class="big">${k.v}</div><div class="foot">${k.f}</div></div>`).join("");
