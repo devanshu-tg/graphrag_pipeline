@@ -1,0 +1,13 @@
+{
+  "p2xl": {
+    "exact": 0,
+    "n": 20,
+    "recall": 0.173335,
+    "precision": 0.334525,
+    "f1": 0.209985,
+    "prompt": 54614.35,
+    "completion": 12.65,
+    "planner": 0,
+    "total": 54627
+  }
+}

@@ -1,0 +1,388 @@
+{
+  "method": "deterministic metadata extraction over all documents (no LLM)",
+  "documents": 20000,
+  "documents_parsed": 20000,
+  "coverage_floor": 0.2,
+  "relations": [
+    {
+      "relation": "authored",
+      "documents": 6645,
+      "coverage": 0.3322,
+      "edges": 6645,
+      "entities": 7143,
+      "examples": [
+        {
+          "source": "Priya Rao",
+          "target": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "field": "author",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "Maya Chen",
+          "target": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json",
+          "field": "author",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json"
+        },
+        {
+          "source": "Ava Martinez",
+          "target": "confluence/applied-ml-and-evals/eval-harness/evaluator-cli-and-sidecar-plugin-spec-2026.json",
+          "field": "author",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/evaluator-cli-and-sidecar-plugin-spec-2026.json"
+        }
+      ]
+    },
+    {
+      "relation": "participated_in",
+      "documents": 17822,
+      "coverage": 0.8911,
+      "edges": 88188,
+      "entities": 31322,
+      "examples": [
+        {
+          "source": "Mike Chen",
+          "target": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "field": "reviewers",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "Alyssa Gomez",
+          "target": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "field": "reviewers",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "Jordan Li",
+          "target": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "field": "reviewers",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        }
+      ]
+    },
+    {
+      "relation": "in_channel",
+      "documents": 11146,
+      "coverage": 0.5573,
+      "edges": 11146,
+      "entities": 11180,
+      "examples": [
+        {
+          "source": "slack/1712004829-pen-test-intake-remediation-plan.json",
+          "target": "eng-security",
+          "field": "channel",
+          "doc": "slack/1712004829-pen-test-intake-remediation-plan.json"
+        },
+        {
+          "source": "slack/1713201234-tor-l4-loss-investigation.json",
+          "target": "eng-infra",
+          "field": "channel",
+          "doc": "slack/1713201234-tor-l4-loss-investigation.json"
+        },
+        {
+          "source": "slack/1713571200-new-dedicated-gpu-launch-paris-mumbai.json",
+          "target": "eng-infra",
+          "field": "channel",
+          "doc": "slack/1713571200-new-dedicated-gpu-launch-paris-mumbai.json"
+        }
+      ]
+    },
+    {
+      "relation": "doc_type",
+      "documents": 6372,
+      "coverage": 0.3186,
+      "edges": 6372,
+      "entities": 6426,
+      "examples": [
+        {
+          "source": "confluence/architecture-and-standards/decision-records/adr-hubspot-routing-and-ownership-rules.json",
+          "target": "architecture-decision-record",
+          "field": "doc_type",
+          "doc": "confluence/architecture-and-standards/decision-records/adr-hubspot-routing-and-ownership-rules.json"
+        },
+        {
+          "source": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json",
+          "target": "security_review",
+          "field": "call_type",
+          "doc": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json"
+        },
+        {
+          "source": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json",
+          "target": "discovery",
+          "field": "call_type",
+          "doc": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json"
+        }
+      ]
+    },
+    {
+      "relation": "reports_to",
+      "documents": 20000,
+      "coverage": 1.0,
+      "edges": 160,
+      "entities": 167,
+      "examples": [
+        {
+          "source": "Ethan Park",
+          "target": "Priya Natarajan",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        },
+        {
+          "source": "Marcus Lin",
+          "target": "Dr. Aisha Rahman",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        },
+        {
+          "source": "Chloe Martin",
+          "target": "Dylan Brooks",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        }
+      ]
+    },
+    {
+      "relation": "in_department",
+      "documents": 20000,
+      "coverage": 1.0,
+      "edges": 167,
+      "entities": 182,
+      "examples": [
+        {
+          "source": "Sofia Ivanova",
+          "target": "Engineering",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        },
+        {
+          "source": "Olivia Grant",
+          "target": "Applied ML / Research",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        },
+        {
+          "source": "Dana Lo",
+          "target": "Developer Experience",
+          "field": "employee_directory",
+          "doc": "employee_directory.yaml"
+        }
+      ]
+    }
+  ],
+  "long_tail": [
+    {
+      "relation": "assigned_to",
+      "documents": 1617,
+      "coverage": 0.0809,
+      "edges": 1617,
+      "entities": 2067,
+      "examples": [
+        {
+          "source": "jira/customer-support/SUP-1000001-unicode-idempotency-normalization-mismatch-multibyte-keys.json",
+          "target": "Rafael Ortega",
+          "field": "assignee",
+          "doc": "jira/customer-support/SUP-1000001-unicode-idempotency-normalization-mismatch-multibyte-keys.json"
+        },
+        {
+          "source": "jira/customer-support/SUP-1000007-sse-keepalive-suppression-and-duplicate-heartbeat-resume.json",
+          "target": "Priya Shah",
+          "field": "assignee",
+          "doc": "jira/customer-support/SUP-1000007-sse-keepalive-suppression-and-duplicate-heartbeat-resume.json"
+        },
+        {
+          "source": "jira/customer-support/SUP-100012-saved-dashboard-filter-presets-reset-on-report-edit.json",
+          "target": "Liam O'Connor",
+          "field": "assignee",
+          "doc": "jira/customer-support/SUP-100012-saved-dashboard-filter-presets-reset-on-report-edit.json"
+        }
+      ]
+    },
+    {
+      "relation": "owned_by",
+      "documents": 1961,
+      "coverage": 0.098,
+      "edges": 1961,
+      "entities": 2520,
+      "examples": [
+        {
+          "source": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json",
+          "target": "Markus Klein",
+          "field": "redwood_owner",
+          "doc": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json"
+        },
+        {
+          "source": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json",
+          "target": "Maya Patel",
+          "field": "redwood_owner",
+          "doc": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json"
+        },
+        {
+          "source": "fireflies/2025-05-28-private-upgrades-technical-deep-dive.json",
+          "target": "Markus Klein",
+          "field": "redwood_owner",
+          "doc": "fireflies/2025-05-28-private-upgrades-technical-deep-dive.json"
+        }
+      ]
+    },
+    {
+      "relation": "in_team",
+      "documents": 2810,
+      "coverage": 0.1405,
+      "edges": 5377,
+      "entities": 4040,
+      "examples": [
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "engineering",
+          "field": "owner_team",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "applied-ml-and-evals",
+          "field": "space",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json",
+          "target": "engineering",
+          "field": "owner_team",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json"
+        }
+      ]
+    },
+    {
+      "relation": "in_repo",
+      "documents": 314,
+      "coverage": 0.0157,
+      "edges": 314,
+      "entities": 335,
+      "examples": [
+        {
+          "source": "github/audit-log-exporter/pr-612-add-time-windowed-exports-and-filters.json",
+          "target": "audit-log-exporter",
+          "field": "repo",
+          "doc": "github/audit-log-exporter/pr-612-add-time-windowed-exports-and-filters.json"
+        },
+        {
+          "source": "github/benchmark-lab/pr-17493-hetero-mixworkload-orchestrator-fidelity-sampler.json",
+          "target": "benchmark-lab",
+          "field": "repo",
+          "doc": "github/benchmark-lab/pr-17493-hetero-mixworkload-orchestrator-fidelity-sampler.json"
+        },
+        {
+          "source": "github/benchmark-lab/pr-2147-multi-tenant-benchmark-runner-profile-reporter.json",
+          "target": "benchmark-lab",
+          "field": "repo",
+          "doc": "github/benchmark-lab/pr-2147-multi-tenant-benchmark-runner-profile-reporter.json"
+        }
+      ]
+    },
+    {
+      "relation": "about_customer",
+      "documents": 1161,
+      "coverage": 0.058,
+      "edges": 1161,
+      "entities": 2263,
+      "examples": [
+        {
+          "source": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json",
+          "target": "MedData Systems",
+          "field": "customer_company",
+          "doc": "fireflies/2025-02-11-onprem-backup-restore-and-audit-log-retention-security-review-meddata.json"
+        },
+        {
+          "source": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json",
+          "target": "Tethys Systems",
+          "field": "customer_company",
+          "doc": "fireflies/2025-03-27-tethys-systems-si-channel-cloud-gpu-fit-discovery.json"
+        },
+        {
+          "source": "fireflies/2025-05-28-private-upgrades-technical-deep-dive.json",
+          "target": "Northstar Health Systems",
+          "field": "customer_company",
+          "doc": "fireflies/2025-05-28-private-upgrades-technical-deep-dive.json"
+        }
+      ]
+    },
+    {
+      "relation": "has_label",
+      "documents": 2149,
+      "coverage": 0.1075,
+      "edges": 11546,
+      "entities": 4718,
+      "examples": [
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "evals",
+          "field": "labels",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "ci",
+          "field": "labels",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "determinism",
+          "field": "labels",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        }
+      ]
+    },
+    {
+      "relation": "has_status",
+      "documents": 3710,
+      "coverage": 0.1855,
+      "edges": 3710,
+      "entities": 3732,
+      "examples": [
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json",
+          "target": "published",
+          "field": "status",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/ci-eval-determinism-and-flake-mitigation.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json",
+          "target": "published",
+          "field": "status",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/edge-shadow-telemetry-contract-2026.json"
+        },
+        {
+          "source": "confluence/applied-ml-and-evals/eval-harness/evaluator-cli-and-sidecar-plugin-spec-2026.json",
+          "target": "in_review",
+          "field": "status",
+          "doc": "confluence/applied-ml-and-evals/eval-harness/evaluator-cli-and-sidecar-plugin-spec-2026.json"
+        }
+      ]
+    },
+    {
+      "relation": "has_priority",
+      "documents": 1625,
+      "coverage": 0.0813,
+      "edges": 1857,
+      "entities": 1637,
+      "examples": [
+        {
+          "source": "confluence/oncall-and-incident-response/postmortems/2026-02-09-sev2-dedicated-autoscaler-stuck.json",
+          "target": "SEV-2",
+          "field": "severity",
+          "doc": "confluence/oncall-and-incident-response/postmortems/2026-02-09-sev2-dedicated-autoscaler-stuck.json"
+        },
+        {
+          "source": "confluence/oncall-and-incident-response/postmortems/2026-02-22-sev2-console-deploy-rollout-ui-bug.json",
+          "target": "SEV-2",
+          "field": "severity",
+          "doc": "confluence/oncall-and-incident-response/postmortems/2026-02-22-sev2-console-deploy-rollout-ui-bug.json"
+        },
+        {
+          "source": "google_drive/shared_drives/engineering/site-reliability-engineering/memory-surge-heuristics-tuning-runbook-sketch.json",
+          "target": "sev2",
+          "field": "severity",
+          "doc": "google_drive/shared_drives/engineering/site-reliability-engineering/memory-surge-heuristics-tuning-runbook-sketch.json"
+        }
+      ]
+    }
+  ]
+}

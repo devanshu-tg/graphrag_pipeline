@@ -40,3 +40,26 @@ env/
 *.log
 .DS_Store
 Thumbs.db
+
+# ── enterprise-graphrag REGENERABLES — too big for GitHub, all rebuildable ────
+# GitHub hard-rejects >100 MB and warns over 50 MB. Every file below is produced by a
+# script in build/, never hand-authored, so excluding them costs nothing but a rebuild.
+#
+#   corpus.jsonl        142 MB  ->  python build/build_enterprise_corpus.py
+#                                   python build/add_directory_docs.py --push
+#   documents.jsonl     119 MB  ->  same two commands (written together)
+#   index/edges_prov     61 MB  ->  python build/build_edge_index.py
+#   index_v2/edges_prov  56 MB  ->  python build/canonicalize.py
+#
+# The 20k source documents live in datasets/enterprise/raw/ (or are re-downloadable),
+# and employee_directory.yaml IS committed — it is small and the org chart is the one
+# thing the whole benchmark depends on.
+enterprise-graphrag/datasets/enterprise/corpus.jsonl
+enterprise-graphrag/datasets/enterprise/documents.jsonl
+enterprise-graphrag/pipeline3_round3/index/edges_prov.json
+enterprise-graphrag/pipeline3_round3/index_v2/edges_prov.json
+
+# caches and scratch
+**/__pycache__/
+*.pyc
+enterprise-graphrag/datasets/enterprise/corpus.jsonl.bak

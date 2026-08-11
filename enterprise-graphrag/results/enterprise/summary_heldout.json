@@ -1,0 +1,46 @@
+{
+  "p1": {
+    "exact": 0,
+    "n": 20,
+    "recall": 0.0,
+    "precision": 0.0,
+    "f1": 0.0,
+    "prompt": 197.55,
+    "completion": 13.65,
+    "planner": 0,
+    "total": 211.2
+  },
+  "p2": {
+    "exact": 0,
+    "n": 20,
+    "recall": 0.0225,
+    "precision": 0.1,
+    "f1": 0.036665,
+    "prompt": 5510.8,
+    "completion": 1.9,
+    "planner": 0,
+    "total": 5512.7
+  },
+  "p2xl": {
+    "exact": 0,
+    "n": 20,
+    "recall": 0.0925,
+    "precision": 0.201665,
+    "f1": 0.114285,
+    "prompt": 27119.8,
+    "completion": 4.4,
+    "planner": 0,
+    "total": 27124.2
+  },
+  "p3": {
+    "exact": 14,
+    "n": 20,
+    "recall": 0.71,
+    "precision": 0.75,
+    "f1": 0.716665,
+    "prompt": 1894.45,
+    "completion": 7.3,
+    "planner": 1183,
+    "total": 3084.75
+  }
+}
