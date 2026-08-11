@@ -310,21 +310,31 @@ const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"
 
 function kpis(m){
   const g=m.overall.find(r=>r.name==="GraphRAG")||{};
-  const b=m.overall.find(r=>r.name==="Basic RAG")||{};
-  // strongest baseline of ALL non-graph arms, whichever it happens to be. Hardcoding
-  // "iterative" understated it once the 50-chunk arm landed at 0.438.
-  const bl=m.overall.filter(r=>r.arm!=="p3"&&r.arm!=="p1"&&r.f1!=null);
-  const top=bl.reduce((a,r)=>(!a||r.f1>a.f1)?r:a,null);
-  const save=(top&&top.tokens&&g.tokens)?Math.round(100*(g.tokens-top.tokens)/top.tokens):null;
+  // "Basic RAG" by name works on BOTH tabs: enterprise is p2rr (reranked), SEC is mg-p2-rag.
+  const b=m.overall.find(r=>/^Basic RAG/.test(r.name||""))||{};
+  const save=(b.tokens&&g.tokens)?Math.round(100*(g.tokens-b.tokens)/b.tokens):null;
+  // The headline is the JUDGE score, not the exact count. The judge reads the question, the
+  // correct answer and the given answer and awards 0-100, so a near-miss earns proportional
+  // credit instead of a flat zero — which is the fairest single number for the baseline too.
+  // It is a lenient second opinion, so it sits beside setF1 in the table rather than replacing it.
+  const pct=v=>v==null?"—":Math.round(v*100)+"%";
+  const lift=(g.judge!=null&&b.judge)?Math.round(10*(g.judge/b.judge))/10:null;
   const cards=[
-    {c:"", l:"GraphRAG accuracy", v:g.f1!=null?f2(g.f1):"—",
-     f:g.n?`across ${g.n} questions`:"set F1, blended"},
-    {c:"b2", l:"Best baseline", v:top?f2(top.f1):f2(b.f1),
-     f:top?`${top.name} · ${nu(top.tokens)} tokens`:"—"},
-    {c:"b3", l:"Tokens per query", v:nu(g.tokens),
-     f:save!=null?`${save}% vs the best baseline`:"—"},
+    // Leads with the STRICT count — fully correct, nothing wrong — because it means the same
+    // thing on both tabs and survives "what does correct mean?". The lenient judge score is in
+    // the footer and in the table; strict vs lenient differ by ~17 points on identical answers
+    // (SEC: 44% strict, 61.5% judged), so the headline has to say which one it is.
+    {c:"", l:"GraphRAG correct",
+     v:g.correct!=null?Math.round(100*g.correct/g.n)+"%":pct(g.judge!=null?g.judge:g.f1),
+     f:(g.correct!=null?`${g.correct} of ${g.n} fully correct · Basic RAG ${b.correct}`:"")
+       +(g.judge!=null?` · judged ${pct(g.judge)} vs ${pct(b.judge)}`:"")},
+    {c:"b2", l:"Basic RAG tokens", v:nu(b.tokens),
+     f:b.correct!=null?`per query · ${b.correct} of ${b.n} fully correct`:"per query"},
+    {c:"b3", l:"GraphRAG tokens", v:nu(g.tokens),
+     f:(save!=null?`${save}% vs Basic RAG`:"per query")
+       +(g.correct!=null?` · ${g.correct} of ${g.n} fully correct`:"")},
     {c:"b4", l:"Cost per 1k queries", v:g.cost!=null?"$"+g.cost.toFixed(2):"—",
-     f:top&&top.cost!=null?`best baseline $${top.cost.toFixed(2)}`:"—"}];
+     f:b.cost!=null?`Basic RAG $${b.cost.toFixed(2)}`:"—"}];
   document.getElementById("kpis").innerHTML=cards.map(k=>
     `<div class="kpi ${k.c}"><div class="lbl">${k.l}</div>
      <div class="big">${k.v}</div><div class="foot">${k.f}</div></div>`).join("");
@@ -336,12 +346,14 @@ function table(m){
   const retr=m.overall.filter(r=>!/LLM only/.test(r.name));
   const cheap=Math.min(...retr.map(r=>r.tokens??1e9));
   document.getElementById("thead").innerHTML=
-    `<tr><th>Pipeline</th><th>Set F1</th>`+
+    `<tr><th>Pipeline</th><th>Full / partial / missed</th><th>Set F1</th>`+
     `${hj?"<th>LLM judge</th>":""}<th>Tokens</th><th>Cost / 1k</th></tr>`;
   document.getElementById("tbody").innerHTML=m.overall.map(r=>{
     const lead=r.f1!=null&&r.f1===best&&best>0;
     return `<tr class="${lead?"lead":""}">
       <td><span class="pill"><i style="background:${COL[r.arm]||"var(--p3)"}"></i>${r.name}</span></td>
+      <td>${r.correct==null?'<span class="na">—</span>':
+            `${r.correct} / ${r.partial||0}${r.partial_avg?` <span class="na">@${Math.round(r.partial_avg*100)}%</span>`:""} / ${r.zero||0}`}</td>
       <td class="${lead?"best":""}">${f3(r.f1)}</td>
       ${hj?`<td>${f3(r.judge)}</td>`:""}
       <td class="${r.tokens===cheap?"best":""}">${nu(r.tokens)}</td>

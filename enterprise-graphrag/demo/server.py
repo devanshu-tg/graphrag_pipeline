@@ -74,7 +74,14 @@ def _agg(rows: list[dict], arm: str, tier: str | None = None) -> dict | None:
     pt = st.mean([r["prompt_tokens"] for r in R]) + pl
     ct = st.mean([r["completion_tokens"] for r in R])
     J = [r["judge_score"] for r in R if r.get("judge_score") is not None]
+    # "partial" = not fully correct but not zero either. Reporting the COUNT alone is not
+    # enough: 9 partials averaging 47% of the answer is a different system from 9 averaging
+    # 15%. The mean over just the partials says how close the near-misses were.
+    part = [r["f1"] for r in R if not r["exact"] and r["f1"] > 0]
     return {"n": len(R), "correct": sum(r["exact"] for r in R),
+            "partial": len(part),
+            "partial_avg": round(st.mean(part), 3) if part else None,
+            "zero": sum(1 for r in R if not r["exact"] and r["f1"] == 0),
             "f1": round(st.mean([r["f1"] for r in R]), 3),
             "judge": round(st.mean(J), 3) if J else None,
             "bert": round(st.mean([r.get("bertscore", 0) or 0 for r in R]), 3),
@@ -92,7 +99,12 @@ def textual_metrics(split: str = "tuned") -> dict:
     if split == "heldout":
         rows = _jsonl(RESULTS / "eval_noempty_held.jsonl") + _jsonl(RESULTS / "eval_rr_held.jsonl")
     else:
-        rows = _jsonl(RESULTS / "eval_noempty40.jsonl") + _jsonl(RESULTS / "eval_rr40.jsonl")
+        # eval_ent50: the CURRENT run — 50 questions (20 single-doc / 10 directory /
+        # 20 multi-hop) x 3 arms on gemini-3.6-flash, every answer judged 0-100.
+        # Supersedes eval_live40 (40 questions) and everything before it. Earlier files are
+        # kept on disk for the audit trail but must not be averaged in: eval_noempty40 and
+        # eval_rr40 were gemini-2.5-flash, and mixing models would misreport every arm.
+        rows = _jsonl(RESULTS / "eval_ent50.jsonl")
     # Iterative RAG (setF1 0.387, 14,603 tokens) is measured and kept on disk but not shown —
     # reranking beats it at a third of the cost. Add ("p2p", "Iterative RAG") to restore it.
     # Reranked is THE baseline: 0.506 against 0.301 plain at the same token cost, and within
@@ -113,7 +125,7 @@ def textual_metrics(split: str = "tuned") -> dict:
         "subtitle": ("20 multi-hop questions · different random seed · every overlapping "
                      "question removed · run once"
                      if split == "heldout"
-                     else "40 questions · 73,613 chunks · 38,273 entities · 128,282 edges"),
+                     else "50 questions · 20 single-doc / 10 directory / 20 multi-hop · 73,613 chunks · 128,282 edges"),
         "overall": [{"arm": a, "name": n, **(_agg(rows, a) or {})} for a, n in arms],
         "tiers": [{"tier": t, "name": n,
                    "rows": [{"arm": a, "name": nm, **(_agg(rows, a, t) or {})}
@@ -158,42 +170,65 @@ def all_questions(split: str = "tuned") -> list[dict]:
 
 
 def factual_metrics() -> dict:
-    """MasterGraph's reproduced system on SEC filings. Tokens computed from the frozen
-    evidence files; accuracy is the recorded blended judge score from that round."""
-    theirs = _jsonl(EVID / "theirs.jsonl")
-    arm_map = [("mg-p1-llmonly", "LLM only"), ("mg-p2-rag", "Basic RAG"),
-               ("mg-p3-graphrag", "GraphRAG")]
+    """MasterGraph's three pipelines on the 50 SEC questions, RE-RUN LIVE.
+
+    Until the 13 installed queries were restored on the `finance` graph their P3 could not
+    retrieve at all, so this tab could only replay frozen answers. eval_sec_live.jsonl is an
+    actual run: every answer generated now, then graded by the same lenient judge used on the
+    enterprise side against their own gold.
+
+    Their gold answers are single facts with commentary ("$57,048M (~$57.0B), down 2% YoY"),
+    not name sets, so the set-F1 scorer built for the enterprise questions does not transfer.
+    Correctness here is the judge's call and `exact` means it awarded 100.
+    """
+    rows = _jsonl(RESULTS / "eval_sec_live.jsonl")
+    arms = [("p1", "LLM only"), ("p2", "Basic RAG"), ("p3", "GraphRAG")]
+    if not rows:            # fall back to the frozen record if the live run is missing
+        return _factual_frozen()
     out = []
-    for a, n in arm_map:
+    for a, n in arms:
+        agg = _agg(rows, a)
+        if agg:
+            out.append({"arm": a, "name": n, **agg})
+    return {
+        "label": "SEC 10-K filings — MasterGraph reproduced, re-run live",
+        "subtitle": ("50 questions · finance graph, 13 queries restored · answers generated now, "
+                     "not replayed · graded by the same blind judge"),
+        "overall": out,
+        "tiers": [],
+        "notes": [
+            "GraphRAG leads by only ~3 points here (57.3% vs 54.8% judged) — most SEC questions are "
+            "single facts sitting in one chunk, which vector search handles well. The graph's "
+            "advantage appears on aggregation, not lookup.",
+            "It still uses HALF the tokens: 2,451 vs 4,754 per question.",
+            "LLM-only scores 38% with NO retrieval — the model has read these filings. On the "
+            "enterprise corpus the same arm scores 0%, because that company is fictional. That gap "
+            "is contamination measured, and the reason the enterprise result is the one to trust.",
+            "Scored by judge, not set-F1: these gold answers are numbers with commentary "
+            "('$57,048M, down 2% YoY'), so name-set matching does not apply.",
+        ],
+    }
+
+
+def _factual_frozen() -> dict:
+    """The pre-restore replay path, kept so the tab still works if the live file is absent."""
+    theirs = _jsonl(EVID / "theirs.jsonl")
+    out = []
+    for a, n in [("mg-p1-llmonly", "LLM only"), ("mg-p2-rag", "Basic RAG"),
+                 ("mg-p3-graphrag", "GraphRAG")]:
         R = [r for r in theirs if r["arm"] == a]
         if not R:
             continue
         pt = st.mean([r["prompt_tokens"] for r in R])
         ct = st.mean([r["completion_tokens"] for r in R])
         out.append({"arm": a, "name": n, "n": len(R), "tokens": round(pt + ct),
-                    "cost": round(pt * 0.0003 + ct * 0.0025, 2)})
-    # recorded scores from that round (see _evidence/CONTEXT.md and MG_FIXES_FINDINGS.md)
-    for row in out:
-        row["f1"] = {"LLM only": 0.0, "Basic RAG": 0.414, "GraphRAG": 0.603}.get(row["name"])
-        row["correct"] = None
-        row["judge"] = None
-        row["bert"] = None
-    return {
-        "label": "SEC 10-K filings — MasterGraph reproduced",
-        "subtitle": "50 questions · frozen in _evidence/ · 428 file hashes verify",
-        "overall": out,
-        "tiers": [],
-        "notes": [
-            "GraphRAG 0.603 blended; rose to 0.737 after fixing 9 audited bugs in their submission.",
-            "Graph-first aggregation scored 0.843 vs 0.414 for vector-only on set questions.",
-            "GraphRAG used 2,471 tokens/question vs Basic RAG's 4,760 — a 48% reduction.",
-            "On 5 HELD-OUT questions neither team tuned on, the ranking REVERSED (theirs 4/5, ours 3/5). "
-            "Both routers were hand-tuned regex; that is the finding that motivated this whole rebuild.",
-        ],
-    }
+                    "cost": round(pt * 0.0003 + ct * 0.0025, 2),
+                    "f1": {"LLM only": 0.0, "Basic RAG": 0.414, "GraphRAG": 0.603}[n],
+                    "correct": None, "partial": None, "judge": None, "bert": None})
+    return {"label": "SEC 10-K filings — frozen replay", "subtitle": "50 questions · _evidence/",
+            "overall": out, "tiers": [], "notes": ["Live run not found; showing frozen evidence."]}
 
 
-# ---------------------------------------------------------------- live query
 def warm() -> None:
     with _lock:
         if _mods:

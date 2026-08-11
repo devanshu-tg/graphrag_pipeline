@@ -139,14 +139,14 @@ def main() -> int:
         if failed:
             print(f"    WARNING: {failed} judgements failed and are excluded, not scored 0")
 
-        names = {"p1": "P1 LLM-only", "p2": "P2 Basic RAG", "p2xl": "P2-XL Big context",
+        names = {"p1": "P1 LLM-only", "p2": "P2 Basic RAG", "p2xl": "P2-XL Big context", "p2rr": "P2-RR Reranked",
                  "p2p": "P2+ Iterative RAG", "p3": "P3 GraphRAG"}
         by: dict = {}
         for r in rows:
             by.setdefault(r["arm"], []).append(r)
         print(f"\n  {'pipeline':<20}{'judge':>8}{'setF1':>8}{'gap':>8}")
         print("  " + "-" * 44)
-        for a in ("p1", "p2", "p2xl", "p2p", "p3"):
+        for a in ("p1", "p2", "p2rr", "p2xl", "p2p", "p3"):
             R = [x for x in by.get(a, []) if x.get("judge_score") is not None]
             if not R:
                 continue
