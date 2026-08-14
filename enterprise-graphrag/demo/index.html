@@ -328,8 +328,7 @@ function kpis(m){
     {c:"", l:"LLM judge score", v:pct(g.judge!=null?g.judge:g.f1),
      f:`vs Basic RAG ${pct(b.judge!=null?b.judge:b.f1)}`
        +(g.n?` · ${g.n} questions`:"")},
-    {c:"b2", l:"Basic RAG tokens", v:nu(b.tokens),
-     f:b.correct!=null?`per query · ${b.correct} of ${b.n} fully correct`:"per query"},
+    {c:"b2", l:"Basic RAG tokens", v:nu(b.tokens), f:"per query"},
     {c:"b3", l:"GraphRAG tokens", v:nu(g.tokens), f:"per query"},
     // Token reduction rather than cost: the token counts are MEASURED, the dollar figures
     // assume gemini-3.6-flash is priced like 2.5-flash, which is unverified (see config.py).
@@ -342,20 +341,24 @@ function kpis(m){
 
 function table(m){
   const hj=m.overall.some(r=>r.judge!=null);
-  const best=Math.max(...m.overall.map(r=>r.f1??0));
+  const hb=m.overall.some(r=>r.bert!=null&&r.bert>0);
+  // Lead row is decided by the LLM judge now that Set F1 is not displayed. BERTScore is NOT
+  // used for it: measured on this benchmark it ranks the NO-RETRIEVAL arm highest (84.6% while
+  // being 2.2% correct), because "Alex Chen" and "Aisha Patel" embed almost identically. It is
+  // shown because it was asked for, not because it discriminates.
+  const best=Math.max(...m.overall.map(r=>(r.judge!=null?r.judge:r.f1)??0));
   const retr=m.overall.filter(r=>!/LLM only/.test(r.name));
   const cheap=Math.min(...retr.map(r=>r.tokens??1e9));
   document.getElementById("thead").innerHTML=
-    `<tr><th>Pipeline</th><th>Full / partial / missed</th><th>Set F1</th>`+
+    `<tr><th>Pipeline</th>${hb?"<th>BERTScore</th>":""}`+
     `${hj?"<th>LLM judge</th>":""}<th>Tokens</th><th>Cost / 1k</th></tr>`;
   document.getElementById("tbody").innerHTML=m.overall.map(r=>{
-    const lead=r.f1!=null&&r.f1===best&&best>0;
+    const score=r.judge!=null?r.judge:r.f1;
+    const lead=score!=null&&score===best&&best>0;
     return `<tr class="${lead?"lead":""}">
       <td><span class="pill"><i style="background:${COL[r.arm]||"var(--p3)"}"></i>${r.name}</span></td>
-      <td>${r.correct==null?'<span class="na">—</span>':
-            `${r.correct} / ${r.partial||0}${r.partial_avg?` <span class="na">@${Math.round(r.partial_avg*100)}%</span>`:""} / ${r.zero||0}`}</td>
-      <td class="${lead?"best":""}">${f3(r.f1)}</td>
-      ${hj?`<td>${f3(r.judge)}</td>`:""}
+      ${hb?`<td>${f3(r.bert)}</td>`:""}
+      ${hj?`<td class="${lead?"best":""}">${f3(r.judge)}</td>`:""}
       <td class="${r.tokens===cheap?"best":""}">${nu(r.tokens)}</td>
       <td>${r.cost==null?'<span class="na">—</span>':"$"+r.cost.toFixed(2)}</td></tr>`}).join("");
 }
