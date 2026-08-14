@@ -1,0 +1,13 @@
+{
+  "p1": {
+    "exact": 0,
+    "n": 50,
+    "recall": 0.004,
+    "precision": 0.005,
+    "f1": 0.004444,
+    "prompt": 262.68,
+    "completion": 11.98,
+    "planner": 0,
+    "total": 274.66
+  }
+}
