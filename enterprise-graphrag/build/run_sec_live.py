@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -32,7 +33,9 @@ init_console()
 load_env()
 
 MG = Path(__file__).resolve().parents[2] / "mastergraph-round3"
-WORKER = "http://localhost:8001"
+# T4 runs a SECOND worker on another port under a fair generation config, so the dashboard's
+# worker on 8001 keeps serving untouched while the re-measurement runs.
+WORKER = os.getenv("SEC_WORKER", "http://localhost:8001")
 ARMS = {"p1": "P1 LLM-only", "p2": "P2 Basic RAG", "p3": "P3 GraphRAG"}
 
 
@@ -40,6 +43,12 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="results/enterprise/eval_sec_live.jsonl")
     ap.add_argument("--n", type=int, default=50)
+    # dev_set.jsonl is MasterGraph's OWN held-out split: 24 questions, same A/B/C/D tiers, with
+    # gold answers, and ZERO overlap with the 50 in eval_set.jsonl (verified). It is the honest
+    # way to get new SEC questions without inventing gold for a corpus of real filings, and it
+    # has never been used in any measurement by either team.
+    ap.add_argument("--questions", default="datasets/round3/eval_set.jsonl",
+                    help="path relative to mastergraph-round3/")
     args = ap.parse_args()
 
     import requests
@@ -53,8 +62,8 @@ def main() -> int:
         return 2
     print(f"worker ready. running {args.n} SEC questions x 3 pipelines LIVE\n")
 
-    qs = [json.loads(l) for l in ropen(MG / "datasets" / "round3" / "eval_set.jsonl")
-          if l.strip()][: args.n]
+    qs = [json.loads(l) for l in ropen(MG / args.questions) if l.strip()][: args.n]
+    print(f"  questions: {args.questions}  ({len(qs)} loaded)")
 
     import llm_judge
     rows, t0 = [], time.time()
