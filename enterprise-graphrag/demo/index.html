@@ -8,9 +8,14 @@
 /* ONE knob controls every text size on the page. Everything below is in rem, so changing
    --fs (or the A-/A+ control in the header) scales the whole interface coherently. The
    previous version used clamp(..,vw,..) per element, whose ceilings bound on wide displays
-   and left the page reading tiny. */
+   and left the page reading tiny.
+
+   17px, not the 26px this was built at. 26 was a ROOM setting — at that base the hero is
+   2.15rem = 56px and the KPI numbers are 2.6rem = 68px, which reads from the back of a hall
+   and looks broken on a laptop. Now that this is a URL people open themselves, the default
+   has to suit a laptop; A+ still takes it to 40px for a projector. */
 :root{
-  --fs:26px;
+  --fs:17px;
   --bg:#08090d;
   --surface:rgba(255,255,255,.034); --surface2:rgba(255,255,255,.058);
   --stroke:rgba(255,255,255,.12); --stroke2:rgba(255,255,255,.2);
@@ -294,11 +299,15 @@ const NAMES={p1:"LLM only",p2:"Basic RAG",p2rr:"Basic RAG",p2xl:"Basic RAG · 50
 const COL={p1:"var(--p1)",p2:"var(--p2)",p2rr:"var(--p2)",p2xl:"var(--p2p)",p3:"var(--p3)"};
 let DATA=null, view="textual", CHIPS=[], onlyAnswered=true;
 
-/* text size: persists, so the setting survives a refresh mid-demo */
-let FS=parseFloat(localStorage.getItem("fs2")||"26");
-function applyFS(){FS=Math.max(16,Math.min(40,FS));
+/* text size: persists, so the setting survives a refresh mid-demo.
+   Key is fs3, not fs2. Changing the default alone would do nothing for anyone who has already
+   loaded the page — their browser still holds the old 26 and would keep rendering at room
+   size forever. Bumping the key retires those saved values in one go. Floor is 13 so A- is
+   still useful from a 17px base; 16 would have left almost no room below the default. */
+let FS=parseFloat(localStorage.getItem("fs3")||"17");
+function applyFS(){FS=Math.max(13,Math.min(40,FS));
   document.documentElement.style.setProperty("--fs",FS+"px");
-  localStorage.setItem("fs2",FS)}
+  localStorage.setItem("fs3",FS)}
 applyFS();
 document.getElementById("zIn").onclick=()=>{FS+=2;applyFS()};
 document.getElementById("zOut").onclick=()=>{FS-=2;applyFS()};
