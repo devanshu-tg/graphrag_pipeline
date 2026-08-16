@@ -53,7 +53,20 @@ TG_USER = os.getenv("TIGERGRAPH_USERNAME", "tigergraph")
 TG_PASS = os.getenv("TIGERGRAPH_PASSWORD", "")
 TG_SECRET = os.getenv("TIGERGRAPH_SECRET", "")
 
-INDEX_DIR = Path(os.getenv("P3_INDEX_DIR", "pipeline3_round3/index"))
+# index_v2, matching the graph. This default used to be "pipeline3_round3/index" while
+# demo/server.py forced index_v2, so the BENCHMARK and the DEMO read different provenance
+# indexes and nobody had chosen that — the two defaults simply disagreed. The TigerGraph graph
+# itself was ingested from index_v2 (build/ingest_typed_v2.py), so v2 is the one that matches
+# what a traversal actually walks; the old default was the odd one out.
+#
+# The two differ by exactly three relations that canonicalisation drops — doc_type 6,372,
+# has_priority 1,857, has_status 3,710, totalling the entire 11,939-edge gap — while every
+# shared relation has an IDENTICAL count. None of the 8 published question shapes reference
+# those three. Verified rather than assumed: one question per tier re-run against v2 returned
+# the same answer set, the only textual difference being "Jordan Blake" for "jordan_blake",
+# which is canonicalisation resolving a username to a display name and which grades 1.0
+# because norm() strips non-alphanumerics. The published figures stand on either index.
+INDEX_DIR = Path(os.getenv("P3_INDEX_DIR", "pipeline3_round3/index_v2"))
 CORPUS = Path(os.getenv("P3_CORPUS", "datasets/enterprise/corpus.jsonl"))
 
 ROUTER_OFF = os.getenv("P3_ROUTER_OFF", "0") != "0"

@@ -47,16 +47,23 @@ RUN test -s pipeline3_round3/index_v2/edges_prov.json \
     || (echo "MISSING pipeline3_round3/index_v2/edges_prov.json — see the header" && exit 1)
 
 # Import the whole runtime path at build time. requirements-runtime.txt is hand-derived, so
-# this is the check that catches a missing dependency here instead of on the first query.
+# this is the check that catches a missing dependency here instead of on the first query —
+# and it has already earned its keep once, catching tiktoken (imported by metrics.py, which
+# a grep of the obvious files missed).
+#
+# pipeline3 is loaded by importlib at warm() time with an explicit path, so a plain
+# `import pipeline3_round3.pipeline` does not exercise the code path the server uses. Load it
+# the same way the server does, and import schema_router from inside that package, or this
+# check passes while the only pipeline that matters is still broken.
 RUN python -c "\
-import demo.server as s; \
-import pipeline1_llm_only, pipeline2_basic_rag, schema_router, retrieval_common; \
-print('runtime imports OK')" 2>/dev/null \
-    || python -c "\
-import sys; sys.path.insert(0,'.'); \
-import pipeline1_llm_only, pipeline2_basic_rag, schema_router, retrieval_common; \
+import sys, importlib.util; \
+sys.path.insert(0, '.'); sys.path.insert(0, 'pipeline3_round3'); \
+import pipeline1_llm_only, pipeline2_basic_rag, retrieval_common, metrics, llm_client, config; \
+import schema_router; \
 from embeddings.embedder import get_embedder; \
-print('runtime imports OK')"
+spec = importlib.util.spec_from_file_location('p3', 'pipeline3_round3/pipeline.py'); \
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m); \
+print('runtime imports OK — all three pipelines')"
 
 # Same configuration the benchmark ran under. P3_VEC_SLOTS=3 is the published setting:
 # 2,733 tokens against Basic RAG's 5,312, 50/50 exact.

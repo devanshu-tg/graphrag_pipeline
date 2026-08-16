@@ -16,6 +16,20 @@ requests>=2.31.0
 numpy>=1.26.0
 tqdm>=4.66.0
 
+# Token counting in metrics.py, which every pipeline imports. This one was MISSED on the
+# first pass — a hand-written grep of the obvious files did not reach metrics.py, because
+# pipeline1 imports it, not the server. The Dockerfile's import check caught it at build
+# time, which is exactly what that check is for. A transitive AST walk from demo/server.py
+# is the way to regenerate this list; see the scan in deploy/README.md.
+tiktoken>=0.7.0
+
+# DELIBERATELY ABSENT, verified lazy — both are imported INSIDE their provider function
+# (llm_client._openai_call line 95, llm_client._ollama_call line 81), so they load only when
+# LLM_PROVIDER selects them. This deployment runs gemini, so neither is ever imported:
+#   openai            ~40 MB with httpx and friends
+#   langchain-ollama  local-model provider, irrelevant to a hosted deploy
+# If you switch LLM_PROVIDER, add the matching package here or the first query will 500.
+
 # Document/message types used by llm_client and metrics. The `-core` package only — the
 # chroma/ollama/text-splitter integrations are development-only.
 langchain-core>=0.2.0
