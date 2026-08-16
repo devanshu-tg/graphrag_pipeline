@@ -620,6 +620,54 @@ def examples() -> list[dict]:
     return picks
 
 
+# ---------------------------------------------------------------- access control
+# Off by default. Set DEMO_TOKEN and/or DEMO_RATE_PER_HOUR to arm them; the deploy config
+# sets both. Kept deliberately small — no dependency, no store, no user accounts. It is not
+# authentication, it is a spend limit with a shared password in front of it.
+DEMO_TOKEN = os.getenv("DEMO_TOKEN", "")
+DEMO_RATE = int(os.getenv("DEMO_RATE_PER_HOUR", "0"))     # 0 = unlimited
+_hits: dict[str, list[float]] = {}
+_hits_lock = threading.Lock()
+
+
+def _client_ip(h) -> str:
+    # Behind Fly/Railway/Render the socket peer is the proxy, so the real client only appears
+    # in X-Forwarded-For. Taking the FIRST entry is right for those platforms, which append
+    # rather than trust: a client-supplied XFF ends up later in the list. Do not copy this to
+    # a platform that passes the header through unmodified — there the first entry is a lie.
+    xff = h.headers.get("X-Forwarded-For", "")
+    return (xff.split(",")[0].strip() if xff else h.client_address[0]) or "?"
+
+
+def _gate(h) -> tuple[int, str] | None:
+    """None if the request may proceed, else (status, message)."""
+    if DEMO_TOKEN:
+        from urllib.parse import parse_qs
+        supplied = (h.headers.get("X-Demo-Token", "")
+                    or (parse_qs(urlparse(h.path).query).get("token") or [""])[0])
+        # compare_digest, not ==, so the check does not leak the token's length or prefix
+        # through response timing.
+        import hmac
+        if not hmac.compare_digest(supplied, DEMO_TOKEN):
+            return 401, "this demo needs an access token"
+    if DEMO_RATE > 0:
+        import time as _t
+        now, ip = _t.time(), _client_ip(h)
+        with _hits_lock:
+            seen = [t for t in _hits.get(ip, []) if now - t < 3600]
+            if len(seen) >= DEMO_RATE:
+                wait = int((3600 - (now - seen[0])) / 60) + 1
+                _hits[ip] = seen
+                return 429, (f"rate limit: {DEMO_RATE} live queries per hour. "
+                             f"Try again in ~{wait} min, or browse the recorded runs below.")
+            seen.append(now)
+            _hits[ip] = seen
+            if len(_hits) > 5000:      # unbounded dict = a slow memory leak under a scan
+                for k in [k for k, v in _hits.items() if not v or now - v[-1] > 3600]:
+                    _hits.pop(k, None)
+    return None
+
+
 # ---------------------------------------------------------------- http
 class Handler(BaseHTTPRequestHandler):
     def _send(self, code, body, ctype="application/json"):
@@ -658,6 +706,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if urlparse(self.path).path != "/api/query":
             return self._send(404, json.dumps({"error": "not found"}))
+        # Every call past this point spends money: three LLM calls and a TigerGraph round trip,
+        # ~77s and ~8,500 tokens for a full three-arm query. On a laptop that is nobody's
+        # problem. On a public URL it is an anonymous Gemini endpoint funded by whoever owns
+        # the key, so the gate below is REQUIRED before this is exposed. Both checks are
+        # inert unless their env var is set, so local development is unchanged.
+        gate = _gate(self)
+        if gate:
+            return self._send(gate[0], json.dumps({"error": gate[1]}))
         try:
             n = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(n) or b"{}")

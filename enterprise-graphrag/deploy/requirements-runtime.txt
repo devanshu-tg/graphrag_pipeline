@@ -1,0 +1,30 @@
+# What the LIVE SERVER imports — derived by walking the actual runtime path
+# (demo/server.py -> pipeline1/2/3 -> schema_router, retrieval_common, embeddings, config),
+# not by copying requirements.txt.
+#
+# requirements.txt is the DEVELOPMENT set: it also carries chromadb, streamlit, plotly,
+# pandas, scikit-learn, datasets, evaluate, bert-score, openai, three langchain integrations,
+# spacy and its 40 MB English model, and tiktoken. None of them are imported when serving a
+# query. They exist for the build and evaluation scripts, and installing them into the image
+# costs roughly a gigabyte and several minutes of build time for code that never runs.
+#
+# Keep this file honest: if the server starts importing something new, add it HERE, and the
+# smoke test in the Dockerfile will catch the omission at build time rather than at 3am.
+
+python-dotenv>=1.0.0
+requests>=2.31.0
+numpy>=1.26.0
+tqdm>=4.66.0
+
+# Document/message types used by llm_client and metrics. The `-core` package only — the
+# chroma/ollama/text-splitter integrations are development-only.
+langchain-core>=0.2.0
+
+# Graph AND vector store. Pipeline 2 also retrieves through TigerGraph now, so there is no
+# Chroma index to ship.
+pyTigerGraph>=1.0.0
+
+# Embedder (BAAI/bge-small-en-v1.5) and cross-encoder reranker
+# (cross-encoder/ms-marco-MiniLM-L-6-v2). Pulls torch and transformers; the Dockerfile
+# installs the CPU-only torch build first so pip does not drag in ~2 GB of CUDA wheels.
+sentence-transformers>=3.0.0

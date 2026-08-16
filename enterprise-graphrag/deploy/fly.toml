@@ -1,0 +1,49 @@
+# Fly.io, chosen for one reason: a full three-arm query takes ~77 seconds and Fly does not
+# impose an HTTP timeout shorter than that. Vercel (60s hobby / 300s pro), Netlify Functions
+# (10s), and Cloudflare Workers all cut the request before the third pipeline finishes.
+# Railway and Render work too — see deploy/README.md.
+#
+#   fly launch --no-deploy --copy-config     (first time only)
+#   fly secrets set GOOGLE_API_KEY=... TIGERGRAPH_HOST=... TIGERGRAPH_SECRET=... \
+#                   TIGERGRAPH_USERNAME=... TIGERGRAPH_PASSWORD=... DEMO_TOKEN=...
+#   fly deploy --dockerfile deploy/Dockerfile
+
+app = "graphrag-demo"
+primary_region = "iad"          # near the TigerGraph Savanna workspace; move both together
+
+[build]
+  dockerfile = "deploy/Dockerfile"
+
+[env]
+  DEMO_PORT = "8000"
+  # 20 live queries per hour per IP. A query costs ~8,500 tokens across three arms, so this
+  # bounds a single scraper to roughly 170k tokens/hour rather than an unbounded bill.
+  # The recorded runs stay browsable when someone hits the limit, so the page still works.
+  DEMO_RATE_PER_HOUR = "20"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # NOT zero. Cold start is ~60s: the corpus is 141 MB of JSONL parsed into a dict, plus a
+  # 55 MB edge index, plus two models. Scaling to zero means every visitor after an idle
+  # period waits a minute on a blank page. One machine always on is a few dollars a month
+  # and the difference between a demo and a disappointment.
+  min_machines_running = 1
+  auto_stop_machines = false
+  auto_start_machines = true
+
+  [[http_service.checks]]
+    # /api/status returns {"state": "cold|loading|ready|error"} without touching the LLM or
+    # the graph, so it is safe to poll and it reports warm-up honestly.
+    path = "/api/status"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "180s"       # must exceed cold start or Fly restarts it mid-load, forever
+
+[[vm]]
+  # Measured, not guessed: the process sits at 1,064 MB resident once warm (corpus dict,
+  # edge index, embedder, cross-encoder). 1 GB OOMs during load; 2 GB leaves ~900 MB headroom
+  # for concurrent queries.
+  memory = "2gb"
+  cpu_kind = "shared"
+  cpus = 2                      # the cross-encoder reranks a 200-candidate pool per query
