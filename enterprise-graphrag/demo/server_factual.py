@@ -48,6 +48,45 @@ load_env()                                  # our .env — theirs points at a Ma
 os.environ["TIGERGRAPH_GRAPH"] = os.getenv("SEC_GRAPH", "finance")
 PORT = int(os.getenv("FACTUAL_PORT", "8001"))
 
+# --- T4: run their pipelines under a FAIR generation config -------------------------------
+# The audit measured three config choices that depress every SEC arm, none of them
+# architectural:
+#   MAX_TOKENS=512   with gemini-2.5-flash drawing thinking and output from ONE budget, answers
+#                    are cut at ~18-21 visible tokens. 19/50 P2 answers were truncated, vs 7/50
+#                    for P3 — it penalises the BASELINE 2.7x hardest.
+#   refusal allowed  "if the answer is not supported by them, say so" -> 11/50 P2 and 11/50 P3
+#                    answers are refusals scoring 0. Our enterprise prompt forbids declining.
+#   gemini-2.5-flash two generations behind; on our held-out 20 the switch to 3.6-flash moved
+#                    GraphRAG 0.717 -> 1.000.
+#
+# MAX_TOKENS and GEMINI_MODEL are already os.getenv() in THEIR config, so those need no patch —
+# just the environment. SYSTEM_PROMPT is a literal, so SEC_NO_REFUSAL patches the module
+# ATTRIBUTE at runtime. Every arm reads config.SYSTEM_PROMPT at call time (verified in
+# pipeline1_llm_only.py:11, pipeline2_basic_rag.py:114, pipeline3_round3/pipeline.py:666), so
+# one assignment covers all three, and NOTHING on disk is modified — the 428 frozen hashes must
+# still verify afterwards.
+NO_REFUSAL = os.getenv("SEC_NO_REFUSAL", "0") != "0"
+
+# Same wording as our enterprise config.SYSTEM_PROMPT, verbatim, so the two projects are
+# finally being measured under the same instruction rather than opposite ones.
+_NO_EMPTY = (
+    "Give your best supported answer rather than declining. NEVER return an empty answer, "
+    "and never reply 'None', 'N/A' or that you cannot answer. If the context does not fully "
+    "settle it, name the MOST LIKELY item(s) the context supports and output only those. "
+    "An empty reply is always worse than a best-effort one.\n")
+
+
+def _patch_prompt(cfg) -> None:
+    """Replace their refusal licence with our no-empty rule. Applied to all three arms."""
+    old = "if the answer is not supported by them, say so. "
+    p = cfg.SYSTEM_PROMPT
+    if old in p:
+        cfg.SYSTEM_PROMPT = p.replace(old, "") + "\n" + _NO_EMPTY
+    else:
+        # their wording changed; append rather than silently doing nothing
+        print("[factual] WARNING: refusal clause not found verbatim — appending no-empty rule")
+        cfg.SYSTEM_PROMPT = p + "\n" + _NO_EMPTY
+
 _lock = threading.Lock()
 _mods: dict = {}
 _state = {"state": "cold", "error": ""}
@@ -73,6 +112,14 @@ def warm() -> None:
             import pipeline1_llm_only as p1
             import pipeline2_basic_rag as p2
             from chroma_store import load_vectorstore
+            import config as mg_config
+            if NO_REFUSAL:
+                _patch_prompt(mg_config)
+            print(f"[factual] model={mg_config.GEMINI_MODEL} max_tokens={mg_config.MAX_TOKENS} "
+                  f"no_refusal={NO_REFUSAL}")
+            _state["config"] = {"model": mg_config.GEMINI_MODEL,
+                                "max_tokens": mg_config.MAX_TOKENS,
+                                "no_refusal": NO_REFUSAL}
             _mods.update({"p1": p1, "p2": p2, "p3": p3, "vs": load_vectorstore()})
             _state["state"] = "ready"
         except Exception as e:

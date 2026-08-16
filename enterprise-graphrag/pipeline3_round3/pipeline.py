@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import config
+import retrieval_common
 import schema_router
 from _portability import init_console, load_env, ropen
 from llm_client import get_llm_response
@@ -67,8 +68,49 @@ MAX_CTX_CHARS = int(os.getenv("MAX_CHUNK_CHARS", str(config.CONTEXT_CHUNK_CHARS)
 # refill from when duplicates were dropped and P2 had none. A small asymmetry, but it
 # favoured the system under test, which is the one direction that is never acceptable.
 VEC_K = int(os.getenv("P3_VEC_K", str(config.CONTEXT_NUM_CHUNKS)))
+# How many of the 10 context slots traversal evidence may occupy when a graph route fires.
+# The rest go to reranked vector chunks, so a WRONG plan can never crowd out the text that
+# holds the answer — the failure that cost 26 content questions their answer entirely.
+# Half is a deliberate default rather than a tuned one; the aggregation tier is re-run to
+# confirm it does not cost anything there, since on those questions the answer travels in the
+# `facts` traversal line rather than in the provenance sentences.
+PROV_SLOTS = int(os.getenv("P3_PROV_SLOTS", str(max(1, config.CONTEXT_NUM_CHUNKS // 2))))
+# Hard cap on how many VECTOR chunks join the context. Without it the context simply fills to
+# MAX_CTX_CHUNKS, so a question where the graph found little gets the MOST chunks — which is why
+# single_doc was the most expensive tier at 6,962 tokens while multi_hop cost 4,750. Measured
+# retrieval coverage on the official content questions: top-3 keeps 91% of top-10's coverage for
+# 30% of the context tokens, so capping trades a little recall for a lot of budget.
+# Default equals MAX_CTX_CHUNKS, i.e. exactly the previous behaviour, so stored results stay
+# reproducible and this knob has to be set deliberately.
+VEC_SLOTS = int(os.getenv("P3_VEC_SLOTS", str(config.CONTEXT_NUM_CHUNKS)))
+
+# --- graph-backed traversal (P3_TG_TRAVERSE=1) -------------------------------------------
+# Default OFF, because the stored 50-question result was produced with the local adjacency and
+# changing the default would silently invalidate it.
+#
+# With it ON, every hop of the walk becomes an installed GSQL query against the TYPED graph
+# `enterprise_v2` (build/install_v2_queries.py) instead of a Python dict lookup. Vector search
+# still runs on `enterprise` — v2 has no Chunk vertex, so it cannot serve vectors.
+#
+# Honest boundary, because it matters for what may be claimed: the graph supplies the
+# STRUCTURE (which nodes a hop reaches). The evidence SENTENCE for each edge still comes from
+# the local edges_prov index, because ingest_typed_v2.py loaded edges without their chunk_id —
+# v2 holds no provenance. So this proves traversal runs in TigerGraph; it does not make the
+# provenance graph-resident.
+TG_TRAVERSE = os.getenv("P3_TG_TRAVERSE", "0") != "0"
+TG_V2_GRAPH = os.getenv("TG_V2_GRAPH", "enterprise_v2")
+# The same 800-node frontier cap the local walk uses, so a capped hop truncates identically in
+# both modes. HOP_BATCH keeps one POST body a sane size.
+HOP_CAP, HOP_BATCH = 800, 400
+# Relations v2 has an edge type for. doc_type / has_status / has_priority are ATTRIBUTES of
+# Document in v2, not vertices, so they have no edge to traverse — those hops fall back to the
+# local table and are counted in _hop_stats so the fallback can never go unreported.
+V2_RELS = {"authored", "participated_in", "assigned_to", "owned_by", "in_team", "in_channel",
+           "in_repo", "about_customer", "has_label", "reports_to", "in_department", "related_to"}
+_hop_stats = {"graph": 0, "local_fallback": 0, "capped": 0, "errors": 0}
 
 _conn: tg.TigerGraphConnection | None = None
+_conn_v2: tg.TigerGraphConnection | None = None
 _embedder = None
 _chunk_text: dict | None = None
 _chunk_meta: dict | None = None
@@ -126,18 +168,82 @@ def _connect() -> tg.TigerGraphConnection | None:
     return None
 
 
-def _run_query(conn, name, params, retries=3):
+# Savanna drops large responses mid-read under load. The original list caught 500/timeout/reset
+# but not the urllib3 "Connection broken: IncompleteRead(...)" that a big payload actually
+# produces, so a single truncated read aborted a whole 50-question run.
+_TRANSIENT = ("500", "502", "503", "504", "timeout", "reset", "incompleteread",
+              "connection broken", "connection aborted", "protocolerror", "remote end closed",
+              "max retries", "temporarily unavailable")
+
+
+def _run_query(conn, name, params, retries=4):
     last = None
     for attempt in range(retries):
         try:
             return conn.runInstalledQuery(name, params)
         except Exception as e:
             last = e
-            if "500" in str(e) or "timeout" in str(e).lower() or "reset" in str(e).lower():
+            if any(t in str(e).lower() for t in _TRANSIENT):
                 time.sleep(1.5 * (attempt + 1))
                 continue
             raise
     raise last
+
+
+# ---------------------------------------------------------------- typed-graph traversal
+def _connect_v2() -> tg.TigerGraphConnection | None:
+    """Second connection, to the TYPED graph. Separate from _conn because the two graphs hold
+    different things: enterprise has the chunk vectors, enterprise_v2 has the typed entities."""
+    global _conn_v2
+    if _conn_v2 is not None:
+        return _conn_v2
+    last = None
+    for attempt in range(4):
+        try:
+            conn = tg.TigerGraphConnection(host=TG_HOST, graphname=TG_V2_GRAPH,
+                                           gsqlSecret=TG_SECRET or None,
+                                           username=TG_USER, password=TG_PASS)
+            conn.getToken(TG_SECRET)
+            conn.echo()
+            _conn_v2 = conn
+            return _conn_v2
+        except Exception as e:
+            last = e
+            time.sleep(2 ** attempt + 1)
+    raise RuntimeError(f"[p3] P3_TG_TRAVERSE=1 but {TG_V2_GRAPH} unreachable: {str(last)[:140]}")
+
+
+def _tg_hop(frontier: set, rel: str, direction: str) -> tuple[set, list[tuple[str, str]]]:
+    """One hop, executed by TigerGraph: hop_<rel>_<out|in>(SET<STRING> seeds).
+
+    usePost=True is not optional. pyTigerGraph serialises a SET parameter into the query STRING
+    for GET, joining values with commas — and these seeds are document paths, so any value
+    containing a comma would be split into two bogus ids. POST sends them as a JSON list.
+    """
+    conn = _connect_v2()
+    seeds = sorted(frontier)
+    if len(seeds) > HOP_CAP:
+        _hop_stats["capped"] += 1
+        seeds = seeds[:HOP_CAP]
+    nodes: set[str] = set()
+    pairs: list[tuple[str, str]] = []
+    for i in range(0, len(seeds), HOP_BATCH):
+        batch = seeds[i:i + HOP_BATCH]
+        try:
+            r = conn.runInstalledQuery(f"hop_{rel}_{direction}", {"seeds": batch}, usePost=True)
+        except Exception as e:
+            _hop_stats["errors"] += 1
+            if REQUIRE_TG:
+                raise RuntimeError(f"[p3] hop_{rel}_{direction} failed: {str(e)[:140]}")
+            return set(), []
+        for row in (r or []):
+            nodes.update(row.get("nodes") or [])
+            for p in (row.get("pairs") or []):
+                if " >> " in p:
+                    a, b = p.split(" >> ", 1)
+                    pairs.append((a, b))
+    _hop_stats["graph"] += 1
+    return nodes, pairs
 
 
 # ---------------------------------------------------------------- retrieval
@@ -152,14 +258,27 @@ def _tg_vector_search(question: str, k: int = VEC_K) -> list[str]:
         return []
     try:
         qv = _embedder.embed_query(question)
-        r = _run_query(conn, "vector_search", {"query_vec": qv, "k": k})
-        ids = []
-        if r and isinstance(r, list):
-            for row in r:
-                for vs in (row.get("vs") or []) if isinstance(row.get("vs"), list) else []:
-                    cid = vs.get("v_id") or vs.get("attributes", {}).get("chunk_id")
-                    if cid:
-                        ids.append(cid)
+        # vector_search_lite returns chunk IDS ONLY. The original vector_search ends in
+        # `PRINT vs WITH VECTOR`, so every hit carries its full 384-float embedding — ~40KB at
+        # k=10 but ~1.3MB at the reranker's k=200, and Savanna dropped the connection mid-read
+        # (IncompleteRead: 838KB of 1.27MB). The pipeline only ever read v_id, so the vectors
+        # were pure payload waste. Falls back to the original query if lite is not installed,
+        # because this file has to keep working against a graph built before it existed.
+        ids: list[str] = []
+        try:
+            r = _run_query(conn, "vector_search_lite", {"query_vec": qv, "k": k})
+            for row in (r or []):
+                ids.extend([c for c in (row.get("ids") or []) if c])
+        except Exception:
+            ids = []
+        if not ids:
+            r = _run_query(conn, "vector_search", {"query_vec": qv, "k": k})
+            if r and isinstance(r, list):
+                for row in r:
+                    for vs in (row.get("vs") or []) if isinstance(row.get("vs"), list) else []:
+                        cid = vs.get("v_id") or vs.get("attributes", {}).get("chunk_id")
+                        if cid:
+                            ids.append(cid)
         return ids
     except Exception as e:
         if REQUIRE_TG:
@@ -337,9 +456,30 @@ def _walk(plan: dict) -> tuple[list[str], list[dict]]:
     def step(frontier: set, path: list) -> set:
         for rel, direction in path:
             table = fwd[rel] if direction == "out" else rev[rel]
-            nxt: set[str] = set()
-            for node in list(frontier)[:800]:
-                nxt.update(table.get(node, ()))
+            # sorted() only in traverse mode: the local default must stay byte-identical to the
+            # run that produced results/enterprise/eval_ent50.jsonl, but the cross-check below
+            # is only meaningful if both modes start from the SAME capped subset.
+            seeds = (sorted(frontier) if TG_TRAVERSE else list(frontier))[:HOP_CAP]
+            local: set[str] = set()
+            for node in seeds:
+                local.update(table.get(node, ()))
+            if TG_TRAVERSE and rel in V2_RELS:
+                nxt, _ = _tg_hop(frontier, rel, direction)
+                # The typed graph and this local adjacency were loaded from the SAME edge
+                # records, so a disagreement is a load or query bug, not a difference of
+                # opinion. Counted rather than raised, so one flaky hop cannot abort a
+                # 50-question run — and reported at the end so it cannot go unnoticed either.
+                k = "agree" if nxt == local else "disagree"
+                _hop_stats[k] = _hop_stats.get(k, 0) + 1
+                if nxt != local:
+                    _hop_stats.setdefault("diff_examples", []).append(
+                        {"rel": rel, "dir": direction, "seeds": len(seeds),
+                         "graph_only": sorted(nxt - local)[:3],
+                         "local_only": sorted(local - nxt)[:3]})
+            else:
+                if TG_TRAVERSE:
+                    _hop_stats["local_fallback"] += 1   # relation has no edge type in v2
+                nxt = local
             for e in _rel_index.get(rel, []):
                 a, b = ((e["source"], e["target"]) if direction == "out"
                         else (e["target"], e["source"]))
@@ -426,6 +566,7 @@ def run_single(question: str, vectorstore=None, num_hops: int = 2) -> CallMetric
 
     ids: list[str] = []
     context = ""
+    trail: list[dict] = []          # stays empty when the planner returns no legs
     if plan["legs"]:
         landed, trail = _walk(plan)
         if landed:
@@ -440,18 +581,41 @@ def run_single(question: str, vectorstore=None, num_hops: int = 2) -> CallMetric
                         f" {plan['combine']}" if len(plan["legs"]) > 1 else "")
                      + f" ({len(landed)} results): {', '.join(landed[:60])}")
             graph_doc_ids = [e.get("chunk_id", "") for e in trail[:MAX_CTX_CHUNKS]]
-            if COMPRESS_OFF:
-                context, ids = _context_from_chunks([e.get("chunk_id", "") for e in trail])
-            else:
-                context, ids = _context_from_prov(trail)
 
-    # UNION, never replacement: vector results always available underneath, so the graph
-    # can only add. With no constraints this degrades to exactly Basic RAG.
-    if not ids:
-        ids = _tg_vector_search(question, k=VEC_K)
-        context, ids = _context_from_chunks(ids)
-        if not graph_doc_ids:
-            graph_doc_ids = ids
+    # UNION, never replacement — and now the code actually does that.
+    #
+    # It used to read `if not ids:`, so vector search ran ONLY when the graph returned nothing.
+    # When the graph returned something WRONG the answering text was never fetched at all.
+    # Measured on the official 200 content questions: 26 were routed to the graph, and on those
+    # retrieval hit@k collapsed to 22.9% and the score to 9.6%, against Basic RAG's 46.8% on the
+    # same questions. The comment above has claimed "union, never replacement" since the design
+    # document; the implementation did the opposite.
+    #
+    # Vector search now ALWAYS runs, and is reranked with the same cross-encoder and the same
+    # RR_POOL/RR_KEEP the baseline uses (retrieval_common), because the fallback previously took
+    # plain top-10 while the arm it is compared against reranked 50 -> 10. That asymmetry cost
+    # 8.4 points on the 166 questions that had already fallen back, and it favoured the
+    # BASELINE, which is the only direction that is never acceptable to leave in place.
+    #
+    # Budget stays identical to P2's: at most MAX_CTX_CHUNKS items total. Traversal evidence is
+    # capped at PROV_SLOTS so a wrong plan can never crowd out the chunk holding the answer;
+    # the remaining slots are filled with reranked chunks. On aggregation questions the answer
+    # travels in the `facts` line, not in the provenance sentences, so capping them is safe —
+    # and both benchmarks are re-run to confirm that rather than assume it.
+    pool = _tg_vector_search(question, k=max(VEC_K, retrieval_common.RR_POOL))
+    vec_ids = retrieval_common.rerank(question, pool, _chunk_text.get,
+                                      keep=VEC_SLOTS, max_chars=MAX_CTX_CHARS)
+    if facts:
+        keep_prov = trail[:PROV_SLOTS]
+        if COMPRESS_OFF:
+            context, ids = _context_from_chunks(
+                [e.get("chunk_id", "") for e in trail] + vec_ids)
+        else:
+            context, ids = _context_from_prov(keep_prov, extra=vec_ids)
+    else:
+        context, ids = _context_from_chunks(vec_ids)
+    if not graph_doc_ids:
+        graph_doc_ids = ids
 
     prompt = _build_prompt(question, context, facts)
     with MetricsTimer("Pipeline 3: GraphRAG (schema-driven)", question) as timer:

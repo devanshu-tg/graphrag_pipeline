@@ -112,6 +112,14 @@ def run_arm(arm: str, questions: list[dict], vs=None) -> list[dict]:
         pt = schema_router.plan_token_usage()
         for r in rows:
             r["planner_tokens"] = round((pt["prompt"] + pt["output"]) / max(1, len(rows)))
+        # With P3_TG_TRAVERSE=1 every hop is an installed GSQL query on the typed graph. Print
+        # the tally, because "the graph did the traversal" is a claim that needs a count behind
+        # it — including how often it FELL BACK to the local table, and whether the two agreed.
+        if getattr(p3, "TG_TRAVERSE", False):
+            hs = {k: v for k, v in p3._hop_stats.items() if k != "diff_examples"}
+            print(f"  hops via {p3.TG_V2_GRAPH}: {hs}")
+            for d in p3._hop_stats.get("diff_examples", [])[:5]:
+                print(f"    DISAGREEMENT {d}")
     return rows
 
 

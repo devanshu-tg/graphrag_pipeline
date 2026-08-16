@@ -53,6 +53,15 @@ EVID = ROOT.parent / "_evidence"
 RESULTS = ROOT / "results" / "enterprise"
 PORT = int(os.getenv("DEMO_PORT", "8000"))
 
+# ONE file behind the summary table AND the question list, because they used to be different
+# ones: the table read eval_ent50 (50 questions, gemini-3.6-flash) while the question list read
+# eval_noempty40 + eval_rr40 (40 questions, gemini-2.5-flash). Only 23 questions overlapped, so
+# the percentages on screen were never computed from the questions printed underneath them —
+# and the 40-set still carries a malformed question ("...the message '1778881234'..."). Two
+# readers, one constant: they cannot drift again without someone editing this line.
+# Built by build/make_pub50.py, which gates on all three arms covering the same 50 ids.
+PUB = "eval_pub50.jsonl"
+
 _lock = threading.Lock()
 _mods: dict = {}
 _warm = {"state": "cold", "error": ""}
@@ -99,12 +108,16 @@ def textual_metrics(split: str = "tuned") -> dict:
     if split == "heldout":
         rows = _jsonl(RESULTS / "eval_noempty_held.jsonl") + _jsonl(RESULTS / "eval_rr_held.jsonl")
     else:
-        # eval_ent50: the CURRENT run — 50 questions (20 single-doc / 10 directory /
+        # eval_pub50: the CURRENT run — 50 questions (20 single-doc / 10 directory /
         # 20 multi-hop) x 3 arms on gemini-3.6-flash, every answer judged 0-100.
-        # Supersedes eval_live40 (40 questions) and everything before it. Earlier files are
-        # kept on disk for the audit trail but must not be averaged in: eval_noempty40 and
-        # eval_rr40 were gemini-2.5-flash, and mixing models would misreport every arm.
-        rows = _jsonl(RESULTS / "eval_ent50.jsonl")
+        # Supersedes eval_ent50, which measured GraphRAG BEFORE the union fix: vector search
+        # only ran when the graph came back empty, so P3 read 513 prompt tokens and the
+        # "70% fewer tokens" headline was really "reads no chunks at all". Fixed, at a 3-chunk
+        # cap, it is 2,733 against the baseline's 5,312 — 49%, and 50/50 rather than 49/50.
+        # Earlier files stay on disk for the audit trail but must not be averaged in:
+        # eval_noempty40 and eval_rr40 were gemini-2.5-flash, and mixing models would
+        # misreport every arm.
+        rows = _jsonl(RESULTS / PUB)
     # Iterative RAG (setF1 0.387, 14,603 tokens) is measured and kept on disk but not shown —
     # reranking beats it at a third of the cost. Add ("p2p", "Iterative RAG") to restore it.
     # Reranked is THE baseline: 0.506 against 0.301 plain at the same token cost, and within
@@ -131,12 +144,26 @@ def textual_metrics(split: str = "tuned") -> dict:
                    "rows": [{"arm": a, "name": nm, **(_agg(rows, a, t) or {})}
                             for a, nm in arms]} for t, n in tiers],
         "notes": [
-            "Multi-hop is the whole story: Basic RAG scores 17% there and 100% on directory "
-            "lookups — same corpus, same model, same token budget. The only variable is whether "
-            "the question needs a join. GraphRAG holds 99% on both.",
-            "GraphRAG has ZERO complete failures here — 49 perfect, 1 partial, 0 wrong. Basic RAG "
-            "has 16 zeros. A traversal either lands on the exact set or returns nothing, so it "
-            "fails visibly; retrieval fails plausibly, which is harder to catch in production.",
+            "Multi-hop is the whole story: Basic RAG scores 26% there and 100% on directory "
+            "lookups — same corpus, same model, same questions. The only variable is whether the "
+            "question needs a join. GraphRAG holds 100% on both. On multi-hop the baseline gets "
+            "0 of 20 exactly right.",
+            "GraphRAG has ZERO complete failures here — 50 perfect, 0 partial, 0 wrong. Basic RAG "
+            "has 13 zeros and 11 partials. A traversal either lands on the exact set or returns "
+            "nothing, so it fails visibly; retrieval fails plausibly, which is harder to catch in "
+            "production.",
+            "GraphRAG reads 3 chunks, Basic RAG reads 10 — and still loses. The budgets are "
+            "deliberately NOT equal: 10 is where the reranked baseline scores best (dropping it "
+            "to 3 costs it hit@k 82.5% -> 75.0%), so the baseline is shown at its strongest. "
+            "GraphRAG at 3 chunks costs 2,733 tokens against 5,312, i.e. 49% fewer while scoring "
+            "100% against 52%. NOT measured: the baseline end-to-end at a 3-chunk budget.",
+            "Of GraphRAG's 2,733 tokens, 1,185 are the planner call — 43% of its spend, and a "
+            "fixed cost that does not shrink with the chunk cap. That is the honest floor on the "
+            "token claim, not a number to hide.",
+            "The three arms come from three separate runs (LLM-only and the baseline were not "
+            "re-run for the 3-chunk measurement, because neither reads that setting). Same 50 "
+            "questions, same generator, same judge, and build/make_pub50.py aborts unless all "
+            "three cover identical question ids and wording.",
             "LLM-only scores 0.8% with no retrieval. The company is fictional, so nothing here is "
             "answerable from model memory — that is the leak gate, and it is what makes the rest "
             "of the numbers mean anything.",
@@ -152,8 +179,11 @@ def textual_metrics(split: str = "tuned") -> dict:
             "KNOWN GAP: all 50 questions are relationship traversals — the shape a graph is built "
             "for. SEC has a 'bridge' tier (entity then its number) where both systems fall to ~38%. "
             "That shape has never been tested on this data.",
-            "BERTScore is computed and DISCARDED: it ranked LLM-only FIRST at 0.858 with 0/50 "
-            "correct, because it rewards fluent wrong answers.",
+            "BERTScore is shown but is NOT the number of record. Here it happens to rank the "
+            "arms correctly (0.852 / 0.934 / 1.000), but on the SEC set it put LLM-only ABOVE "
+            "Basic RAG (0.839 vs 0.830) while LLM-only got 5 of 50 right — it rewards fluent "
+            "wrong answers. A metric that only works when you already know the answer is not "
+            "evidence; exact-set and the blind judge are.",
         ],
     }
 
@@ -168,7 +198,7 @@ def all_questions(split: str = "tuned") -> list[dict]:
     if split == "heldout":
         rows = _jsonl(RESULTS / "eval_noempty_held.jsonl") + _jsonl(RESULTS / "eval_rr_held.jsonl")
     else:
-        rows = _jsonl(RESULTS / "eval_noempty40.jsonl") + _jsonl(RESULTS / "eval_rr40.jsonl")
+        rows = _jsonl(RESULTS / PUB)          # same file as the table above it — see PUB
     by: dict = {}
     for r in rows:
         q = by.setdefault(r["question_id"], {
@@ -183,18 +213,30 @@ def all_questions(split: str = "tuned") -> list[dict]:
 
 
 def factual_metrics() -> dict:
-    """MasterGraph's three pipelines on the 50 SEC questions, RE-RUN LIVE.
+    """MasterGraph's three pipelines on the 50 SEC questions, re-run under a FAIR config.
 
-    Until the 13 installed queries were restored on the `finance` graph their P3 could not
-    retrieve at all, so this tab could only replay frozen answers. eval_sec_live.jsonl is an
-    actual run: every answer generated now, then graded by the same lenient judge used on the
-    enterprise side against their own gold.
+    eval_sec_live was their config as shipped, and two settings in it were breaking their own
+    numbers rather than measuring their architecture:
+
+      MAX_TOKENS = 512. gemini-2.5-flash draws thinking AND output from one budget, so answers
+      were cut at ~18 visible tokens, mid-number: 'JPMorgan Chase: $57.0 billion\\nExxonMobil:
+      $18'. It truncated 19 of 50 BASELINE answers against 7 of ours — a long retrieved context
+      provokes longer thinking, so the setting punished the arm that retrieves most. Our
+      enterprise side runs 8,192.
+
+      Their prompt permits refusal ('if the answer is not supported by them, say so'); ours
+      forbids it. 11 of 50 answers on each retrieval arm were refusals scoring zero.
+
+    eval_sec_fair_prompt fixes both. BOTH CHANGES HELPED THEIR BASELINE — Basic RAG went 54.8%
+    to 58.2% — which is the point: the deficit was config, not architecture. We modified their
+    prompt to get here, and that is disclosed on the page rather than buried. The changes are
+    injected at runtime; mastergraph-round3/ stays frozen under 428 file hashes.
 
     Their gold answers are single facts with commentary ("$57,048M (~$57.0B), down 2% YoY"),
     not name sets, so the set-F1 scorer built for the enterprise questions does not transfer.
     Correctness here is the judge's call and `exact` means it awarded 100.
     """
-    rows = _jsonl(RESULTS / "eval_sec_live.jsonl")
+    rows = _jsonl(RESULTS / "eval_sec_fair_prompt.jsonl")
     arms = [("p1", "LLM only"), ("p2", "Basic RAG"), ("p3", "GraphRAG")]
     if not rows:            # fall back to the frozen record if the live run is missing
         return _factual_frozen()
@@ -203,29 +245,43 @@ def factual_metrics() -> dict:
         agg = _agg(rows, a)
         if agg:
             out.append({"arm": a, "name": n, **agg})
+    # The 57.3% average was hiding a 4-way split in which the graph wins the hardest tier and
+    # loses the easiest by 38 points. That split is the finding; the average is the noise.
+    tiers = [("A", "Single lookup"), ("B", "Bridge · relation then number"),
+             ("C", "Aggregation"), ("D", "Multi-part")]
     return {
-        "label": "SEC 10-K filings — MasterGraph reproduced, re-run live",
-        "subtitle": ("50 questions · finance graph, 13 queries restored · answers generated now, "
-                     "not replayed · graded by the same blind judge"),
+        "label": "SEC 10-K filings — MasterGraph reproduced, re-run under a fair config",
+        "subtitle": ("50 questions · finance graph, 13 queries restored · 8,192-token budget and "
+                     "no-refusal prompt applied to ALL arms · graded by the same blind judge"),
         "overall": out,
-        "tiers": [],
+        "tiers": [{"tier": t, "name": n,
+                   "rows": [{"arm": a, "name": nm, **(_agg(rows, a, t) or {})}
+                            for a, nm in arms]} for t, n in tiers],
         "notes": [
-            "GraphRAG leads by only ~3 points here (57.3% vs 54.8% judged) — most SEC questions are "
-            "single facts sitting in one chunk, which vector search handles well. The graph's "
-            "advantage appears on aggregation, not lookup.",
-            "It still uses HALF the tokens: 2,451 vs 4,754 per question.",
+            "CONFIG, NOT ARCHITECTURE: their shipped config capped answers at 512 tokens, which "
+            "truncated 19 of 50 Basic RAG answers mid-number against 7 of ours — it punished the "
+            "arm that retrieves most. Raising it to 8,192 and removing the refusal option took "
+            "their baseline from 54.8% to 58.2% and GraphRAG from 57.3% to 65.7%. We changed "
+            "their prompt to run this; their source is untouched and stays hash-frozen.",
+            "GraphRAG leads by 7.5 points on the average (65.7% vs 58.2%) — but the average is "
+            "the least interesting number here. See the tiers.",
+            "It uses HALF the tokens: 2,545 vs 4,846 per question.",
             "LLM-only scores 38% with NO retrieval — the model has read these filings. On the "
             "enterprise corpus the same arm scores 0%, because that company is fictional. That gap "
             "is contamination measured, and the reason the enterprise result is the one to trust.",
+            "The judge also inflates every arm here: it gave 75% to 'Walmart $611,289M; Apple "
+            "$383,285M' when the gold was $713.2B and $416.2B — real figures from the wrong year. "
+            "For financial QA a wrong number is a wrong answer, so `exact` (23 of 50) is the "
+            "figure to trust, not the percentage.",
             "Scored by judge, not set-F1: these gold answers are numbers with commentary "
             "('$57,048M, down 2% YoY'), so name-set matching does not apply.",
-            "BY TIER — GraphRAG wins the hardest one and LOSES the easiest. Aggregation (20 q, "
-            "'every company audited by KPMG'): 73% vs 47%. Single-doc lookup (8 q, 'Exxon's "
-            "revenue'): 62% vs 99% — retrieval is simply the better tool for one number in one "
-            "filing, and the planner call is wasted overhead.",
-            "The BRIDGE tier is where both collapse (15 q, ~38% each): 'the company that "
+            "BY TIER — GraphRAG wins the hardest and LOSES the easiest. Aggregation (20 q, "
+            "'every company audited by KPMG'): 76.1% vs 48.0%, and 12 exact against 3. Single "
+            "lookup (8 q, 'Apple's net sales'): 61.9% vs 99.4% — retrieval is simply the better "
+            "tool for one number in one filing, and the planner call is wasted overhead.",
+            "The BRIDGE tier is where both struggle (16 q, 54.7% vs 45.9%): 'the company that "
             "appointed John Ternus as CEO — what were its total net sales?' Hop one is a "
-            "relationship, hop two is a table cell. Neither tool does both.",
+            "relationship, hop two is a table cell. Neither tool does both well.",
             "SEC relations are THIN: audited_by 100 edges, uses_supplier 178, has_ceo just ONE in "
             "the whole graph. Enterprise participated_in has 88,188. Same idea, ~800x the density "
             "— which is why CEO bridge questions had nothing to traverse.",
@@ -464,7 +520,13 @@ def _gold_lookup(question: str) -> dict | None:
     global _GOLD
     if _GOLD is None:
         _GOLD = {}
-        for f in ("eval_mixed40.jsonl", "eval_heldout20.jsonl", "eval_singledoc10.jsonl"):
+        # eval_mixed50 FIRST and, until this line, missing: the published set is the 50, and
+        # 27 of them appear in none of the other three files. Clicking one of those chips
+        # produced no CORRECT/WRONG badge at all — the console showed three answers and left
+        # the audience to work out which was right. Ordering matters only for duplicates, and
+        # the 23 shared questions carry identical gold in both files.
+        for f in ("eval_mixed50.jsonl", "eval_mixed40.jsonl",
+                  "eval_heldout20.jsonl", "eval_singledoc10.jsonl"):
             for line in _jsonl_raw(ROOT / "datasets" / "enterprise" / f):
                 _GOLD[_norm_q(line["question"])] = {
                     "gold": line["answer"], "members": line.get("gold_members", []),
@@ -499,13 +561,21 @@ def _grade(answer: str, members: list) -> dict:
 def examples() -> list[dict]:
     """Pre-run queries with their MEASURED outcome, so a demo never gambles on a live guess.
 
-    Deliberately includes cases where GraphRAG does NOT win — a demo that only shows wins is
-    the thing everyone in the audience is already suspicious of.
+    THIS is the list the page actually shows, and it used to read eval_mixed40 — a third file,
+    different again from the summary table and from all_questions(). 17 of its 40 questions were
+    not in the benchmark at all, so the chips under the table were largely questions the
+    percentages above were never computed from. Now it reads PUB like everything else.
+
+    Kept a category for questions the BASELINE wins, because a demo that cannot show itself
+    losing is the one nobody believes. On this run it returns nothing: GraphRAG is 50/50, so no
+    such question exists here. That is a property of this question set — all 50 are relationship
+    traversals — not evidence that the category was removed. The SEC tab is where the graph
+    loses, and it loses there in public.
     """
-    rows = _jsonl(RESULTS / "eval_mixed40.jsonl")
+    rows = _jsonl(RESULTS / PUB)
     p3 = {r["question_id"]: r for r in rows if r["arm"] == "p3"}
-    p2 = {r["question_id"]: r for r in rows if r["arm"] == "p2"}
-    p2p = {r["question_id"]: r for r in rows if r["arm"] == "p2p"}
+    p2 = {r["question_id"]: r for r in rows if r["arm"] == "p2rr"}
+    p2p: dict = {}          # the iterative baseline was not re-run for PUB; p2rr is the strongest
     picks, seen = [], set()
 
     def take(want, limit, tier=None):
