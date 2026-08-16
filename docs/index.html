@@ -464,7 +464,7 @@ async function ask(){
 
   await Promise.all(ARMS.map(async a=>{
     try{
-      const d=await STATIC_QUERY(q,a);
+      const d=await STATIC_QUERY(q,a,view);
       if(d.error){ results[a]={arm:a,answer:"could not run: "+d.error,tokens:0,route:"error"}; }
       else {
         if(d.gold&&!gold){ gold={answer:d.gold,qid:d.qid}; drawGold(gold); }
@@ -532,10 +532,11 @@ document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")a
 // ---- static replay shim (added by demo/build_static.py) ----------------------
 // There is no backend here. Answers come from the recorded run, keyed on the exact
 // question text; anything else returns an honest error rather than a guess.
-let _ANS=null;
-async function STATIC_QUERY(q,arm){
-  if(!_ANS) _ANS=await (await fetch("api/answers.json")).json();
-  const hit=_ANS[q];
+const _ANS={};
+async function STATIC_QUERY(q,arm,view){
+  const f = view==="factual" ? "api/answers-factual.json" : "api/answers.json";
+  if(!_ANS[f]) _ANS[f]=await (await fetch(f)).json();
+  const hit=_ANS[f][q];
   if(!hit) return {error:"this build has no recorded answer for that question — "
                         +"pick one of the questions below"};
   const r=(hit.results||[]).find(x=>x.arm===arm);

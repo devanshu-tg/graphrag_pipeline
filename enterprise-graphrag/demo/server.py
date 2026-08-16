@@ -213,18 +213,30 @@ def all_questions(split: str = "tuned") -> list[dict]:
 
 
 def factual_metrics() -> dict:
-    """MasterGraph's three pipelines on the 50 SEC questions, RE-RUN LIVE.
+    """MasterGraph's three pipelines on the 50 SEC questions, re-run under a FAIR config.
 
-    Until the 13 installed queries were restored on the `finance` graph their P3 could not
-    retrieve at all, so this tab could only replay frozen answers. eval_sec_live.jsonl is an
-    actual run: every answer generated now, then graded by the same lenient judge used on the
-    enterprise side against their own gold.
+    eval_sec_live was their config as shipped, and two settings in it were breaking their own
+    numbers rather than measuring their architecture:
+
+      MAX_TOKENS = 512. gemini-2.5-flash draws thinking AND output from one budget, so answers
+      were cut at ~18 visible tokens, mid-number: 'JPMorgan Chase: $57.0 billion\\nExxonMobil:
+      $18'. It truncated 19 of 50 BASELINE answers against 7 of ours — a long retrieved context
+      provokes longer thinking, so the setting punished the arm that retrieves most. Our
+      enterprise side runs 8,192.
+
+      Their prompt permits refusal ('if the answer is not supported by them, say so'); ours
+      forbids it. 11 of 50 answers on each retrieval arm were refusals scoring zero.
+
+    eval_sec_fair_prompt fixes both. BOTH CHANGES HELPED THEIR BASELINE — Basic RAG went 54.8%
+    to 58.2% — which is the point: the deficit was config, not architecture. We modified their
+    prompt to get here, and that is disclosed on the page rather than buried. The changes are
+    injected at runtime; mastergraph-round3/ stays frozen under 428 file hashes.
 
     Their gold answers are single facts with commentary ("$57,048M (~$57.0B), down 2% YoY"),
     not name sets, so the set-F1 scorer built for the enterprise questions does not transfer.
     Correctness here is the judge's call and `exact` means it awarded 100.
     """
-    rows = _jsonl(RESULTS / "eval_sec_live.jsonl")
+    rows = _jsonl(RESULTS / "eval_sec_fair_prompt.jsonl")
     arms = [("p1", "LLM only"), ("p2", "Basic RAG"), ("p3", "GraphRAG")]
     if not rows:            # fall back to the frozen record if the live run is missing
         return _factual_frozen()
@@ -233,29 +245,43 @@ def factual_metrics() -> dict:
         agg = _agg(rows, a)
         if agg:
             out.append({"arm": a, "name": n, **agg})
+    # The 57.3% average was hiding a 4-way split in which the graph wins the hardest tier and
+    # loses the easiest by 38 points. That split is the finding; the average is the noise.
+    tiers = [("A", "Single lookup"), ("B", "Bridge · relation then number"),
+             ("C", "Aggregation"), ("D", "Multi-part")]
     return {
-        "label": "SEC 10-K filings — MasterGraph reproduced, re-run live",
-        "subtitle": ("50 questions · finance graph, 13 queries restored · answers generated now, "
-                     "not replayed · graded by the same blind judge"),
+        "label": "SEC 10-K filings — MasterGraph reproduced, re-run under a fair config",
+        "subtitle": ("50 questions · finance graph, 13 queries restored · 8,192-token budget and "
+                     "no-refusal prompt applied to ALL arms · graded by the same blind judge"),
         "overall": out,
-        "tiers": [],
+        "tiers": [{"tier": t, "name": n,
+                   "rows": [{"arm": a, "name": nm, **(_agg(rows, a, t) or {})}
+                            for a, nm in arms]} for t, n in tiers],
         "notes": [
-            "GraphRAG leads by only ~3 points here (57.3% vs 54.8% judged) — most SEC questions are "
-            "single facts sitting in one chunk, which vector search handles well. The graph's "
-            "advantage appears on aggregation, not lookup.",
-            "It still uses HALF the tokens: 2,451 vs 4,754 per question.",
+            "CONFIG, NOT ARCHITECTURE: their shipped config capped answers at 512 tokens, which "
+            "truncated 19 of 50 Basic RAG answers mid-number against 7 of ours — it punished the "
+            "arm that retrieves most. Raising it to 8,192 and removing the refusal option took "
+            "their baseline from 54.8% to 58.2% and GraphRAG from 57.3% to 65.7%. We changed "
+            "their prompt to run this; their source is untouched and stays hash-frozen.",
+            "GraphRAG leads by 7.5 points on the average (65.7% vs 58.2%) — but the average is "
+            "the least interesting number here. See the tiers.",
+            "It uses HALF the tokens: 2,545 vs 4,846 per question.",
             "LLM-only scores 38% with NO retrieval — the model has read these filings. On the "
             "enterprise corpus the same arm scores 0%, because that company is fictional. That gap "
             "is contamination measured, and the reason the enterprise result is the one to trust.",
+            "The judge also inflates every arm here: it gave 75% to 'Walmart $611,289M; Apple "
+            "$383,285M' when the gold was $713.2B and $416.2B — real figures from the wrong year. "
+            "For financial QA a wrong number is a wrong answer, so `exact` (23 of 50) is the "
+            "figure to trust, not the percentage.",
             "Scored by judge, not set-F1: these gold answers are numbers with commentary "
             "('$57,048M, down 2% YoY'), so name-set matching does not apply.",
-            "BY TIER — GraphRAG wins the hardest one and LOSES the easiest. Aggregation (20 q, "
-            "'every company audited by KPMG'): 73% vs 47%. Single-doc lookup (8 q, 'Exxon's "
-            "revenue'): 62% vs 99% — retrieval is simply the better tool for one number in one "
-            "filing, and the planner call is wasted overhead.",
-            "The BRIDGE tier is where both collapse (15 q, ~38% each): 'the company that "
+            "BY TIER — GraphRAG wins the hardest and LOSES the easiest. Aggregation (20 q, "
+            "'every company audited by KPMG'): 76.1% vs 48.0%, and 12 exact against 3. Single "
+            "lookup (8 q, 'Apple's net sales'): 61.9% vs 99.4% — retrieval is simply the better "
+            "tool for one number in one filing, and the planner call is wasted overhead.",
+            "The BRIDGE tier is where both struggle (16 q, 54.7% vs 45.9%): 'the company that "
             "appointed John Ternus as CEO — what were its total net sales?' Hop one is a "
-            "relationship, hop two is a table cell. Neither tool does both.",
+            "relationship, hop two is a table cell. Neither tool does both well.",
             "SEC relations are THIN: audited_by 100 edges, uses_supplier 178, has_ceo just ONE in "
             "the whole graph. Enterprise participated_in has 88,188. Same idea, ~800x the density "
             "— which is why CEO bridge questions had nothing to traverse.",

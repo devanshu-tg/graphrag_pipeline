@@ -44,14 +44,18 @@ def _load_server():
 
 
 # ---------------------------------------------------------------- recorded answers
-def build_answers(S) -> dict:
+def build_answers(S, filename: str, grade: bool = True) -> dict:
     """question text -> the exact payload /api/query would have returned.
 
     Arms are renamed p2rr -> p2 because the frontend asks for p1/p2/p3 and keys its cards on
     those ids. The label shown is unchanged either way (NAMES maps both to "Basic RAG").
+
+    `grade` is off for the SEC set: its gold answers are numbers with commentary, so the
+    name-set grader would mark every one of them wrong. That tab is judged, not set-scored,
+    and the console shows the gold answer beside the three replies instead of a badge.
     """
-    rows = S._jsonl(S.RESULTS / S.PUB)
-    ARM_OUT = {"p1": "p1", "p2rr": "p2", "p3": "p3"}
+    rows = S._jsonl(S.RESULTS / filename)
+    ARM_OUT = {"p1": "p1", "p2": "p2", "p2rr": "p2", "p3": "p3"}
     by_q: dict[str, dict] = {}
     for r in rows:
         arm = ARM_OUT.get(r["arm"])
@@ -74,9 +78,10 @@ def build_answers(S) -> dict:
         }
         # Grade through the server's own function, so a replayed card and a live card can never
         # disagree about what counts as correct.
-        g = S._gold_lookup(q)
-        if g:
-            entry["grade"] = S._grade(entry["answer"], g["members"])
+        if grade:
+            g = S._gold_lookup(q)
+            if g:
+                entry["grade"] = S._grade(entry["answer"], g["members"])
         payload["results"].append(entry)
     for p in by_q.values():
         p["results"].sort(key=lambda e: ["p1", "p2", "p3"].index(e["arm"]))
@@ -88,10 +93,11 @@ STATIC_JS = """
 // ---- static replay shim (added by demo/build_static.py) ----------------------
 // There is no backend here. Answers come from the recorded run, keyed on the exact
 // question text; anything else returns an honest error rather than a guess.
-let _ANS=null;
-async function STATIC_QUERY(q,arm){
-  if(!_ANS) _ANS=await (await fetch("api/answers.json")).json();
-  const hit=_ANS[q];
+const _ANS={};
+async function STATIC_QUERY(q,arm,view){
+  const f = view==="factual" ? "api/answers-factual.json" : "api/answers.json";
+  if(!_ANS[f]) _ANS[f]=await (await fetch(f)).json();
+  const hit=_ANS[f][q];
   if(!hit) return {error:"this build has no recorded answer for that question — "
                         +"pick one of the questions below"};
   const r=(hit.results||[]).find(x=>x.arm===arm);
@@ -112,7 +118,7 @@ PATCHES = [
     ('''const r=await fetch("/api/query",{method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({question:q,arms:[a],dataset:view})});
       const d=await r.json();''',
-     '''const d=await STATIC_QUERY(q,a);'''),
+     '''const d=await STATIC_QUERY(q,a,view);'''),
 
     # --- and says so. "live" is what drives every bit of console copy.
     ('const live=view==="textual";\n  document.getElementById("askHead")',
@@ -174,8 +180,13 @@ def main() -> int:
     dump("status.json", {"state": "static", "error": ""})
     dump("examples-textual.json", S.examples())
     dump("examples-factual.json", S.factual_examples())
-    answers = build_answers(S)
+    answers = build_answers(S, S.PUB)
     dump("answers.json", answers)
+    # The SEC console replays from the SAME file its table reads. The live server replays it
+    # from _evidence/theirs.jsonl instead — the pre-restore frozen run — which is the mismatch
+    # that was just removed from the enterprise tab, still present on this one.
+    sec = build_answers(S, "eval_sec_fair_prompt.jsonl", grade=False)
+    dump("answers-factual.json", sec)
 
     html = patch_html((Path(__file__).parent / "index.html").read_text(encoding="utf-8"))
     (out / "index.html").write_text(html, encoding="utf-8")
@@ -189,7 +200,8 @@ def main() -> int:
     if re.search(r'fetch\("/api/', html):
         raise SystemExit("ABORT: a /api/ call survived patching — the static page would 404")
     total = sum(f.stat().st_size for f in out.rglob("*") if f.is_file())
-    print(f"\n{len(answers)} questions replayable · {total / 1024:.0f} KB total · {out}")
+    print(f"\n{len(answers)} enterprise + {len(sec)} SEC questions replayable · "
+          f"{total / 1024:.0f} KB total · {out}")
     return 0
 
 
