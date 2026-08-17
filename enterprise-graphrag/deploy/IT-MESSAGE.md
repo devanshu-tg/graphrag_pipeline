@@ -1,54 +1,63 @@
 # Copy-paste message for IT / platform team
 
-Short on purpose. The full spec is in IT-REQUEST.md if they ask for detail.
+Render only, one option, with the exact line items. Full spec in IT-REQUEST.md if they want it.
 
 ---
 
-**Subject: Small container host for a public GraphRAG demo**
+**Subject: Small container host for a demo backend**
 
-Hi — I've built a public demo comparing three retrieval strategies (LLM-only, vector RAG, and
-GraphRAG on TigerGraph) over a 20k-document corpus. The results page is already live on
-Netlify. What I need now is somewhere to run the backend that answers live queries.
+Hi — I have a public GraphRAG demo (three retrieval strategies compared on TigerGraph) whose
+results page is already live. I need somewhere to run the backend that answers live queries.
 
-It's one small container:
+It's one container:
 
-- **2 vCPU, 4 GB RAM, 20 GB disk** (the process sits at ~1 GB resident; 2 GB is the floor)
+- **2 vCPU, 4 GB RAM, 20 GB disk** — the process sits at ~1 GB resident, 2 GB is the floor
 - **No GPU, no database, no persistent storage, no scaling**
-- **Outbound HTTPS to two hosts only:** our TigerGraph Savanna workspace (`*.i.tgcloud.io`)
-  and the Gemini API (`generativelanguage.googleapis.com`)
-- **Inbound 443** — or internal-only behind VPN/SSO, which I'd actually prefer
-- **Two secrets as environment variables** (a Gemini API key and our existing Savanna secret)
+- **Outbound HTTPS to two hosts only:** `*.i.tgcloud.io` (our Savanna workspace) and
+  `generativelanguage.googleapis.com` (Gemini)
+- **Inbound 443**, or internal-only behind VPN/SSO — internal is my preference, not a
+  compromise: the endpoint calls a paid LLM API on every request, so a public URL is
+  effectively an anonymous endpoint spending our quota
+- **Two secrets as environment variables**
 
 **Do we already have somewhere this could live?** A namespace on an existing cluster, a small
-VM in one of our cloud accounts, or an internal box would all be ideal — I have a working
-Dockerfile and I'll deploy and maintain it, so there's nothing ongoing for your side.
+VM in one of our cloud accounts, or an internal box would all be ideal. I have a working
+Dockerfile and I'll deploy and maintain it — nothing ongoing for your side.
 
-**Internal-only is my preference, not a compromise.** The endpoint calls a paid LLM API on
-every request, so a public URL is effectively an anonymous endpoint spending our quota. It has
-a shared token and a rate limit in front of it, but behind SSO that concern disappears
-entirely.
+**If there's nothing internal, here is exactly what I'd need on Render — $25/month total:**
 
-**If there's genuinely nothing internal:** Render would work. The workspace plan is free
-(Hobby) and we'd pay only for one *Standard* compute instance at 2 GB — I'll confirm the exact
-figure. Fly.io is roughly $14/month for the same specs if cost matters more than familiarity.
-Either is single-digit-to-low-double-digit dollars a month.
+| line item | choice | cost |
+|---|---|---|
+| Workspace plan | **Hobby** | **$0/mo** |
+| Web Service compute | **Standard** — 2 GB RAM, 1 CPU | **$25/mo** |
+| Deploy method | Docker (I supply the Dockerfile) | — |
+| Postgres / Key Value | **none** — we use our existing TigerGraph | $0 |
+| Persistent disk | **none**, the service is stateless | $0 |
+| Bandwidth | well under the 5 GB included | $0 |
 
-Two things I should flag so nobody suggests a cheaper shape that won't work:
+The free and Starter compute tiers are both 512 MB, which can't run this — Standard is the
+smallest that fits. Pro (4 GB / 2 CPU) would be more comfortable but isn't necessary.
 
-- **A request takes up to 80 seconds** (three retrieval pipelines, each making an LLM call), so
-  anything with a short gateway timeout is out — Lambda/API Gateway at 29s, Netlify Functions
-  at 10s.
-- **It holds ~1 GB in memory permanently** (a parsed corpus and a graph edge index), so 512 MB
-  free tiers can't run it and scale-to-zero means a 60-second cold start for the first visitor.
+Two constraints, so nothing unsuitable gets suggested: **requests take up to 80 seconds**
+(three pipelines, each making an LLM call — rules out Lambda/API Gateway at 29s and Netlify
+Functions at 10s), and it **holds ~1 GB in memory permanently**, so 512 MB tiers can't run it
+and scale-to-zero means a 60-second cold start for the first visitor.
 
 Happy to walk through it or hand over the Dockerfile. Thanks!
 
 ---
 
-## If they ask "what do you need from us to start"
+## If they ask what you need to start
 
-- a hostname or IP
+- the hostname, or a Render workspace invite
 - SSH access, or a registry/pipeline to push the image to
-- the two outbound hosts allowed through egress rules
+- the two outbound hosts allowed through egress
 
-It's live the same day after that.
+Live the same day after that.
+
+## One note for you, not for them
+
+Standard is **1 CPU**. Every query reranks a 200-candidate pool through a cross-encoder, which
+is CPU-bound, and that was measured on a machine with several cores free. Expect queries slower
+than local — comfortably inside Render's 100-minute response limit, just less snappy. If it
+feels sluggish, Pro (4 GB / 2 CPU) is the fix.
