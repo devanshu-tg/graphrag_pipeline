@@ -71,6 +71,43 @@ Serverless platforms are built for the opposite shape — short, small, stateles
 long-running query engine with a warm cache. It is the wrong workload for Lambda and the
 right workload for one small always-on container.
 
+## If there is genuinely nothing internal
+
+Then a managed platform, and the specifics matter — most of them cannot run this.
+
+**Render — Standard instance.** Verified against Render's own docs:
+
+| plan | RAM | CPU | fits? |
+|---|---|---|---|
+| Free | 512 MB | 0.1 | no — half the memory we need, and spins down after 15 min |
+| Starter | 512 MB | 0.5 | no — same memory ceiling |
+| **Standard** | **2 GB** | **1** | **yes, minimum viable** |
+| Pro | 4 GB | 2 | yes, comfortable |
+
+**~$25/month for Standard.** That figure is from a third-party comparison, not Render's own
+pricing page — the page is JavaScript-rendered and I could not read the numbers off it.
+Confirm before committing.
+
+**Render's real advantage for this workload:** its documented HTTP response limit is
+**100 minutes.** Our longest single request is ~46 s. Compare Netlify Functions at 10 s,
+API Gateway at 29 s, Vercel hobby at 60 s, a Cloudflare tunnel at ~100 s. Render is one of
+very few managed platforms where an 80-second query is simply not a problem.
+
+**The risk on Standard is the 1 CPU, not the RAM.** Memory is fine — the process is 1,064 MB
+against a 2 GB ceiling. But every query reranks a 200-candidate pool through a cross-encoder,
+which is CPU-bound, and this was measured on a machine with several cores free. On a single
+core expect queries slower than our local numbers. Still well inside the timeout, just not as
+snappy. Pro (4 GB / 2 CPU) matches what was actually measured, at a higher price.
+
+**Alternatives if Render is not preferred:** Fly.io is ~$14/month for the same 2 GB and also
+has no short request timeout. Railway is ~$20–30. Hugging Face Spaces requires a $9/month PRO
+subscription for Docker Spaces — cheapest of the lot, but the platform is aimed at ML demos
+rather than production. Anything advertising a free tier at 512 MB cannot run this.
+
+**Ranked by total cost including our time:** existing internal capacity ≫ a small company VM
+≫ HF PRO $9 ≫ Fly $14 ≫ Render $25. Render is the most expensive option that works, and the
+only one that needs a new vendor relationship — which is usually the slower half.
+
 ## What I need back
 
 - the hostname or IP
