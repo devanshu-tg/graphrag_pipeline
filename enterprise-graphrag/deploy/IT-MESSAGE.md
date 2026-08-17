@@ -35,8 +35,9 @@ Dockerfile and I'll deploy and maintain it — nothing ongoing for your side.
 | Persistent disk | **none**, the service is stateless | $0 |
 | Bandwidth | well under the 5 GB included | $0 |
 
-The free and Starter compute tiers are both 512 MB, which can't run this — Standard is the
-smallest that fits. Pro (4 GB / 2 CPU) would be more comfortable but isn't necessary.
+Free ($0) and Starter ($7) are both 512 MB, which can't run this — Standard is the smallest
+that fits. The next tier up, Pro, is $85/month for a second core, so Standard is the sensible
+choice unless it proves too slow.
 
 Two constraints, so nothing unsuitable gets suggested: **requests take up to 80 seconds**
 (three pipelines, each making an LLM call — rules out Lambda/API Gateway at 29s and Netlify
@@ -57,7 +58,17 @@ Live the same day after that.
 
 ## One note for you, not for them
 
-Standard is **1 CPU**. Every query reranks a 200-candidate pool through a cross-encoder, which
-is CPU-bound, and that was measured on a machine with several cores free. Expect queries slower
-than local — comfortably inside Render's 100-minute response limit, just less snappy. If it
-feels sluggish, Pro (4 GB / 2 CPU) is the fix.
+Standard is **1 CPU**, and every query reranks a 200-candidate pool through a cross-encoder,
+which is CPU-bound and was measured here with several cores free. Expect queries slower than
+local — still far inside Render's 100-minute response limit, just less snappy.
+
+**Do not reach for Pro if it drags.** Render's ladder is $25 → **$85** for that second core, a
+3.4x jump. Try the free lever first: `RR_POOL` is an environment variable, currently 200. Drop
+it to 100 and the rerank does half the work. The measured cost of that is known — retrieval
+hit@k moves 82.5% -> 75.0% going from 10 chunks to 3, and the pool size is a smaller lever than
+the chunk count. Tune the env var before spending $60/month.
+
+Render's health check also works in our favour: `demo/server.py` binds its port immediately and
+warms in a background thread, reporting `{"state":"loading"}` until ready. So the health check
+passes straight away instead of failing during a 60-90s cold start, which is what would
+otherwise put the service into a restart loop.
