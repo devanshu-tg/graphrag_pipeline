@@ -89,19 +89,52 @@ def build_answers(S, filename: str, grade: bool = True) -> dict:
 
 
 # ---------------------------------------------------------------- html patches
-STATIC_JS = """
-// ---- static replay shim (added by demo/build_static.py) ----------------------
-// There is no backend here. Answers come from the recorded run, keyed on the exact
-// question text; anything else returns an honest error rather than a guess.
+STATIC_JS_TEMPLATE = """
+// ---- query shim (added by demo/build_static.py) ------------------------------
+// LIVE_URL is set at build time. When present the browser calls the real backend and falls
+// back to the recorded run if that fails; when absent everything is replay.
+//
+// The fallback is the important part. The live backend is a laptop behind a tunnel: it goes
+// away when the machine sleeps, and it rate-limits at 20 queries/hour/IP. Without a fallback
+// every one of those cases shows the visitor an error. With it they get the real measured
+// answer for that question and a note saying it is recorded. Degrading to true data beats
+// failing.
+//
+// LIVE_TOKEN is visible here — it must be, this is a static page. It stops crawlers, not a
+// person reading the source. The per-IP rate limit is the actual spend control.
+const LIVE_URL   = __LIVE_URL__;
+const LIVE_TOKEN = __LIVE_TOKEN__;
+const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before it 524s
+
 const _ANS={};
-async function STATIC_QUERY(q,arm,view){
+async function REPLAY(q,arm,view){
   const f = view==="factual" ? "api/answers-factual.json" : "api/answers.json";
   if(!_ANS[f]) _ANS[f]=await (await fetch(f)).json();
   const hit=_ANS[f][q];
-  if(!hit) return {error:"this build has no recorded answer for that question — "
-                        +"pick one of the questions below"};
+  if(!hit) return {error:"no recorded answer for that question — pick one below"};
   const r=(hit.results||[]).find(x=>x.arm===arm);
+  if(r) r.replayed=true;
   return {gold:hit.gold, qid:hit.qid, results:r?[r]:[]};
+}
+
+async function STATIC_QUERY(q,arm,view){
+  if(LIVE_URL){
+    const ctl=new AbortController();
+    const t=setTimeout(()=>ctl.abort(), LIVE_TIMEOUT_MS);
+    try{
+      const res=await fetch(LIVE_URL+"/api/query",{
+        method:"POST", signal:ctl.signal,
+        headers:{"Content-Type":"application/json","X-Demo-Token":LIVE_TOKEN},
+        body:JSON.stringify({question:q,arms:[arm],dataset:view})});
+      clearTimeout(t);
+      if(res.ok){
+        const d=await res.json();
+        if(!d.error && (d.results||[]).length) return d;
+      }
+      // 429 (rate limited), 401, 5xx, or an error body: fall through to the recording
+    }catch(e){ clearTimeout(t); }   // offline, aborted, DNS gone, tunnel closed
+  }
+  return REPLAY(q,arm,view);
 }
 """
 
@@ -141,7 +174,7 @@ PATCHES = [
 ]
 
 
-def patch_html(html: str) -> str:
+def patch_html(html: str, live_url: str = "", live_token: str = "") -> str:
     for old, new in PATCHES:
         if old not in html:
             raise SystemExit(
@@ -149,7 +182,24 @@ def patch_html(html: str) -> str:
                 "Shipping anyway would produce a page with dead buttons. Fix the patch in\n"
                 f"demo/build_static.py, then rebuild.\n\n--- expected ---\n{old[:300]}")
         html = html.replace(old, new, 1)
-    return html.replace("</script>\n</body>", STATIC_JS + "</script>\n</body>", 1)
+
+    shim = (STATIC_JS_TEMPLATE
+            .replace("__LIVE_URL__", json.dumps(live_url.rstrip("/")))
+            .replace("__LIVE_TOKEN__", json.dumps(live_token)))
+    html = html.replace("</script>\n</body>", shim + "</script>\n</body>", 1)
+
+    # With a live backend the console is genuinely live again, so undo the two copy patches
+    # that told the visitor otherwise. Leaving them would understate what the page does.
+    if live_url:
+        html = html.replace('${"replaying the recorded run"}',
+                            '${"running three pipelines live"}', 1)
+        html = html.replace('"replays the recorded run — every answer and token count is '
+                            'measured, not generated now"',
+                            '"runs all three pipelines live against the real graph — '
+                            'falls back to the recorded run if the backend is offline"', 1)
+        html = html.replace('const live=false;\n  document.getElementById("askHead")',
+                            'const live=true;\n  document.getElementById("askHead")', 1)
+    return html
 
 
 def main() -> int:
@@ -160,6 +210,11 @@ def main() -> int:
     # deploy that needs CI is a deploy that can break the day you present. Netlify/Vercel take
     # any folder, so --out stays available.
     ap.add_argument("--out", default=str(ROOT.parent / "docs"))
+    ap.add_argument("--live-url", default="",
+                    help="backend base URL, e.g. https://x.trycloudflare.com. Omit for a "
+                         "pure-replay build.")
+    ap.add_argument("--live-token", default="",
+                    help="value sent as X-Demo-Token. Ends up in the published JavaScript.")
     args = ap.parse_args()
     out = Path(args.out)
     api = out / "api"
@@ -188,8 +243,10 @@ def main() -> int:
     sec = build_answers(S, "eval_sec_fair_prompt.jsonl", grade=False)
     dump("answers-factual.json", sec)
 
-    html = patch_html((Path(__file__).parent / "index.html").read_text(encoding="utf-8"))
+    html = patch_html((Path(__file__).parent / "index.html").read_text(encoding="utf-8"),
+                      args.live_url, args.live_token)
     (out / "index.html").write_text(html, encoding="utf-8")
+    print(f"  {'mode':<28}{'LIVE -> ' + args.live_url if args.live_url else 'replay only':>8}")
     print(f"  {'index.html':<28}{(out / 'index.html').stat().st_size / 1024:>8.1f} KB")
 
     # GitHub Pages runs Jekyll by default, which silently drops files and folders whose names

@@ -668,15 +668,45 @@ def _gate(h) -> tuple[int, str] | None:
     return None
 
 
+# Needed only when the published page and this service are on different origins — the static
+# site on Netlify calling a tunnel or a VM. Same-origin use (opening this server directly)
+# never triggers CORS, so the default of "unset" keeps local development untouched.
+#
+# An explicit origin, never "*": this endpoint costs ~8,500 tokens and a TigerGraph round trip
+# per call, and a wildcard would let ANY page on the internet drive it from a visitor's
+# browser, spending the key's quota without the visitor knowing.
+DEMO_CORS_ORIGIN = os.getenv("DEMO_CORS_ORIGIN", "")
+
+
 # ---------------------------------------------------------------- http
 class Handler(BaseHTTPRequestHandler):
+    def _cors(self):
+        if DEMO_CORS_ORIGIN:
+            self.send_header("Access-Control-Allow-Origin", DEMO_CORS_ORIGIN)
+            self.send_header("Vary", "Origin")
+
     def _send(self, code, body, ctype="application/json"):
         data = body if isinstance(body, bytes) else str(body).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
+        self._cors()
         self.end_headers()
         self.wfile.write(data)
+
+    def do_OPTIONS(self):
+        # The browser sends this BEFORE the POST because /api/query carries a custom header
+        # (X-Demo-Token), which makes it a non-simple request. Without a handler here
+        # BaseHTTPRequestHandler answers 501 and the real POST is never sent — the query box
+        # would fail with nothing in this server's log to show why.
+        self.send_response(204)
+        self._cors()
+        if DEMO_CORS_ORIGIN:
+            self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Demo-Token")
+            self.send_header("Access-Control-Max-Age", "86400")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def log_message(self, *a):
         pass
