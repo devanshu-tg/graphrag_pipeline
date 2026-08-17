@@ -1,0 +1,49 @@
+# HTTPS in front of the GraphRAG service.
+#
+# This is NOT optional polish. graphrag-benchmark.netlify.app is served over HTTPS, and a
+# browser refuses to let an HTTPS page fetch from an http:// endpoint — mixed content is
+# blocked outright, with the request never leaving the browser. Without TLS here the query
+# box would fail silently for every visitor while the backend logs stay empty and look
+# healthy. That is the single most confusing way this could break, so it is solved up front.
+#
+# The domain is sslip.io, which resolves <anything>.<ip>.sslip.io to that IP. It needs no
+# registration and no DNS setup, and Let's Encrypt will issue for it, so a bare Oracle VM
+# gets a real certificate with no domain purchase. Caddy handles issuance and renewal itself.
+#
+# Substitute the VM's public IP with dashes, e.g. 130.61.24.7 -> 130-61-24-7:
+#     graphrag.130-61-24-7.sslip.io
+
+graphrag.REPLACE-WITH-DASHED-IP.sslip.io {
+	# The published page is a different origin, so the browser sends a CORS preflight before
+	# the POST. Only the Netlify origin is allowed: this endpoint spends money per call, and
+	# `*` would let any page on the internet drive it from a visitor's browser.
+	@preflight method OPTIONS
+	handle @preflight {
+		header Access-Control-Allow-Origin "https://graphrag-benchmark.netlify.app"
+		header Access-Control-Allow-Methods "POST, GET, OPTIONS"
+		header Access-Control-Allow-Headers "Content-Type, X-Demo-Token"
+		header Access-Control-Max-Age "86400"
+		respond 204
+	}
+
+	header Access-Control-Allow-Origin "https://graphrag-benchmark.netlify.app"
+
+	reverse_proxy localhost:8090 {
+		# A three-arm query takes ~77 s and Caddy's default read timeout would cut it long
+		# before that. 300 s leaves room for a cold container plus the slowest arm.
+		transport http {
+			read_timeout 300s
+			write_timeout 300s
+		}
+		# The rate limiter reads X-Forwarded-For and takes the FIRST entry. Caddy sets it to
+		# the real client, so that is correct here. If you ever put another proxy in front,
+		# re-read demo/server.py:_client_ip before trusting it.
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	encode gzip
+	log {
+		output file /var/log/caddy/graphrag.log
+		level WARN
+	}
+}

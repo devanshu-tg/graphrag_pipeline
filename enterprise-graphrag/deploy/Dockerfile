@@ -20,9 +20,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
 
 WORKDIR /app
 
-# CPU-only torch FIRST, from the CPU index. Left to itself pip resolves the default CUDA
-# build and pulls ~2 GB of GPU libraries into an image that will only ever run on a CPU.
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+# CPU-only torch FIRST, and the right way to get it depends on the architecture:
+#
+#   x86_64   PyPI's default torch is the CUDA build — ~2 GB of GPU libraries in an image that
+#            will only ever run on a CPU. The /whl/cpu index avoids that.
+#   aarch64  there is no CUDA build for generic ARM, so PyPI's wheel is ALREADY CPU-only.
+#            The /whl/cpu index carries no aarch64 wheels, so forcing it here fails the build
+#            outright. Verified against the PyPI API: torch 2.13.0 publishes 12 aarch64 wheels
+#            (manylinux_2_28_aarch64) and 6 x86_64.
+#
+# Oracle's Always Free tier is ARM, so both branches are live paths, not hypotheticals.
+RUN ARCH="$(uname -m)"; \
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
+        echo "aarch64 -> stock PyPI torch (already CPU-only)"; \
+        pip install --no-cache-dir torch; \
+    else \
+        echo "$ARCH -> torch from the CPU index"; \
+        pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu; \
+    fi
 
 COPY deploy/requirements-runtime.txt .
 RUN pip install --no-cache-dir -r requirements-runtime.txt
