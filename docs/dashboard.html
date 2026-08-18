@@ -398,11 +398,11 @@ function render(){
     `<div class="note"><i>→</i><span>${n}</span></div>`).join("");
   document.getElementById("tFactual").className=view==="factual"?"on":"";
   document.getElementById("tTextual").className=view==="textual"?"on":"";
-  const live=false;
+  const live=true;
   document.getElementById("askHead").textContent=live?"Query console · live":"Query console · replay";
   document.getElementById("askHint").textContent=live
     ? "runs all three pipelines against the real graph"
-    : "replays the recorded run — every answer and token count is measured, not generated now";
+    : "runs all three pipelines live against the real graph — falls back to the recorded run if the backend is offline";
   document.getElementById("q").placeholder=live
     ? "Pick one of the questions below…" : "Pick one of the SEC questions below…";
   document.getElementById("cards").innerHTML="";
@@ -469,7 +469,7 @@ async function ask(){
     best=Math.min(...Object.values(results).filter(x=>x.arm!=="p1").map(x=>x.tokens), Infinity);
     for(const x of Object.values(results)) drawCard(x, best, gold);
   };
-  st.innerHTML=`<span class="sp"></span> ${"replaying the recorded run"} — 0/${ARMS.length} done`;
+  st.innerHTML=`<span class="sp"></span> ${"running three pipelines live"} — 0/${ARMS.length} done`;
 
   await Promise.all(ARMS.map(async a=>{
     try{
@@ -550,8 +550,8 @@ document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")a
 //
 // LIVE_TOKEN is visible here — it must be, this is a static page. It stops crawlers, not a
 // person reading the source. The per-IP rate limit is the actual spend control.
-const LIVE_URL   = "";
-const LIVE_TOKEN = "";
+const LIVE_URL   = "https://arbor-simultaneously-execute-catch.trycloudflare.com";
+const LIVE_TOKEN = "VLv30qScS_mYzTJARcK3EWTE4eAlMxhB-ai-YYVPmEU";
 const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before it 524s
 
 const _ANS={};

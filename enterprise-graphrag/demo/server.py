@@ -641,6 +641,16 @@ def _client_ip(h) -> str:
 
 def _gate(h) -> tuple[int, str] | None:
     """None if the request may proceed, else (status, message)."""
+    # A browser on this machine sends no token — index.html has none to send — so arming
+    # DEMO_TOKEN for a tunnel would 401 the operator's own dashboard, which reads as "the
+    # pipeline is broken again". Loopback is exempt.
+    #
+    # The test is "no X-Forwarded-For AND the peer is loopback", not "peer is loopback": with
+    # a tunnel in front, cloudflared connects FROM 127.0.0.1, so peer alone would exempt the
+    # entire internet. XFF present means proxied, means enforce.
+    if not h.headers.get("X-Forwarded-For", "") and \
+            h.client_address[0] in ("127.0.0.1", "::1", "localhost"):
+        return None
     if DEMO_TOKEN:
         from urllib.parse import parse_qs
         supplied = (h.headers.get("X-Demo-Token", "")
