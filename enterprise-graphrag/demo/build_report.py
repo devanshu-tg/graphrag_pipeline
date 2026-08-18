@@ -247,6 +247,200 @@ pre.arch{font-family:var(--mono);font-size:.74rem;line-height:1.5;background:var
 .foot-note{margin-top:3.4rem;padding-top:1.4rem;border-top:1px solid var(--line);
   font-size:.78rem;color:var(--faint)}
 a{color:var(--p3)}
+
+/* ---- query console ------------------------------------------------------- */
+.console{border:1px solid var(--line);border-radius:10px;padding:1.25rem;background:var(--panel)}
+.ask{display:flex;gap:.6rem;margin:0 0 .9rem}
+.ask input{flex:1;font:inherit;font-size:.92rem;padding:.6rem .8rem;border:1px solid var(--line2);
+  border-radius:7px;background:var(--bg);color:var(--ink)}
+.ask input:focus{outline:2px solid var(--p3);outline-offset:-1px;border-color:var(--p3)}
+.ask button{font:inherit;font-size:.88rem;font-weight:600;padding:.6rem 1.15rem;border:0;
+  border-radius:7px;background:var(--p3);color:#fff;cursor:pointer}
+.ask button:disabled{opacity:.5;cursor:default}
+.ds{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;margin:0 0 .9rem}
+.ds button{font:inherit;font-size:.8rem;padding:.4rem .8rem;border:0;background:var(--bg);
+  color:var(--dim);cursor:pointer}
+.ds button.on{background:var(--ink);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1rem;max-height:8.5rem;overflow-y:auto}
+.chip{font-size:.76rem;padding:.3rem .6rem;border:1px solid var(--line2);border-radius:20px;
+  background:var(--bg);color:var(--ink2);cursor:pointer;white-space:nowrap;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis}
+.chip:hover{border-color:var(--p3);color:var(--p3)}
+.state{font-size:.8rem;color:var(--dim);min-height:1.2rem;margin:0 0 .8rem;font-family:var(--mono)}
+.gold{background:var(--okbg);border:1px solid #c7e6d2;border-radius:7px;padding:.6rem .8rem;
+  margin:0 0 .8rem;font-size:.85rem}
+.gold .gl{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--okink);
+  font-weight:600;display:block;margin-bottom:.15rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.8rem}
+.rc{border:1px solid var(--line);border-radius:9px;background:var(--bg);overflow:hidden}
+.rc .cap{display:flex;justify-content:space-between;align-items:center;gap:.5rem;
+  padding:.55rem .8rem;border-bottom:1px solid var(--line);background:var(--panel)}
+.rc .cn{font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.rc .cn i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.rc .rt{font-size:.68rem;color:var(--faint);font-family:var(--mono)}
+.rc .bd{padding:.75rem .8rem}
+.rc .ans{font-size:.86rem;line-height:1.45;word-break:break-word}
+.rc .ans.empty{color:var(--faint);font-style:italic}
+.rc .ft{display:flex;gap:.9rem;margin-top:.65rem;padding-top:.55rem;
+  border-top:1px solid var(--line);font-size:.72rem;color:var(--dim);font-family:var(--mono)}
+.rc .ft b{color:var(--ink)}
+.rc .ft .best{color:var(--win)}
+.rc.cheap{border-color:#bfe0c9}
+.spin{display:inline-block;width:9px;height:9px;border:2px solid var(--line2);
+  border-top-color:var(--p3);border-radius:50%;animation:sp .7s linear infinite;
+  vertical-align:-1px;margin-right:.4rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+"""
+
+
+CONSOLE = """
+<div class="console">
+  <div class="ds">
+    <button id="dsT" class="on">EnterpriseRAG-Bench</button><button id="dsF">SEC filings</button>
+  </div>
+  <div class="ask">
+    <input id="q" placeholder="Pick a question below, or type your own..." autocomplete="off">
+    <button id="go">Run all three</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="state" id="state"></div>
+  <div id="gold"></div>
+  <div class="cards" id="cards"></div>
+</div>
+"""
+
+# The console calls a live backend when one is configured and REPLAYS the recorded run when it
+# is not, or when the call fails. Replay is not a degraded mode: those answers are the measured
+# ones, so a visitor with no backend still sees real data instead of an error. Cards say
+# "recorded" when that is what happened.
+CONSOLE_JS = r"""
+<script>
+const LIVE_URL   = __LIVE_URL__;
+const LIVE_TOKEN = __LIVE_TOKEN__;
+const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before it does
+
+const NAMES = {p1:"LLM only", p2:"Basic RAG", p2rr:"Basic RAG", p3:"GraphRAG"};
+const COL   = {p1:"var(--p1)", p2:"var(--p2)", p2rr:"var(--p2)", p3:"var(--p3)"};
+let view = "textual";
+const _ANS = {}, _CHIPS = {};
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function answers(){
+  const f = view==="factual" ? "api/answers-factual.json" : "api/answers.json";
+  if(!_ANS[f]) _ANS[f] = await (await fetch(f)).json();
+  return _ANS[f];
+}
+
+async function replay(q, arm){
+  const A = await answers(); const hit = A[q];
+  if(!hit) return {error:"no recorded answer for that question - pick one below"};
+  const r = (hit.results||[]).find(x => x.arm===arm || (arm==="p2rr" && x.arm==="p2"));
+  if(r) r.replayed = true;
+  return {gold:hit.gold, qid:hit.qid, results: r?[r]:[]};
+}
+
+async function askArm(q, arm){
+  if(LIVE_URL){
+    const ctl = new AbortController();
+    const t = setTimeout(()=>ctl.abort(), LIVE_TIMEOUT_MS);
+    try{
+      const res = await fetch(LIVE_URL+"/api/query", {method:"POST", signal:ctl.signal,
+        headers:{"Content-Type":"application/json","X-Demo-Token":LIVE_TOKEN},
+        body:JSON.stringify({question:q, arms:[arm], dataset:view})});
+      clearTimeout(t);
+      if(res.ok){ const d = await res.json();
+        if(!d.error && (d.results||[]).length) return d; }
+    }catch(e){ clearTimeout(t); }
+  }
+  return replay(q, arm);
+}
+
+function drawCard(x, cheap){
+  const el = document.getElementById("card-"+x.arm); if(!el) return;
+  const empty = !x.answer || x.answer === "(no answer)";
+  let badge = "";
+  if(x.grade){
+    const p = Math.round(x.grade.score*100);
+    badge = '<span class="pill ' + (p===100?"pass":p>0?"part":"fail") + '">' +
+            (p===100?"CORRECT":p>0?p+"% correct":"WRONG") + '</span>';
+  }
+  el.className = "rc" + (x.tokens===cheap ? " cheap" : "");
+  el.innerHTML =
+    '<div class="cap"><div class="cn"><i style="background:'+COL[x.arm]+'"></i>'+NAMES[x.arm]+badge+
+    '</div><span class="rt">'+esc(x.replayed ? "recorded" : (x.route||"-"))+'</span></div>'+
+    '<div class="bd"><div class="ans '+(empty?"empty":"")+'">'+
+      (empty ? "no answer returned" : esc(x.answer))+'</div>'+
+    '<div class="ft"><span>tokens <b class="'+(x.tokens===cheap?"best":"")+'">'+
+      (x.tokens||0).toLocaleString()+'</b></span>'+
+    (x.planner_tokens?'<span>planner <b>'+x.planner_tokens.toLocaleString()+'</b></span>':'')+
+    (x.latency?'<span><b>'+x.latency+'s</b></span>':'')+'</div></div>';
+}
+
+async function ask(){
+  const q = document.getElementById("q").value.trim(); if(!q) return;
+  const arms = view==="factual" ? ["p1","p2","p3"] : ["p1","p2rr","p3"];
+  const btn = document.getElementById("go"), st = document.getElementById("state");
+  btn.disabled = true;
+  document.getElementById("gold").innerHTML = "";
+  document.getElementById("cards").innerHTML = arms.map(a =>
+    '<div class="rc" id="card-'+a+'"><div class="cap"><div class="cn"><i style="background:'+
+    COL[a]+'"></i>'+NAMES[a]+'</div><span class="rt"><span class="spin"></span></span></div>'+
+    '<div class="bd"><div class="ans empty">running...</div></div></div>').join("");
+  const t0 = Date.now(); let done = 0, gold = null, cheap = Infinity; const got = {};
+  const paint = () => {
+    cheap = Math.min(...Object.values(got).filter(x=>x.arm!=="p1").map(x=>x.tokens), Infinity);
+    for(const x of Object.values(got)) drawCard(x, cheap);
+  };
+  st.innerHTML = '<span class="spin"></span> 0/'+arms.length+' done';
+  await Promise.all(arms.map(async a => {
+    try{
+      const d = await askArm(q, a);
+      if(d.error){ got[a] = {arm:a, answer:"could not run: "+d.error, tokens:0}; }
+      else{
+        if(d.gold && !gold){ gold = d.gold;
+          document.getElementById("gold").innerHTML =
+            '<div class="gold"><span class="gl">Correct answer'+
+            (d.qid?" - "+esc(d.qid):"")+'</span>'+esc(d.gold)+'</div>'; }
+        const x = (d.results||[]).find(z=>z.arm===a) || (d.results||[])[0];
+        if(x){ x.arm = a; got[a] = x; }
+      }
+    }catch(e){ got[a] = {arm:a, answer:"could not run: "+e, tokens:0}; }
+    done++; paint();
+    st.innerHTML = done < arms.length
+      ? '<span class="spin"></span> '+done+'/'+arms.length+' done'
+      : 'all '+arms.length+' finished in '+((Date.now()-t0)/1000).toFixed(1)+'s'+
+        (gold ? " - graded against the answer key" : "");
+  }));
+  btn.disabled = false;
+}
+
+async function loadChips(){
+  const f = view==="factual" ? "api/examples-factual.json" : "api/examples-textual.json";
+  if(!_CHIPS[f]) _CHIPS[f] = await (await fetch(f)).json();
+  document.getElementById("chips").innerHTML = _CHIPS[f].map(e =>
+    '<button class="chip" title="'+esc(e.q)+'">'+
+    esc(e.q.length>62 ? e.q.slice(0,60)+"..." : e.q)+'</button>').join("");
+  [...document.querySelectorAll("#chips .chip")].forEach((b,i) => b.onclick = () => {
+    document.getElementById("q").value = _CHIPS[f][i].q; ask(); });
+}
+
+function switchView(v){
+  view = v;
+  document.getElementById("dsT").className = v==="textual" ? "on" : "";
+  document.getElementById("dsF").className = v==="factual" ? "on" : "";
+  document.getElementById("cards").innerHTML = "";
+  document.getElementById("gold").innerHTML = "";
+  document.getElementById("state").innerHTML = "";
+  loadChips();
+}
+
+document.getElementById("go").onclick = ask;
+document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
+document.getElementById("dsT").onclick = () => switchView("textual");
+document.getElementById("dsF").onclick = () => switchView("factual");
+loadChips();
+</script>
 """
 
 
@@ -254,6 +448,10 @@ def main() -> int:
     init_console()
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT.parent / "docs" / "report.html"))
+    ap.add_argument("--live-url", default="",
+                    help="backend base URL; omit for a replay-only build")
+    ap.add_argument("--live-token", default="",
+                    help="X-Demo-Token value; it ends up in the published page")
     args = ap.parse_args()
 
     ent = load("eval_pub50.jsonl")
@@ -326,6 +524,15 @@ def main() -> int:
     A(card(f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
            "Leak gate — the company is fictional", "neutral"))
     A('</div>')
+
+    A('<h2>Ask it yourself</h2>')
+    A(CONSOLE)
+    A(callout(
+        '<b>Every question below has a verified answer key</b>, so the console grades each '
+        'reply rather than leaving you to judge it. With a backend configured it runs all '
+        'three pipelines live; without one it replays the recorded run — the same measured '
+        'answer either way, and the card says <code>recorded</code> when that is what '
+        'happened.'))
 
     A('<h2>Scorecard</h2>')
     A(scorecard(ENT_ARMS, E, ent_metrics))
@@ -534,8 +741,10 @@ def main() -> int:
       'time. None are typed by hand.</div>')
     A('</section></div>')
 
+    js = (CONSOLE_JS.replace('__LIVE_URL__', json.dumps(args.live_url.rstrip('/')))
+                    .replace('__LIVE_TOKEN__', json.dumps(args.live_token)))
     doc = (f'<title>GraphRAG evaluation — scorecard</title>\n<style>{CSS}</style>\n'
-           + "\n".join(H1))
+           + "\n".join(H1) + js)
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(doc, encoding="utf-8")
