@@ -171,6 +171,7 @@ a{color:var(--p3)}
 .rc.p3{border-top:2px solid var(--p3)}
 .rc.cheap{border-color:rgba(227,82,5,.5)}
 
+.chiphint{font-size:.74rem;color:var(--faint);margin:0 0 .5rem}
 .chipbar{display:flex;gap:.45rem;align-items:center;margin:.95rem 0 .7rem;flex-wrap:wrap}
 .filt{background:var(--bg);border:1px solid var(--line2);color:var(--dim);border-radius:6px;
   padding:.4rem .75rem;font-weight:600;font-size:.8rem;line-height:1;font-family:inherit;
@@ -224,6 +225,7 @@ a{color:var(--p3)}
   <div id="goldBox"></div>
   <div class="cards" id="cards"></div>
   <div class="chipbar" id="chipbar"></div>
+  <div class="chiphint" id="chipHint"></div>
   <div class="chips" id="chips"></div>
 </div>
 
@@ -439,11 +441,19 @@ function drawChips(){
   const box = document.getElementById("chips");
   if(!list.length){ box.innerHTML = '<div class="state">No questions match this filter.</div>'; return; }
   box.innerHTML = list.map(e =>
-    '<button class="chip"><span class="tag '+esc(e.tier||"")+'">'+
+    '<button class="chip" data-q="'+esc(e.q)+'"><span class="tag '+esc(e.tier||"")+'">'+
     esc((e.tier||"").replace(/_/g," ")||"q")+'</span><span class="qt">'+esc(e.q)+'</span></button>'
   ).join("");
-  [...box.querySelectorAll(".chip")].forEach((b,i) => b.onclick = () => {
-    document.getElementById("q").value = list[i].q; ask(); });
+  // Fill, focus, scroll — do NOT run. Selecting a question and having three pipelines fire
+  // immediately is the wrong default: it spends tokens on a misclick and takes the choice of
+  // when to start away from whoever is presenting. The dashboard behaved this way; the port
+  // had quietly changed it.
+  box.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+    const box2 = document.getElementById("q");
+    box2.value = c.dataset.q;
+    box2.focus();
+    box2.scrollIntoView({behavior:"smooth", block:"center"});
+  });
 }
 
 async function loadChips(){
@@ -457,6 +467,8 @@ async function loadChips(){
     document.getElementById("fA").onclick = () => { onlyAnswered = true;  loadChips(); };
     document.getElementById("fB").onclick = () => { onlyAnswered = false; loadChips(); };
   }
+  document.getElementById("chipHint").textContent =
+    "click a question to load it, then press Run";
   drawChips();
 }
 
