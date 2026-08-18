@@ -448,6 +448,7 @@ CONSOLE = """
     <button id="dsF" class="on"><span class="sw"></span>Factual · SEC</button>
     <button id="dsT"><span class="sw"></span>Textual · Enterprise</button>
   </div>
+  <div class="stats" id="dsStats"></div>
   <div class="ask">
     <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
     <button class="run" id="go">Run</button>
@@ -475,6 +476,7 @@ const COL   = {p1:"var(--p1)", p2:"var(--p2)", p2rr:"var(--p2)", p3:"var(--p3)"}
 // Questions the GRAPH answers correctly, baked in at build time. The examples-*.json files
 // cannot serve this: their factual entries carry p3: null, so there is nothing to filter on.
 const PASSING = __PASSING__;
+const STATS = __STATS__;
 let view = "factual", CHIPS = [];
 const _ANS = {}, _EX = {};
 const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
@@ -621,6 +623,9 @@ function setView(v){
   document.getElementById("askHint").textContent = LIVE_URL
     ? "runs all three pipelines live; falls back to the recorded run if the backend is offline"
     : "replays the recorded run - every answer and token count is measured, not generated now";
+  document.getElementById("dsStats").innerHTML = (STATS[v]||[]).map(c =>
+    '<div class="stat '+c[3]+'"><div class="big">'+esc(c[0])+'</div>'+
+    '<div class="lbl">'+esc(c[1])+'</div><div class="foot">'+esc(c[2])+'</div></div>').join("");
   document.getElementById("q").placeholder = v==="factual"
     ? "Ask about an S&P-100 filing..." : "Ask something about the company...";
   document.getElementById("cards").innerHTML = "";
@@ -948,11 +953,36 @@ def main() -> int:
                             "qid": r.get("question_id", "")})
         return out
 
+    # KPI cards that switch with the console's dataset toggle, exactly as the old dashboard
+    # did. Same figures the two section headers use further down, so the top of the page and the
+    # sections cannot disagree.
+    stats_js = json.dumps({
+        "factual": [
+            (f"-{sec_red:.0f}%", "Tokens vs Basic RAG",
+             f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question", ""),
+            (f"{S['p3']['strict']}/{S['p3']['n']}", "GraphRAG strict pass",
+             f"Basic RAG {S['p2']['strict']}/{S['p2']['n']} · LLM-only "
+             f"{S['p1']['strict']}/{S['p1']['n']}", "neutral"),
+            (f"{S['p1']['judge']:.0f}%", "LLM-only judged score",
+             "Real companies — contamination, measured", "warn"),
+        ],
+        "textual": [
+            (f"-{red:.0f}%", "Tokens vs Basic RAG",
+             f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question", ""),
+            (f"+{gap:.0f} pts", "Strict pass vs Basic RAG",
+             f"GraphRAG {E['p3']['strict']}/{E['p3']['n']} · RAG "
+             f"{E['p2rr']['strict']}/{E['p2rr']['n']}", ""),
+            (f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
+             "Leak gate — the company is fictional", "neutral"),
+        ],
+    })
+
     passing_js = json.dumps({"textual": passing(ent, "p3"), "factual": passing(sec, "p3")})
     print(f"  console offers {len(json.loads(passing_js)['textual'])} enterprise + "
           f"{len(json.loads(passing_js)['factual'])} SEC questions (GraphRAG passes only)")
 
     js = (CONSOLE_JS.replace('__PASSING__', passing_js)
+                    .replace('__STATS__', stats_js)
                     .replace('__LIVE_URL__', json.dumps(args.live_url.rstrip('/')))
                     .replace('__LIVE_TOKEN__', json.dumps(args.live_token)))
     doc = (f'<title>GraphRAG evaluation — scorecard</title>\n<style>{CSS}</style>\n'
