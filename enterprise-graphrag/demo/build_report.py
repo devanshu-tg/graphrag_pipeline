@@ -171,7 +171,12 @@ CSS = """
   --fs:16px;
   --ink:#16181d; --ink2:#3d424d; --dim:#6b7280; --faint:#9aa1ab;
   --bg:#ffffff; --panel:#fbfbfc; --line:#e6e8ec; --line2:#d6d9df;
-  --win:#0a7d43; --p1:#9aa1ab; --p2:#c8811f; --p3:#1f6feb;
+  --win:#0a7d43;
+  /* the dashboard's colour language: GraphRAG orange (TigerGraph brand), Basic RAG blue.
+     The scorecard had these reversed, and two pages disagreeing on which colour means
+     which pipeline is worse than either choice on its own. */
+  --p1:#7c8798; --p2:#2563eb; --p3:#e35205;
+  --brand:#e35205; --brand2:#b8420a;
   --okbg:#e8f5ec; --okink:#0a7d43; --badbg:#fdeceb; --badink:#c0362c;
   --partbg:#fff6e5; --partink:#a35b00;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
@@ -258,64 +263,125 @@ a{color:var(--p3)}
 .nav a:hover{color:var(--p3)}
 .nav a.here{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--p3)}
 
-/* ---- query console ------------------------------------------------------- */
-.console{border:1px solid var(--line);border-radius:10px;padding:1.25rem;background:var(--panel)}
-.ask{display:flex;gap:.6rem;margin:0 0 .9rem}
-.ask input{flex:1;font:inherit;font-size:.92rem;padding:.6rem .8rem;border:1px solid var(--line2);
-  border-radius:7px;background:var(--bg);color:var(--ink)}
-.ask input:focus{outline:2px solid var(--p3);outline-offset:-1px;border-color:var(--p3)}
-.ask button{font:inherit;font-size:.88rem;font-weight:600;padding:.6rem 1.15rem;border:0;
-  border-radius:7px;background:var(--p3);color:#fff;cursor:pointer}
-.ask button:disabled{opacity:.5;cursor:default}
-.ds{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;margin:0 0 .9rem}
-.ds button{font:inherit;font-size:.8rem;padding:.4rem .8rem;border:0;background:var(--bg);
-  color:var(--dim);cursor:pointer}
-.ds button.on{background:var(--ink);color:#fff}
-.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1rem;max-height:8.5rem;overflow-y:auto}
-.chip{font-size:.76rem;padding:.3rem .6rem;border:1px solid var(--line2);border-radius:20px;
-  background:var(--bg);color:var(--ink2);cursor:pointer;white-space:nowrap;max-width:100%;
-  overflow:hidden;text-overflow:ellipsis}
-.chip:hover{border-color:var(--p3);color:var(--p3)}
-.state{font-size:.8rem;color:var(--dim);min-height:1.2rem;margin:0 0 .8rem;font-family:var(--mono)}
-.gold{background:var(--okbg);border:1px solid #c7e6d2;border-radius:7px;padding:.6rem .8rem;
-  margin:0 0 .8rem;font-size:.85rem}
-.gold .gl{font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--okink);
-  font-weight:600;display:block;margin-bottom:.15rem}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:.8rem}
-.rc{border:1px solid var(--line);border-radius:9px;background:var(--bg);overflow:hidden}
-.rc .cap{display:flex;justify-content:space-between;align-items:center;gap:.5rem;
-  padding:.55rem .8rem;border-bottom:1px solid var(--line);background:var(--panel)}
-.rc .cn{font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
-.rc .cn i{width:8px;height:8px;border-radius:2px;display:inline-block}
-.rc .rt{font-size:.68rem;color:var(--faint);font-family:var(--mono)}
-.rc .bd{padding:.75rem .8rem}
-.rc .ans{font-size:.86rem;line-height:1.45;word-break:break-word}
+/* ---- query console — ported from demo/index.html, light-adapted ----------- */
+.console{border:1px solid var(--line);border-radius:10px;padding:1.3rem;background:var(--panel)}
+.chead{display:flex;align-items:baseline;justify-content:space-between;gap:.8rem;
+  margin-bottom:.9rem;flex-wrap:wrap}
+.chead h3{font-size:1.02rem;margin:0;font-weight:640;letter-spacing:-.012em}
+.chead .hint{color:var(--faint);font-size:.79rem}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line2);border-radius:9px;
+  padding:.2rem;gap:.2rem;margin-bottom:.9rem}
+.seg button{background:none;border:0;color:var(--dim);padding:.45rem .9rem;border-radius:6px;
+  font:inherit;font-weight:600;font-size:.84rem;line-height:1;cursor:pointer;transition:.15s;
+  display:flex;align-items:center;gap:.45rem;white-space:nowrap}
+.seg button .sw{width:.4rem;height:.4rem;border-radius:50%;background:currentColor;opacity:.4}
+.seg button.on{background:var(--ink);color:#fff}
+.seg button.on .sw{opacity:1}
+.seg button:not(.on):hover{color:var(--ink)}
+
+.ask{display:flex;gap:.6rem}
+.ask input{flex:1;min-width:0;background:var(--bg);border:1.5px solid var(--line2);
+  border-radius:9px;padding:.8rem 1rem;color:var(--ink);font-size:.98rem;line-height:1.3;
+  font-family:inherit;transition:.18s}
+.ask input:focus{outline:none;border-color:var(--brand);
+  box-shadow:0 0 0 .18rem rgba(227,82,5,.14)}
+.ask input::placeholder{color:var(--faint)}
+.run{background:var(--brand);color:#fff;border:0;border-radius:9px;padding:0 1.7rem;
+  font-weight:650;font-size:.95rem;line-height:1;font-family:inherit;cursor:pointer;
+  transition:.18s;white-space:nowrap}
+.run:hover:not(:disabled){background:var(--brand2)}
+.run:disabled{opacity:.45;cursor:not-allowed}
+.state{font-size:.83rem;color:var(--dim);margin:.7rem 0 0;min-height:1rem;display:flex;
+  align-items:center;gap:.5rem;font-family:var(--mono)}
+.state b{color:var(--brand2);font-weight:640}
+
+.gold{display:flex;align-items:baseline;gap:.7rem;flex-wrap:wrap;margin-top:.9rem;
+  background:rgba(10,125,67,.06);border:1px solid rgba(10,125,67,.28);border-radius:8px;
+  padding:.7rem .95rem}
+.gold .lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;
+  color:var(--okink)}
+.gold .val{font-size:.95rem;font-weight:600}
+
+.verdict{margin-left:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.06em;
+  padding:.2rem .45rem;border-radius:4px;text-transform:uppercase}
+.verdict.ok{background:rgba(10,125,67,.13);color:var(--okink)}
+.verdict.part{background:rgba(184,66,10,.13);color:var(--brand2)}
+.verdict.bad{background:rgba(192,54,44,.12);color:var(--badink)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:.95rem}
+@media(max-width:940px){.cards{grid-template-columns:1fr}}
+.rc{background:var(--bg);border:1px solid var(--line);border-radius:9px;overflow:hidden;
+  animation:up .38s cubic-bezier(.2,.8,.2,1) both}
+@keyframes up{from{opacity:0;transform:translateY(.4rem)}}
+.rc .cap{padding:.62rem .9rem;display:flex;justify-content:space-between;align-items:center;
+  gap:.5rem;border-bottom:1px solid var(--line);background:var(--panel)}
+.rc .cn{font-weight:640;font-size:.9rem;display:flex;align-items:center;gap:.45rem}
+.rc .cn i{width:.48rem;height:.48rem;border-radius:2px;display:block;flex:none}
+.rc .rt{font-size:.7rem;color:var(--dim);font-family:var(--mono);
+  background:rgba(15,23,42,.06);padding:.18rem .42rem;border-radius:4px;white-space:nowrap}
+.rc .body{padding:.85rem .9rem}
+.rc .ans{font-size:.95rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+  min-height:2.4rem}
 .rc .ans.empty{color:var(--faint);font-style:italic}
-.rc .ft{display:flex;gap:.9rem;margin-top:.65rem;padding-top:.55rem;
-  border-top:1px solid var(--line);font-size:.72rem;color:var(--dim);font-family:var(--mono)}
-.rc .ft b{color:var(--ink)}
-.rc .ft .best{color:var(--win)}
-.rc.cheap{border-color:#bfe0c9}
+.rc .diff{margin-top:.65rem;font-size:.72rem;color:var(--faint);display:grid;gap:.2rem}
+.rc .diff b{color:var(--ink2);font-weight:650}
+.rc .src{margin-top:.6rem;display:flex;flex-direction:column;gap:.18rem;font-size:.62rem;
+  font-family:var(--mono);color:var(--faint);word-break:break-all}
+.rc .src span:before{content:"source ";color:var(--brand);opacity:.75}
+.rc .foot{display:flex;gap:.8rem;margin-top:.75rem;padding-top:.65rem;
+  border-top:1px solid var(--line);font-size:.74rem;color:var(--faint);flex-wrap:wrap;
+  font-family:var(--mono)}
+.rc .foot b{color:var(--ink2);font-variant-numeric:tabular-nums;font-weight:650}
+.rc .foot b.best{color:var(--win)}
+.rc.p1{border-top:2px solid var(--p1)}
+.rc.p2,.rc.p2rr{border-top:2px solid var(--p2)}
+.rc.p3{border-top:2px solid var(--p3)}
+.rc.cheap{border-color:rgba(227,82,5,.5)}
+
+.chipbar{display:flex;gap:.45rem;align-items:center;margin:.95rem 0 .7rem;flex-wrap:wrap}
+.filt{background:var(--bg);border:1px solid var(--line2);color:var(--dim);border-radius:6px;
+  padding:.4rem .75rem;font-weight:600;font-size:.8rem;line-height:1;font-family:inherit;
+  cursor:pointer;transition:.15s}
+.filt.on{background:var(--brand);color:#fff;border-color:transparent}
+.filt:not(.on):hover{color:var(--ink)}
+.chips{display:grid;grid-template-columns:1fr;gap:.45rem;max-height:38vh;overflow-y:auto;
+  overflow-x:hidden;padding-right:.4rem}
+.chips::-webkit-scrollbar{width:.4rem}
+.chips::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:.6rem .8rem;
+  cursor:pointer;text-align:left;transition:.15s;display:flex;align-items:center;gap:.6rem;
+  color:var(--ink2);font:inherit;font-size:.88rem;min-width:0;width:100%}
+.chip:hover{border-color:var(--brand);color:var(--ink);transform:translateX(.15rem)}
+.chip .qt{flex:1;min-width:0;line-height:1.42;overflow-wrap:anywhere}
+.tag{font-weight:700;font-size:.66rem;line-height:1;text-transform:uppercase;
+  letter-spacing:.07em;padding:.26rem .42rem;border-radius:4px;flex:none;font-family:inherit}
+.tag.multi_hop,.tag.multi,.tag.C{background:rgba(227,82,5,.13);color:var(--brand2)}
+.tag.single_dir,.tag.B{background:rgba(37,99,235,.13);color:#1d4ed8}
+.tag.single_doc,.tag.A,.tag.D{background:rgba(15,23,42,.07);color:var(--dim)}
 .spin{display:inline-block;width:9px;height:9px;border:2px solid var(--line2);
-  border-top-color:var(--p3);border-radius:50%;animation:sp .7s linear infinite;
-  vertical-align:-1px;margin-right:.4rem}
+  border-top-color:var(--brand);border-radius:50%;animation:sp .7s linear infinite;
+  vertical-align:-1px}
 @keyframes sp{to{transform:rotate(360deg)}}
 """
 
 
 CONSOLE = """
 <div class="console">
-  <div class="ds">
-    <button id="dsT" class="on">EnterpriseRAG-Bench</button><button id="dsF">SEC filings</button>
+  <div class="chead"><h3 id="askHead">Query console</h3>
+    <span class="hint" id="askHint"></span></div>
+  <div class="seg">
+    <button id="dsT" class="on"><span class="sw"></span>Textual · Enterprise</button>
+    <button id="dsF"><span class="sw"></span>Factual · SEC</button>
   </div>
   <div class="ask">
-    <input id="q" placeholder="Pick a question below, or type your own..." autocomplete="off">
-    <button id="go">Run all three</button>
+    <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
+    <button class="run" id="go">Run</button>
   </div>
-  <div class="chips" id="chips"></div>
   <div class="state" id="state"></div>
-  <div id="gold"></div>
+  <div id="goldBox"></div>
   <div class="cards" id="cards"></div>
+  <div class="chipbar" id="chipbar"></div>
+  <div class="chips" id="chips"></div>
 </div>
 """
 
@@ -331,20 +397,19 @@ const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before i
 
 const NAMES = {p1:"LLM only", p2:"Basic RAG", p2rr:"Basic RAG", p3:"GraphRAG"};
 const COL   = {p1:"var(--p1)", p2:"var(--p2)", p2rr:"var(--p2)", p3:"var(--p3)"};
-let view = "textual";
-const _ANS = {}, _CHIPS = {};
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c =>
-  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let view = "textual", CHIPS = [], onlyAnswered = true;
+const _ANS = {}, _EX = {};
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-async function answers(){
-  const f = view==="factual" ? "api/answers-factual.json" : "api/answers.json";
-  if(!_ANS[f]) _ANS[f] = await (await fetch(f)).json();
-  return _ANS[f];
-}
+async function jget(f){ if(!_EX[f]) _EX[f] = await (await fetch(f)).json(); return _EX[f]; }
 
+// Replay is the FALLBACK, not a degraded mode: those answers are the measured ones, so a
+// visitor with no backend sees real data instead of an error. Cards say "recorded".
 async function replay(q, arm){
-  const A = await answers(); const hit = A[q];
-  if(!hit) return {error:"no recorded answer for that question - pick one below"};
+  const A = await jget(view==="factual" ? "api/answers-factual.json" : "api/answers.json");
+  const hit = A[q];
+  if(!hit) return {error:"no recorded answer for that question"};
   const r = (hit.results||[]).find(x => x.arm===arm || (arm==="p2rr" && x.arm==="p2"));
   if(r) r.replayed = true;
   return {gold:hit.gold, qid:hit.qid, results: r?[r]:[]};
@@ -366,25 +431,43 @@ async function askArm(q, arm){
   return replay(q, arm);
 }
 
+function drawGold(g, qid){
+  document.getElementById("goldBox").innerHTML =
+    '<div class="gold"><span class="lbl">Correct answer'+(qid?" &middot; "+esc(qid):"")+
+    '</span><span class="val">'+esc(g)+'</span></div>';
+}
+
 function drawCard(x, cheap){
   const el = document.getElementById("card-"+x.arm); if(!el) return;
   const empty = !x.answer || x.answer === "(no answer)";
+  const gr = x.grade;
   let badge = "";
-  if(x.grade){
-    const p = Math.round(x.grade.score*100);
-    badge = '<span class="pill ' + (p===100?"pass":p>0?"part":"fail") + '">' +
-            (p===100?"CORRECT":p>0?p+"% correct":"WRONG") + '</span>';
+  if(gr){
+    const p = Math.round(gr.score*100);
+    badge = '<span class="verdict '+(p===100?"ok":p>0?"part":"bad")+'">'+
+            (p===100?"correct":p>0?p+"% correct":"wrong")+'</span>';
   }
-  el.className = "rc" + (x.tokens===cheap ? " cheap" : "");
+  el.className = "rc "+x.arm+(x.tokens===cheap ? " cheap" : "");
   el.innerHTML =
-    '<div class="cap"><div class="cn"><i style="background:'+COL[x.arm]+'"></i>'+NAMES[x.arm]+badge+
-    '</div><span class="rt">'+esc(x.replayed ? "recorded" : (x.route||"-"))+'</span></div>'+
-    '<div class="bd"><div class="ans '+(empty?"empty":"")+'">'+
-      (empty ? "no answer returned" : esc(x.answer))+'</div>'+
-    '<div class="ft"><span>tokens <b class="'+(x.tokens===cheap?"best":"")+'">'+
-      (x.tokens||0).toLocaleString()+'</b></span>'+
-    (x.planner_tokens?'<span>planner <b>'+x.planner_tokens.toLocaleString()+'</b></span>':'')+
-    (x.latency?'<span><b>'+x.latency+'s</b></span>':'')+'</div></div>';
+    '<div class="cap"><div class="cn"><i style="background:'+COL[x.arm]+'"></i>'+
+      NAMES[x.arm]+badge+'</div>'+
+    '<span class="rt">'+esc(x.replayed ? "recorded" : (x.route||"-"))+'</span></div>'+
+    '<div class="body">'+
+      '<div class="ans'+(empty?" empty":"")+'">'+
+        (empty ? "no answer returned" : esc(x.answer))+'</div>'+
+      (gr && (gr.missed||[]).length + (gr.wrong||[]).length ? '<div class="diff">'+
+        ((gr.missed||[]).length ? '<div><b>missed</b> '+esc(gr.missed.join(", "))+'</div>' : '')+
+        ((gr.wrong||[]).length ? '<div><b>not in the answer</b> '+esc(gr.wrong.join(", "))+'</div>' : '')+
+        '</div>' : '')+
+      ((x.sources||[]).length ? '<div class="src">'+x.sources.map(v =>
+        '<span>'+esc(v.length>52 ? "..."+v.slice(-50) : v)+'</span>').join("")+'</div>' : '')+
+      '<div class="foot">'+
+        '<span>tokens <b'+(x.tokens===cheap?' class="best"':'')+'>'+
+          (x.tokens||0).toLocaleString()+'</b></span>'+
+        (x.planner_tokens ? '<span>planner <b>'+x.planner_tokens.toLocaleString()+'</b></span>' : '')+
+        (x.chunks ? '<span>chunks <b>'+x.chunks+'</b></span>' : '')+
+        (x.latency ? '<span><b>'+x.latency+'s</b></span>' : '')+
+      '</div></div>';
 }
 
 async function ask(){
@@ -392,64 +475,85 @@ async function ask(){
   const arms = view==="factual" ? ["p1","p2","p3"] : ["p1","p2rr","p3"];
   const btn = document.getElementById("go"), st = document.getElementById("state");
   btn.disabled = true;
-  document.getElementById("gold").innerHTML = "";
+  document.getElementById("goldBox").innerHTML = "";
+  // Each arm is its own request, fired together. One combined request would make the console
+  // wait for the SUM rather than the slowest arm.
   document.getElementById("cards").innerHTML = arms.map(a =>
-    '<div class="rc" id="card-'+a+'"><div class="cap"><div class="cn"><i style="background:'+
-    COL[a]+'"></i>'+NAMES[a]+'</div><span class="rt"><span class="spin"></span></span></div>'+
-    '<div class="bd"><div class="ans empty">running...</div></div></div>').join("");
+    '<div class="rc '+a+'" id="card-'+a+'"><div class="cap"><div class="cn">'+
+    '<i style="background:'+COL[a]+'"></i>'+NAMES[a]+'</div>'+
+    '<span class="rt"><span class="spin"></span></span></div>'+
+    '<div class="body"><div class="ans empty">running...</div></div></div>').join("");
   const t0 = Date.now(); let done = 0, gold = null, cheap = Infinity; const got = {};
   const paint = () => {
+    // cheapest RETRIEVAL arm: LLM-only always wins on tokens by retrieving nothing
     cheap = Math.min(...Object.values(got).filter(x=>x.arm!=="p1").map(x=>x.tokens), Infinity);
     for(const x of Object.values(got)) drawCard(x, cheap);
   };
-  st.innerHTML = '<span class="spin"></span> 0/'+arms.length+' done';
+  st.innerHTML = '<span class="spin"></span> running '+arms.length+' pipelines - 0/'+arms.length+' done';
   await Promise.all(arms.map(async a => {
     try{
       const d = await askArm(q, a);
-      if(d.error){ got[a] = {arm:a, answer:"could not run: "+d.error, tokens:0}; }
+      if(d.error){ got[a] = {arm:a, answer:"could not run: "+d.error, tokens:0, route:"error"}; }
       else{
-        if(d.gold && !gold){ gold = d.gold;
-          document.getElementById("gold").innerHTML =
-            '<div class="gold"><span class="gl">Correct answer'+
-            (d.qid?" - "+esc(d.qid):"")+'</span>'+esc(d.gold)+'</div>'; }
+        if(d.gold && !gold){ gold = d.gold; drawGold(d.gold, d.qid); }
         const x = (d.results||[]).find(z=>z.arm===a) || (d.results||[])[0];
         if(x){ x.arm = a; got[a] = x; }
       }
-    }catch(e){ got[a] = {arm:a, answer:"could not run: "+e, tokens:0}; }
+    }catch(e){ got[a] = {arm:a, answer:"could not run: "+e, tokens:0, route:"error"}; }
     done++; paint();
     st.innerHTML = done < arms.length
-      ? '<span class="spin"></span> '+done+'/'+arms.length+' done'
-      : 'all '+arms.length+' finished in '+((Date.now()-t0)/1000).toFixed(1)+'s'+
-        (gold ? " - graded against the answer key" : "");
+      ? '<span class="spin"></span> running - '+done+'/'+arms.length+' done'
+      : 'all '+arms.length+' finished in <b>'+((Date.now()-t0)/1000).toFixed(1)+'s</b>'+
+        (gold ? ' &middot; graded against the answer key' : ' &middot; no answer key for this question');
   }));
   btn.disabled = false;
 }
 
-async function loadChips(){
-  const f = view==="factual" ? "api/examples-factual.json" : "api/examples-textual.json";
-  if(!_CHIPS[f]) _CHIPS[f] = await (await fetch(f)).json();
-  document.getElementById("chips").innerHTML = _CHIPS[f].map(e =>
-    '<button class="chip" title="'+esc(e.q)+'">'+
-    esc(e.q.length>62 ? e.q.slice(0,60)+"..." : e.q)+'</button>').join("");
-  [...document.querySelectorAll("#chips .chip")].forEach((b,i) => b.onclick = () => {
-    document.getElementById("q").value = _CHIPS[f][i].q; ask(); });
+function drawChips(){
+  const list = onlyAnswered ? CHIPS.filter(c => c.answered !== false) : CHIPS;
+  const box = document.getElementById("chips");
+  if(!list.length){ box.innerHTML = '<div class="state">No questions match this filter.</div>'; return; }
+  box.innerHTML = list.map(e =>
+    '<button class="chip"><span class="tag '+esc(e.tier||"")+'">'+
+    esc((e.tier||"").replace(/_/g," ")||"q")+'</span><span class="qt">'+esc(e.q)+'</span></button>'
+  ).join("");
+  [...box.querySelectorAll(".chip")].forEach((b,i) => b.onclick = () => {
+    document.getElementById("q").value = list[i].q; ask(); });
 }
 
-function switchView(v){
+async function loadChips(){
+  CHIPS = await jget(view==="factual" ? "api/examples-factual.json" : "api/examples-textual.json");
+  const any = CHIPS.some(c => c.answered === false);
+  const bar = document.getElementById("chipbar");
+  bar.innerHTML = any
+    ? '<button class="filt '+(onlyAnswered?"on":"")+'" id="fA">Answered correctly</button>'+
+      '<button class="filt '+(onlyAnswered?"":"on")+'" id="fB">All questions</button>' : "";
+  if(any){
+    document.getElementById("fA").onclick = () => { onlyAnswered = true;  loadChips(); };
+    document.getElementById("fB").onclick = () => { onlyAnswered = false; loadChips(); };
+  }
+  drawChips();
+}
+
+function setView(v){
   view = v;
   document.getElementById("dsT").className = v==="textual" ? "on" : "";
   document.getElementById("dsF").className = v==="factual" ? "on" : "";
+  document.getElementById("askHint").textContent = LIVE_URL
+    ? "runs all three pipelines live; falls back to the recorded run if the backend is offline"
+    : "replays the recorded run - every answer and token count is measured, not generated now";
   document.getElementById("cards").innerHTML = "";
-  document.getElementById("gold").innerHTML = "";
+  document.getElementById("goldBox").innerHTML = "";
   document.getElementById("state").innerHTML = "";
+  document.getElementById("q").value = "";
   loadChips();
 }
 
 document.getElementById("go").onclick = ask;
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
-document.getElementById("dsT").onclick = () => switchView("textual");
-document.getElementById("dsF").onclick = () => switchView("factual");
-loadChips();
+document.getElementById("dsT").onclick = () => setView("textual");
+document.getElementById("dsF").onclick = () => setView("factual");
+setView("textual");
 </script>
 """
 
