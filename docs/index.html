@@ -215,21 +215,16 @@ a{color:var(--p3)}
 <div class="wrap">
 <div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span><a href="#" class="here">Scorecard</a><a href="index.html">Interactive dashboard</a><a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>
 <section>
-<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · 20 single-doc / 10 directory / 20 multi-hop · single run</p>
-<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>
-<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store — so does the baseline, which removes the vector store as a variable.</p>
-<div class="stats">
-<div class="stat "><div class="big">−49%</div><div class="lbl">Tokens vs Basic RAG</div><div class="foot">2,733 vs 5,312 per question</div></div>
-<div class="stat "><div class="big">+48 pts</div><div class="lbl">Strict pass vs Basic RAG</div><div class="foot">GraphRAG 50/50 · RAG 26/50</div></div>
-<div class="stat neutral"><div class="big">0.8%</div><div class="lbl">LLM-only with no retrieval</div><div class="foot">Leak gate — the company is fictional</div></div>
-</div>
+<p class="eyebrow">Run it yourself</p>
+<h1>Ask any of the questions the graph answers correctly.</h1>
+<p class="sub">Three pipelines, the same question, side by side, graded against a verified answer key. The list is restricted to questions GraphRAG gets right — every question it gets <i>wrong</i> is still in the per-question tables further down, with the verdict.</p>
 
 <div class="console">
   <div class="chead"><h3 id="askHead">Query console</h3>
     <span class="hint" id="askHint"></span></div>
   <div class="seg">
-    <button id="dsT" class="on"><span class="sw"></span>Textual · Enterprise</button>
-    <button id="dsF"><span class="sw"></span>Factual · SEC</button>
+    <button id="dsF" class="on"><span class="sw"></span>Factual · SEC</button>
+    <button id="dsT"><span class="sw"></span>Textual · Enterprise</button>
   </div>
   <div class="ask">
     <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
@@ -238,21 +233,11 @@ a{color:var(--p3)}
   <div class="state" id="state"></div>
   <div id="goldBox"></div>
   <div class="cards" id="cards"></div>
-  <div class="chipbar" id="chipbar"></div>
   <div class="chiphint" id="chipHint"></div>
   <div class="chips" id="chips"></div>
 </div>
 
 <div class="note"><b>Every question above has a verified answer key</b>, so the console grades each reply rather than leaving you to judge it. With a backend configured it runs all three pipelines live; without one it replays the recorded run — the same measured answer either way, and the card says <code>recorded</code> when that is what happened.</div>
-<h2>Scorecard</h2>
-<table class="sc"><thead><tr><th class="ml">METRIC</th><th>LLM only</th><th>Basic RAG</th><th>GraphRAG</th></tr></thead><tbody><tr><td class="ml">Strict pass (exact set)</td><td class="n">0/50</td><td class="n">26/50</td><td class="n win">50/50</td></tr><tr><td class="ml">Blind LLM judge</td><td class="n">0.8%</td><td class="n">62.3%</td><td class="n win">100.0%</td></tr><tr><td class="ml">BERTScore F1</td><td class="n">0.852</td><td class="n">0.934</td><td class="n win">1.000</td></tr><tr><td class="ml">Complete failures (score 0)</td><td class="n">49</td><td class="n">13</td><td class="n win">0</td></tr><tr><td class="ml">Tokens / question</td><td class="n win">273</td><td class="n">5,312</td><td class="n">2,733</td></tr></tbody></table>
-<div class="note"><b>Read strict pass, not the judge.</b> Strict means the answer set matches gold exactly — no partial credit. The judge is a lenient second opinion and it flatters the baseline: Basic RAG scores 62.3% judged but only 26/50 exactly right. Where the two disagree, strict is the number of record.</div>
-<div class="note"><b>The budgets are deliberately unequal, in the baseline's favour.</b> GraphRAG reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end at a 3-chunk budget.</div>
-<div class="note"><b>1,185 of GraphRAG's 2,733 tokens are the planner call</b> — 43% of its spend, and a fixed cost that does not shrink with the chunk budget. That is the floor on the token claim, not a number to leave out.</div>
-<div class="note"><b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the arms correctly (0.852 / 0.934 / 1.000). On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you already know the answer is not evidence.</div>
-<h2>Strict pass rate by question tier</h2>
-<div class='key'><span class='k a1'></span>LLM only<span class='k a2'></span>Basic RAG<span class='k a3'></span>GraphRAG</div><table class="tb"><thead><tr><th class="ml">TIER</th><th>LLM ONLY</th><th>BASIC RAG</th><th>GRAPHRAG</th></tr></thead><tbody><tr><td class="ml"><b>Single document</b> — one doc holds the answer</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a2" style="width:80%"></span><span class="frac">16/20</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">20/20</span></td></tr><tr><td class="ml"><b>Directory lookup</b> — one hop in the org chart</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/10</span></td><td class="barcell"><span class="bar a2" style="width:100%"></span><span class="frac">10/10</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">10/10</span></td></tr><tr><td class="ml"><b>Multi-hop</b> — needs a join across documents</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a2" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">20/20</span></td></tr></tbody></table>
-<div class="note"><b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same questions. The only variable is whether the question needs a join. Five of those 20 questions require combining 102–1,065 documents against a 10-chunk budget: no reranker fixes that, because nothing puts 1,065 documents into 10 slots.</div>
 </section><section>
 <p class="eyebrow">SEC 10-K / DEF 14A filings · 50 questions · 100 S&amp;P-100 companies · different corpus, different schema, real entities</p>
 <h1>Generalization to real filings — including where the graph loses.</h1>
@@ -269,6 +254,24 @@ a{color:var(--p3)}
 <h2>Strict pass rate by question tier</h2>
 <div class='key'><span class='k a1'></span>LLM only<span class='k a2'></span>Basic RAG<span class='k a3'></span>GraphRAG</div><table class="tb"><thead><tr><th class="ml">TIER</th><th>LLM ONLY</th><th>BASIC RAG</th><th>GRAPHRAG</th></tr></thead><tbody><tr><td class="ml"><b>A · Single lookup</b> — one number in one filing</td><td class="barcell"><span class="bar a1" style="width:38%"></span><span class="frac">3/8</span></td><td class="barcell"><span class="bar a2" style="width:88%"></span><span class="frac">7/8</span></td><td class="barcell"><span class="bar a3" style="width:50%"></span><span class="frac">4/8</span></td></tr><tr><td class="ml"><b>B · Two-hop bridge</b> — relation, then a number</td><td class="barcell"><span class="bar a1" style="width:6%"></span><span class="frac">1/16</span></td><td class="barcell"><span class="bar a2" style="width:31%"></span><span class="frac">5/16</span></td><td class="barcell"><span class="bar a3" style="width:38%"></span><span class="frac">6/16</span></td></tr><tr><td class="ml"><b>C · Aggregation</b> — every company matching a property</td><td class="barcell"><span class="bar a1" style="width:5%"></span><span class="frac">1/20</span></td><td class="barcell"><span class="bar a2" style="width:15%"></span><span class="frac">3/20</span></td><td class="barcell"><span class="bar a3" style="width:60%"></span><span class="frac">12/20</span></td></tr><tr><td class="ml"><b>D · Cross-doc / temporal</b></td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/6</span></td><td class="barcell"><span class="bar a2" style="width:17%"></span><span class="frac">1/6</span></td><td class="barcell"><span class="bar a3" style="width:17%"></span><span class="frac">1/6</span></td></tr></tbody></table>
 <div class="note"><b>The graph wins the hardest tier and loses the easiest.</b> On aggregation it is 12/20 against 3/20 — four times the baseline. On single lookup it is 4/8 against 7/8: for one number in one filing, vector retrieval is simply the better tool and the planner call is wasted overhead. <b>A system that wins everything is a system that has not been tested properly.</b></div>
+</section><section>
+<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · 20 single-doc / 10 directory / 20 multi-hop · single run</p>
+<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>
+<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store — so does the baseline, which removes the vector store as a variable.</p>
+<div class="stats">
+<div class="stat "><div class="big">−49%</div><div class="lbl">Tokens vs Basic RAG</div><div class="foot">2,733 vs 5,312 per question</div></div>
+<div class="stat "><div class="big">+48 pts</div><div class="lbl">Strict pass vs Basic RAG</div><div class="foot">GraphRAG 50/50 · RAG 26/50</div></div>
+<div class="stat neutral"><div class="big">0.8%</div><div class="lbl">LLM-only with no retrieval</div><div class="foot">Leak gate — the company is fictional</div></div>
+</div>
+<h2>Scorecard</h2>
+<table class="sc"><thead><tr><th class="ml">METRIC</th><th>LLM only</th><th>Basic RAG</th><th>GraphRAG</th></tr></thead><tbody><tr><td class="ml">Strict pass (exact set)</td><td class="n">0/50</td><td class="n">26/50</td><td class="n win">50/50</td></tr><tr><td class="ml">Blind LLM judge</td><td class="n">0.8%</td><td class="n">62.3%</td><td class="n win">100.0%</td></tr><tr><td class="ml">BERTScore F1</td><td class="n">0.852</td><td class="n">0.934</td><td class="n win">1.000</td></tr><tr><td class="ml">Complete failures (score 0)</td><td class="n">49</td><td class="n">13</td><td class="n win">0</td></tr><tr><td class="ml">Tokens / question</td><td class="n win">273</td><td class="n">5,312</td><td class="n">2,733</td></tr></tbody></table>
+<div class="note"><b>Read strict pass, not the judge.</b> Strict means the answer set matches gold exactly — no partial credit. The judge is a lenient second opinion and it flatters the baseline: Basic RAG scores 62.3% judged but only 26/50 exactly right. Where the two disagree, strict is the number of record.</div>
+<div class="note"><b>The budgets are deliberately unequal, in the baseline's favour.</b> GraphRAG reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end at a 3-chunk budget.</div>
+<div class="note"><b>1,185 of GraphRAG's 2,733 tokens are the planner call</b> — 43% of its spend, and a fixed cost that does not shrink with the chunk budget. That is the floor on the token claim, not a number to leave out.</div>
+<div class="note"><b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the arms correctly (0.852 / 0.934 / 1.000). On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you already know the answer is not evidence.</div>
+<h2>Strict pass rate by question tier</h2>
+<div class='key'><span class='k a1'></span>LLM only<span class='k a2'></span>Basic RAG<span class='k a3'></span>GraphRAG</div><table class="tb"><thead><tr><th class="ml">TIER</th><th>LLM ONLY</th><th>BASIC RAG</th><th>GRAPHRAG</th></tr></thead><tbody><tr><td class="ml"><b>Single document</b> — one doc holds the answer</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a2" style="width:80%"></span><span class="frac">16/20</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">20/20</span></td></tr><tr><td class="ml"><b>Directory lookup</b> — one hop in the org chart</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/10</span></td><td class="barcell"><span class="bar a2" style="width:100%"></span><span class="frac">10/10</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">10/10</span></td></tr><tr><td class="ml"><b>Multi-hop</b> — needs a join across documents</td><td class="barcell"><span class="bar a1" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a2" style="width:0%"></span><span class="frac">0/20</span></td><td class="barcell"><span class="bar a3" style="width:100%"></span><span class="frac">20/20</span></td></tr></tbody></table>
+<div class="note"><b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same questions. The only variable is whether the question needs a join. Five of those 20 questions require combining 102–1,065 documents against a 10-chunk budget: no reranker fixes that, because nothing puts 1,065 documents into 10 slots.</div>
 </section><section>
 <p class="eyebrow">Overfitting controls</p>
 <h1>Held-out set, and run-to-run variance.</h1>
@@ -312,7 +315,10 @@ const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before i
 
 const NAMES = {p1:"LLM only", p2:"Basic RAG", p2rr:"Basic RAG", p3:"GraphRAG"};
 const COL   = {p1:"var(--p1)", p2:"var(--p2)", p2rr:"var(--p2)", p3:"var(--p3)"};
-let view = "textual", CHIPS = [], onlyAnswered = true;
+// Questions the GRAPH answers correctly, baked in at build time. The examples-*.json files
+// cannot serve this: their factual entries carry p3: null, so there is nothing to filter on.
+const PASSING = {"textual": [{"q": "Who authored the document '20270330 milestone gatekeeper approvals'?", "tier": "single_doc", "qid": "MX01"}, {"q": "Who authored the document '2025 02 11 hosted api latency fallback activated'?", "tier": "single_doc", "qid": "MX02"}, {"q": "Who authored the document 'ENG 913579 attention path prefetcher and kernel winnower'?", "tier": "single_doc", "qid": "MX03"}, {"q": "Who authored the document '20270509 lyra onboarding sig caiq intake'?", "tier": "single_doc", "qid": "MX04"}, {"q": "Who authored the document '20270610 processor roster handoff kms sourcing'?", "tier": "single_doc", "qid": "MX05"}, {"q": "Who authored the document '20270521 medbridge security subprocessor checkin'?", "tier": "single_doc", "qid": "MX06"}, {"q": "Who authored the document '20291107 arcadia evening walkthrough reschedule'?", "tier": "single_doc", "qid": "MX07"}, {"q": "Who authored the document '20261121 slot swap proxy invite widget handoff'?", "tier": "single_doc", "qid": "MX08"}, {"q": "Who authored the document 'ENG 411007 stratified hit ensemble ttl runbook'?", "tier": "single_doc", "qid": "MX09"}, {"q": "Who authored the document '20270420 qbr runway stitch account onepagers'?", "tier": "single_doc", "qid": "MX10"}, {"q": "Which Slack channel is the message '5390001111 tiny astronaut toast emoji echo' in?", "tier": "single_doc", "qid": "MX11"}, {"q": "Which Slack channel is the message '1898765432 pin decay orchestration and grace unification' in?", "tier": "single_doc", "qid": "MX12"}, {"q": "Which Slack channel is the message '3187654321 token identity wobble on embed proj sanity' in?", "tier": "single_doc", "qid": "MX13"}, {"q": "Which Slack channel is the message '2176543210 kms rewrap edge cases and rbac clarify' in?", "tier": "single_doc", "qid": "MX14"}, {"q": "Which Slack channel is the message '2755550000 legal hold stale snapshot service account check' in?", "tier": "single_doc", "qid": "MX15"}, {"q": "Which Slack channel is the message '1918765432 vxlan mtu probe regression canary' in?", "tier": "single_doc", "qid": "MX16"}, {"q": "Which Slack channel is the message '1950012345 shim routing decisionflow' in?", "tier": "single_doc", "qid": "MX17"}, {"q": "Which Slack channel is the message '1789123456 sdr emea first week access' in?", "tier": "single_doc", "qid": "MX18"}, {"q": "Which Slack channel is the message '5698765432 marketplace edgebox gTM readiness' in?", "tier": "single_doc", "qid": "MX19"}, {"q": "Which Slack channel is the message '1845678901 onprem handshake networking handoff' in?", "tier": "single_doc", "qid": "MX20"}, {"q": "Who reports directly to Vikram Singh?", "tier": "single_dir", "qid": "MX21"}, {"q": "Who reports directly to Kimberly Park?", "tier": "single_dir", "qid": "MX22"}, {"q": "Who reports directly to Alex Martinez?", "tier": "single_dir", "qid": "MX23"}, {"q": "Who reports directly to Rafael Mendes?", "tier": "single_dir", "qid": "MX24"}, {"q": "Who is Devon Price's manager?", "tier": "single_dir", "qid": "MX25"}, {"q": "Who is Olivia Grant's manager?", "tier": "single_dir", "qid": "MX26"}, {"q": "Who is Hassan Mirza's manager?", "tier": "single_dir", "qid": "MX27"}, {"q": "Which people are in the Operations / IT department?", "tier": "single_dir", "qid": "MX28"}, {"q": "Which people are in the Finance department?", "tier": "single_dir", "qid": "MX29"}, {"q": "Which people are in the People department?", "tier": "single_dir", "qid": "MX30"}, {"q": "Which Slack channels contain documents involving both Allison Grant and Sergio Costa?", "tier": "multi_hop", "qid": "MX31"}, {"q": "Which Slack channels contain documents involving both Ibrahim Khan and Wei Chen?", "tier": "multi_hop", "qid": "MX32"}, {"q": "Which Slack channels do the people reporting to Marcus Lin take part in?", "tier": "multi_hop", "qid": "MX33"}, {"q": "Which people from the Product department take part in the #incidents Slack channel?", "tier": "multi_hop", "qid": "MX34"}, {"q": "Which Slack channels contain documents involving both Rafael Mendes and Victor Alvarez?", "tier": "multi_hop", "qid": "MX35"}, {"q": "Which Slack channels contain documents involving both Daniel Carter and Naomi Feldman?", "tier": "multi_hop", "qid": "MX36"}, {"q": "Which people from the Product department take part in the #product Slack channel?", "tier": "multi_hop", "qid": "MX37"}, {"q": "Which Slack channels contain documents involving both Sean Gallagher and Vivek Kulkarni?", "tier": "multi_hop", "qid": "MX38"}, {"q": "Which Slack channels contain documents involving both Dev Patel and Rafael Mendes?", "tier": "multi_hop", "qid": "MX39"}, {"q": "Which Slack channels do the people reporting to Sofia Ivanova take part in?", "tier": "multi_hop", "qid": "MX40"}, {"q": "Which Slack channels contain documents involving both Allison Grant and Ibrahim Khan?", "tier": "multi_hop", "qid": "MX41"}, {"q": "Which Slack channels contain documents involving both Aisha Bello and Mina Haddad?", "tier": "multi_hop", "qid": "MX42"}, {"q": "Which Slack channels do the people reporting to Vikram Singh take part in?", "tier": "multi_hop", "qid": "MX43"}, {"q": "Which people from the Product department take part in the #sales Slack channel?", "tier": "multi_hop", "qid": "MX44"}, {"q": "Which Slack channels do the people reporting to Dr. Maya Srinivasan take part in?", "tier": "multi_hop", "qid": "MX45"}, {"q": "Which people from the Infrastructure & SRE department take part in the #eng-runtime Slack channel?", "tier": "multi_hop", "qid": "MX46"}, {"q": "Which Slack channels contain documents involving both Markus Klein and Talia Benson?", "tier": "multi_hop", "qid": "MX47"}, {"q": "Which Slack channels do the people reporting to Laura Bennett take part in?", "tier": "multi_hop", "qid": "MX48"}, {"q": "Which people from the Product department take part in the #announcements Slack channel?", "tier": "multi_hop", "qid": "MX49"}, {"q": "Which Slack channels do the people reporting to Monica Patel take part in?", "tier": "multi_hop", "qid": "MX50"}], "factual": [{"q": "Apple's total net sales for fiscal year 2025?", "tier": "A", "qid": "EQ01"}, {"q": "NVIDIA's total revenue for fiscal year 2026?", "tier": "A", "qid": "EQ02"}, {"q": "Coca-Cola's net operating revenues for FY2025?", "tier": "A", "qid": "EQ05"}, {"q": "Who is Amazon's Chief Executive Officer?", "tier": "A", "qid": "EQ07"}, {"q": "Besides Netflix, which company authorized a $25B share-repurchase program in 2026?", "tier": "B", "qid": "EQ11"}, {"q": "Which had the higher fiscal-year revenue: Walmart or Apple?", "tier": "B", "qid": "EQ14"}, {"q": "Which spent more on R&D in its latest fiscal year: Apple or NVIDIA?", "tier": "B", "qid": "EQ15"}, {"q": "Amgen named an incoming CFO in 2026 \u2014 who is he, and who is Amgen's auditor?", "tier": "B", "qid": "EQ17"}, {"q": "AMD's new revolving credit facility (May 2026 8-K) names which bank as administrative agent, and which was agent on the facility it replaced?", "tier": "B", "qid": "EQ22"}, {"q": "By how much did Caterpillar raise its quarterly dividend (June 2026 8-K), and to what new amount?", "tier": "B", "qid": "EQ24"}, {"q": "Which companies in the dataset name TSMC as a foundry/manufacturing partner?", "tier": "C", "qid": "EQ26"}, {"q": "Two companies list Indra Nooyi as a member of their board \u2014 which two?", "tier": "C", "qid": "EQ27"}, {"q": "Ellen Kullman serves on the boards of which two dataset companies?", "tier": "C", "qid": "EQ28"}, {"q": "Which Energy-sector companies discuss climate change as a risk factor in their 10-K?", "tier": "C", "qid": "EQ30"}, {"q": "Which Utilities-sector companies address climate change in their 10-K?", "tier": "C", "qid": "EQ31"}, {"q": "Which companies authorized a $25 billion share-repurchase program via an 8-K?", "tier": "C", "qid": "EQ35"}, {"q": "Which KPMG-audited companies are in the Consumer Staples sector?", "tier": "C", "qid": "EQ36"}, {"q": "Among the companies that name TSMC as a foundry, which are audited by Ernst & Young?", "tier": "C", "qid": "EQ38"}, {"q": "Among the companies that name TSMC as a foundry, which are audited by PricewaterhouseCoopers?", "tier": "C", "qid": "EQ39"}, {"q": "Among Health-Care companies that mention obesity/weight-loss drugs, which are audited by Ernst & Young?", "tier": "C", "qid": "EQ40"}, {"q": "Which Deloitte-audited companies are in the Health-Care sector?", "tier": "C", "qid": "EQ41"}, {"q": "Among companies that name NVIDIA as a competitor, which are audited by PricewaterhouseCoopers?", "tier": "C", "qid": "EQ43"}, {"q": "What quarterly cash dividend per share did Costco declare in its July 2026 8-K?", "tier": "D", "qid": "EQ50"}]};
+let view = "factual", CHIPS = [];
 const _ANS = {}, _EX = {};
 const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
   c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -425,7 +431,7 @@ async function ask(){
 }
 
 function drawChips(){
-  const list = onlyAnswered ? CHIPS.filter(c => c.answered !== false) : CHIPS;
+  const list = CHIPS;
   const box = document.getElementById("chips");
   if(!list.length){ box.innerHTML = '<div class="state">No questions match this filter.</div>'; return; }
   box.innerHTML = list.map(e =>
@@ -444,19 +450,10 @@ function drawChips(){
   });
 }
 
-async function loadChips(){
-  CHIPS = await jget(view==="factual" ? "api/examples-factual.json" : "api/examples-textual.json");
-  const any = CHIPS.some(c => c.answered === false);
-  const bar = document.getElementById("chipbar");
-  bar.innerHTML = any
-    ? '<button class="filt '+(onlyAnswered?"on":"")+'" id="fA">Answered correctly</button>'+
-      '<button class="filt '+(onlyAnswered?"":"on")+'" id="fB">All questions</button>' : "";
-  if(any){
-    document.getElementById("fA").onclick = () => { onlyAnswered = true;  loadChips(); };
-    document.getElementById("fB").onclick = () => { onlyAnswered = false; loadChips(); };
-  }
+function loadChips(){
+  CHIPS = PASSING[view] || [];
   document.getElementById("chipHint").textContent =
-    "click a question to load it, then press Run";
+    CHIPS.length + " questions GraphRAG answers correctly - click one to load it, then press Run";
   drawChips();
 }
 
@@ -467,6 +464,8 @@ function setView(v){
   document.getElementById("askHint").textContent = LIVE_URL
     ? "runs all three pipelines live; falls back to the recorded run if the backend is offline"
     : "replays the recorded run - every answer and token count is measured, not generated now";
+  document.getElementById("q").placeholder = v==="factual"
+    ? "Ask about an S&P-100 filing..." : "Ask something about the company...";
   document.getElementById("cards").innerHTML = "";
   document.getElementById("goldBox").innerHTML = "";
   document.getElementById("state").innerHTML = "";
@@ -478,5 +477,5 @@ document.getElementById("go").onclick = ask;
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
 document.getElementById("dsT").onclick = () => setView("textual");
 document.getElementById("dsF").onclick = () => setView("factual");
-setView("textual");
+setView("factual");
 </script>

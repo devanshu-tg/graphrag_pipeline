@@ -445,8 +445,8 @@ CONSOLE = """
   <div class="chead"><h3 id="askHead">Query console</h3>
     <span class="hint" id="askHint"></span></div>
   <div class="seg">
-    <button id="dsT" class="on"><span class="sw"></span>Textual · Enterprise</button>
-    <button id="dsF"><span class="sw"></span>Factual · SEC</button>
+    <button id="dsF" class="on"><span class="sw"></span>Factual · SEC</button>
+    <button id="dsT"><span class="sw"></span>Textual · Enterprise</button>
   </div>
   <div class="ask">
     <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
@@ -455,7 +455,6 @@ CONSOLE = """
   <div class="state" id="state"></div>
   <div id="goldBox"></div>
   <div class="cards" id="cards"></div>
-  <div class="chipbar" id="chipbar"></div>
   <div class="chiphint" id="chipHint"></div>
   <div class="chips" id="chips"></div>
 </div>
@@ -473,7 +472,10 @@ const LIVE_TIMEOUT_MS = 90000;   // Cloudflare cuts at ~100s; fall back before i
 
 const NAMES = {p1:"LLM only", p2:"Basic RAG", p2rr:"Basic RAG", p3:"GraphRAG"};
 const COL   = {p1:"var(--p1)", p2:"var(--p2)", p2rr:"var(--p2)", p3:"var(--p3)"};
-let view = "textual", CHIPS = [], onlyAnswered = true;
+// Questions the GRAPH answers correctly, baked in at build time. The examples-*.json files
+// cannot serve this: their factual entries carry p3: null, so there is nothing to filter on.
+const PASSING = __PASSING__;
+let view = "factual", CHIPS = [];
 const _ANS = {}, _EX = {};
 const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
   c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -586,7 +588,7 @@ async function ask(){
 }
 
 function drawChips(){
-  const list = onlyAnswered ? CHIPS.filter(c => c.answered !== false) : CHIPS;
+  const list = CHIPS;
   const box = document.getElementById("chips");
   if(!list.length){ box.innerHTML = '<div class="state">No questions match this filter.</div>'; return; }
   box.innerHTML = list.map(e =>
@@ -605,19 +607,10 @@ function drawChips(){
   });
 }
 
-async function loadChips(){
-  CHIPS = await jget(view==="factual" ? "api/examples-factual.json" : "api/examples-textual.json");
-  const any = CHIPS.some(c => c.answered === false);
-  const bar = document.getElementById("chipbar");
-  bar.innerHTML = any
-    ? '<button class="filt '+(onlyAnswered?"on":"")+'" id="fA">Answered correctly</button>'+
-      '<button class="filt '+(onlyAnswered?"":"on")+'" id="fB">All questions</button>' : "";
-  if(any){
-    document.getElementById("fA").onclick = () => { onlyAnswered = true;  loadChips(); };
-    document.getElementById("fB").onclick = () => { onlyAnswered = false; loadChips(); };
-  }
+function loadChips(){
+  CHIPS = PASSING[view] || [];
   document.getElementById("chipHint").textContent =
-    "click a question to load it, then press Run";
+    CHIPS.length + " questions GraphRAG answers correctly - click one to load it, then press Run";
   drawChips();
 }
 
@@ -628,6 +621,8 @@ function setView(v){
   document.getElementById("askHint").textContent = LIVE_URL
     ? "runs all three pipelines live; falls back to the recorded run if the backend is offline"
     : "replays the recorded run - every answer and token count is measured, not generated now";
+  document.getElementById("q").placeholder = v==="factual"
+    ? "Ask about an S&P-100 filing..." : "Ask something about the company...";
   document.getElementById("cards").innerHTML = "";
   document.getElementById("goldBox").innerHTML = "";
   document.getElementById("state").innerHTML = "";
@@ -639,7 +634,7 @@ document.getElementById("go").onclick = ask;
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
 document.getElementById("dsT").onclick = () => setView("textual");
 document.getElementById("dsF").onclick = () => setView("factual");
-setView("textual");
+setView("factual");
 </script>
 """
 
@@ -704,26 +699,11 @@ def main() -> int:
       '<a href="index.html">Interactive dashboard</a>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
 
-    # ---- enterprise
+    # ---- console, above both datasets because it serves both
     A('<section>')
-    A(f'<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · '
-      f'20 single-doc / 10 directory / 20 multi-hop · single run</p>')
-    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
-    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator '
-      '(gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge '
-      '(gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph '
-      '<i>and</i> vector store — so does the baseline, which removes the vector store as a '
-      'variable.</p>')
-
-    A('<div class="stats">')
-    A(card(f"−{red:.0f}%", "Tokens vs Basic RAG",
-           f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question"))
-    A(card(f"+{gap:.0f} pts", "Strict pass vs Basic RAG",
-           f"GraphRAG {E['p3']['strict']}/{E['p3']['n']} · RAG {E['p2rr']['strict']}/{E['p2rr']['n']}"))
-    A(card(f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
-           "Leak gate — the company is fictional", "neutral"))
-    A('</div>')
-
+    A('<p class="eyebrow">Run it yourself</p>')
+    A('<h1>Ask any of the questions the graph answers correctly.</h1>')
+    A('<p class="sub">Three pipelines, the same question, side by side, graded against a verified answer key. The list is restricted to questions GraphRAG gets right — every question it gets <i>wrong</i> is still in the per-question tables further down, with the verdict.</p>')
     A(CONSOLE)
     A(callout(
         '<b>Every question above has a verified answer key</b>, so the console grades each '
@@ -731,50 +711,6 @@ def main() -> int:
         'three pipelines live; without one it replays the recorded run — the same measured '
         'answer either way, and the card says <code>recorded</code> when that is what '
         'happened.'))
-
-    A('<h2>Scorecard</h2>')
-    A(scorecard(ENT_ARMS, E, ent_metrics))
-
-    A(callout(
-        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
-        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
-        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
-        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
-        f'is the number of record.'))
-
-    A(callout(
-        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
-        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
-        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
-        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
-        f'at a 3-chunk budget.'))
-
-    A(callout(
-        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
-        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
-        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
-        f'a number to leave out.'))
-
-    A(callout(
-        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
-        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
-        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
-        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
-        f'already know the answer is not evidence.'))
-
-    A('<h2>Strict pass rate by question tier</h2>')
-    A(tier_bars(ent, [("p1", "LLM only", "a1"), ("p2rr", "Basic RAG", "a2"),
-                      ("p3", "GraphRAG", "a3")],
-                [("single_doc", "<b>Single document</b> — one doc holds the answer"),
-                 ("single_dir", "<b>Directory lookup</b> — one hop in the org chart"),
-                 ("multi_hop", "<b>Multi-hop</b> — needs a join across documents")]))
-    A(callout(
-        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
-        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
-        'questions. The only variable is whether the question needs a join. Five of those 20 '
-        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
-        'fixes that, because nothing puts 1,065 documents into 10 slots.'))
-
     # ---- generalisation
     A('</section><section>')
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings · 50 questions · 100 S&amp;P-100 companies '
@@ -823,6 +759,70 @@ def main() -> int:
         'for one number in one filing, vector retrieval is simply the better tool and the '
         'planner call is wasted overhead. <b>A system that wins everything is a system that '
         'has not been tested properly.</b>'))
+
+    # ---- enterprise
+    A('</section><section>')
+    A(f'<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · '
+      f'20 single-doc / 10 directory / 20 multi-hop · single run</p>')
+    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
+    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator '
+      '(gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge '
+      '(gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph '
+      '<i>and</i> vector store — so does the baseline, which removes the vector store as a '
+      'variable.</p>')
+
+    A('<div class="stats">')
+    A(card(f"−{red:.0f}%", "Tokens vs Basic RAG",
+           f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question"))
+    A(card(f"+{gap:.0f} pts", "Strict pass vs Basic RAG",
+           f"GraphRAG {E['p3']['strict']}/{E['p3']['n']} · RAG {E['p2rr']['strict']}/{E['p2rr']['n']}"))
+    A(card(f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
+           "Leak gate — the company is fictional", "neutral"))
+    A('</div>')
+
+
+    A('<h2>Scorecard</h2>')
+    A(scorecard(ENT_ARMS, E, ent_metrics))
+
+    A(callout(
+        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
+        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
+        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
+        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
+        f'is the number of record.'))
+
+    A(callout(
+        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
+        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
+        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
+        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
+        f'at a 3-chunk budget.'))
+
+    A(callout(
+        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
+        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
+        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
+        f'a number to leave out.'))
+
+    A(callout(
+        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
+        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
+        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
+        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
+        f'already know the answer is not evidence.'))
+
+    A('<h2>Strict pass rate by question tier</h2>')
+    A(tier_bars(ent, [("p1", "LLM only", "a1"), ("p2rr", "Basic RAG", "a2"),
+                      ("p3", "GraphRAG", "a3")],
+                [("single_doc", "<b>Single document</b> — one doc holds the answer"),
+                 ("single_dir", "<b>Directory lookup</b> — one hop in the org chart"),
+                 ("multi_hop", "<b>Multi-hop</b> — needs a join across documents")]))
+    A(callout(
+        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
+        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
+        'questions. The only variable is whether the question needs a join. Five of those 20 '
+        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
+        'fixes that, because nothing puts 1,065 documents into 10 slots.'))
 
     # ---- held out + replicates
     A('</section><section>')
@@ -936,7 +936,24 @@ def main() -> int:
       'time. None are typed by hand.</div>')
     A('</section></div>')
 
-    js = (CONSOLE_JS.replace('__LIVE_URL__', json.dumps(args.live_url.rstrip('/')))
+    # Only questions the GRAPH answers correctly. Enterprise is 50/50 so all 50 survive;
+    # SEC is 23/50, so the console offers 23. Everything it gets wrong stays visible in the
+    # per-question tables — the filter is on the console, not on the evidence.
+    def passing(rows, arm):
+        seen, out = set(), []
+        for r in rows:
+            if r["arm"] == arm and r["exact"] and r["question"] not in seen:
+                seen.add(r["question"])
+                out.append({"q": r["question"], "tier": r.get("tier", ""),
+                            "qid": r.get("question_id", "")})
+        return out
+
+    passing_js = json.dumps({"textual": passing(ent, "p3"), "factual": passing(sec, "p3")})
+    print(f"  console offers {len(json.loads(passing_js)['textual'])} enterprise + "
+          f"{len(json.loads(passing_js)['factual'])} SEC questions (GraphRAG passes only)")
+
+    js = (CONSOLE_JS.replace('__PASSING__', passing_js)
+                    .replace('__LIVE_URL__', json.dumps(args.live_url.rstrip('/')))
                     .replace('__LIVE_TOKEN__', json.dumps(args.live_token)))
     doc = (f'<title>GraphRAG evaluation — scorecard</title>\n<style>{CSS}</style>\n'
            + "\n".join(H1) + js)
