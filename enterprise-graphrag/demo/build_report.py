@@ -28,6 +28,7 @@ import argparse
 import html
 import json
 import os
+import shutil
 import statistics as st
 import sys
 from pathlib import Path
@@ -247,8 +248,11 @@ td.tier{text-align:left;color:var(--dim);font-size:.75rem;white-space:nowrap}
 td.q{max-width:34ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 td.g{max-width:26ch;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-pre.arch{font-family:var(--mono);font-size:.74rem;line-height:1.5;background:var(--panel);
-  border:1px solid var(--line);border-radius:8px;padding:1.1rem;overflow-x:auto;color:var(--ink2)}
+figure.arch{margin:0;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+  padding:.9rem;overflow-x:auto}
+figure.arch img{display:block;width:100%;max-width:1024px;height:auto;margin:0 auto;
+  border-radius:4px;background:#fff}
+figure.arch figcaption{margin-top:.7rem;font-size:.76rem;color:var(--faint);text-align:center}
 .foot-note{margin-top:3.4rem;padding-top:1.4rem;border-top:1px solid var(--line);
   font-size:.78rem;color:var(--faint)}
 a{color:var(--p3)}
@@ -788,44 +792,27 @@ def main() -> int:
     # ---- architecture
     A('</section><section>')
     A('<p class="eyebrow">How it works</p>')
-    A('<h1>No extraction. The metadata already carried the relations.</h1>')
-    A('<p class="sub">The expensive part of most GraphRAG builds is LLM entity extraction. '
-      'This corpus did not need it: every document already names its author, its channel, its '
-      'project. The graph was built from fields, at zero LLM cost and 100% coverage.</p>')
-    A('<pre class="arch">' + esc(r"""
-1. SOURCE                     20,182 documents  ->  73,613 chunks
-   Confluence pages · Jira tickets · GitHub PRs · Slack messages
-   employee_directory.yaml  ->  the org chart (the one authored input)
-   The company is FICTIONAL. Nothing here is answerable from model memory.
-                                     |
-2. GRAPH CONSTRUCTION — metadata, not extraction
-   author / channel / department / team / repo fields already present
-   ->  128,282 provenance edges, 11 relation types, $0 in LLM calls
-   participated_in 88,188 · has_label 11,546 · in_channel 11,146
-   authored 6,645 · in_team 5,377 · reports_to 160
-                                     |
-3. TIGERGRAPH SAVANNA — graph AND vector store, for BOTH retrieval arms
-   Vertices: Person, Document, Channel, Department, Team, Repo,
-             Chunk(text, embedding vector[384, cosine])
-   Installed queries: vector_search_lite(query,k) · hop_<rel>_out(seeds)
-                      intersect_channels(a,b) · dept_in_channel(d,c)
-                                     |
-                    +----------------+----------------+
-                    |                |                |
-4A. LLM ONLY     4B. BASIC RAG            4C. GRAPHRAG
-    no retrieval     bge-small embed           schema router -> plan
-    the leak gate    TG vector top-k=10        traverse TG (1-3 hops)
-                     cross-encoder rerank      UNION with vector top-k=3
-                     (200-candidate pool)      provenance-sentence context
-                     -> answer                 -> answer
-                    |                |                |
-                    +----------------+----------------+
-                                     |
-5. SCORING   strict set match (exact, no partial credit)  <- number of record
-             blind judge, different model family          <- second opinion
-             BERTScore                                    <- shown, not trusted
-             hit@k against expected_doc_ids               <- retrieval, isolated
-""".strip("\n")) + '</pre>')
+    A('<h1>Two builds, one comparison harness.</h1>')
+    A('<p class="sub">The diagram below is the SEC round: filings chunked, entities and '
+      'relations extracted by an LLM in two passes, canonicalised into a curated graph, then '
+      'three pipelines judged blind. The enterprise build reuses the harness and replaces the '
+      'expensive half — see the note under the diagram.</p>')
+    A('<figure class="arch">'
+      '<img src="architecture-sec.png" alt="End-to-end architecture: SEC filings corpus, '
+      'two-phase Gemini extraction into a curated knowledge graph, TigerGraph Savanna as '
+      'graph and vector store, the three pipelines, and the blind judging layer." '
+      'loading="lazy">'
+      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in two ways that '
+      'matter — see below.</figcaption></figure>')
+    A(callout(
+        '<b>What the enterprise build does differently.</b> Four things in that diagram do '
+        'not apply to it. <b>No extraction:</b> every document already names its author, its '
+        'channel and its project, so 128,282 provenance edges came from metadata fields at '
+        'zero LLM cost and 100% coverage — there is no two-phase Gemini pass and no '
+        'canonicalisation step. <b>No ChromaDB:</b> TigerGraph Savanna is the vector store '
+        'for <i>both</i> retrieval arms, which is what removes the vector store as a '
+        'variable. The graph is <code>enterprise</code>, not <code>finance</code>, and the '
+        'judge is gemini-3.1-pro-preview rather than gpt-4o-mini.'))
     A(callout(
         '<b>The baseline retrieves through TigerGraph too.</b> Both arms use the same vector '
         'store, the same embedder and the same corpus, so the only difference between them is '
@@ -878,6 +865,15 @@ def main() -> int:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(doc, encoding="utf-8")
+
+    # build_static.py rmtree's the output directory on every run, so the diagram cannot just
+    # live there — it has to be copied in by whichever generator references it, every build.
+    img_src = Path(__file__).parent / "architecture-sec.png"
+    if img_src.exists():
+        shutil.copy2(img_src, out.parent / img_src.name)
+        print(f"  copied {img_src.name} ({img_src.stat().st_size/1024:.0f} KB)")
+    else:
+        print(f"  WARNING: {img_src.name} missing — the architecture figure will be a broken image")
     print(f"wrote {out}  ({out.stat().st_size/1024:.1f} KB)")
     print(f"  enterprise  strict  p1 {E['p1']['strict']}/50  p2 {E['p2rr']['strict']}/50  "
           f"p3 {E['p3']['strict']}/50   tokens {E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f}  "
