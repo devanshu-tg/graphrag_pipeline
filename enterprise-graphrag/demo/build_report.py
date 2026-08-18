@@ -516,7 +516,7 @@ def main() -> int:
     A('<div class="wrap">')
     A('<div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span>'
       '<a href="#" class="here">Scorecard</a>'
-      '<a href="dashboard.html">Interactive dashboard</a>'
+      '<a href="index.html">Interactive dashboard</a>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
 
     # ---- enterprise
