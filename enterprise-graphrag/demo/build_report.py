@@ -963,8 +963,12 @@ def main() -> int:
             (f"{S['p3']['strict']}/{S['p3']['n']}", "GraphRAG strict pass",
              f"Basic RAG {S['p2']['strict']}/{S['p2']['n']} · LLM-only "
              f"{S['p1']['strict']}/{S['p1']['n']}", "neutral"),
-            (f"{S['p1']['judge']:.0f}%", "LLM-only judged score",
-             "Real companies — contamination, measured", "warn"),
+            # GraphRAG's judged score leads the card, with the other two arms on the
+            # sub-line. LLM-only's 38.3% is the contamination figure and stays visible there,
+            # plus in the SEC scorecard and its callout below — moved down the page, not dropped.
+            (f"{S['p3']['judge']:.1f}%", "GraphRAG judged score",
+             f"Basic RAG {S['p2']['judge']:.1f}% · LLM-only {S['p1']['judge']:.1f}% "
+             f"(contamination)", ""),
         ],
         "textual": [
             (f"-{red:.0f}%", "Tokens vs Basic RAG",
