@@ -1,0 +1,24 @@
+{
+  "p2rr": {
+    "exact": 25,
+    "n": 50,
+    "recall": 0.605998,
+    "precision": 0.73,
+    "f1": 0.641002,
+    "prompt": 2654.04,
+    "completion": 4.06,
+    "planner": 0,
+    "total": 2658.1
+  },
+  "p3": {
+    "exact": 49,
+    "n": 50,
+    "recall": 0.995,
+    "precision": 1.0,
+    "f1": 0.997142,
+    "prompt": 1544.78,
+    "completion": 6.06,
+    "planner": 1187,
+    "total": 2737.84
+  }
+}

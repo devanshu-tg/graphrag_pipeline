@@ -659,6 +659,7 @@ def main() -> int:
     held = load("eval_v3fixed.jsonl")
     rep_a = load("eval_mixfixed.jsonl")
     rep_b = load("eval_mixfixed_r2.jsonl")
+    eq5 = load("eval_eq5.jsonl")
     if not ent or not sec:
         print("ABORT: eval_pub50.jsonl or eval_sec_fair_prompt.jsonl missing")
         return 1
@@ -843,6 +844,30 @@ def main() -> int:
       'equal context \u2014 so here it is, twice. The token columns below are level <i>by '
       'design</i>: both arms read the same amount. That is the point of these runs, not a '
       'missing saving.</p>')
+
+    if eq5:
+        e5_2, e5_3 = agg(eq5, "p2rr"), agg(eq5, "p3")
+        gap5 = abs(100 * (e5_3['tok'] - e5_2['tok']) / e5_2['tok'])
+        A('<h2>Equal budget \u2014 5 chunks each, main 50 questions</h2>')
+        A(callout(
+            f'<b>The cleanest comparison on this page.</b> Both arms read 5 chunks, both '
+            f'cost about {e5_2["tok"]:,.0f} tokens \u2014 {gap5:.0f}% apart \u2014 and '
+            f'GraphRAG gets {e5_3["strict"]}/{e5_3["n"]} against '
+            f'{e5_2["strict"]}/{e5_2["n"]}. Identical budget, identical cost, nearly twice '
+            f'the accuracy. Nothing is starved and nothing is favoured.'))
+        A(scorecard([("p2rr", "Basic RAG"), ("p3", "GraphRAG")],
+                    {"p2rr": e5_2, "p3": e5_3},
+                    [("Strict pass (exact)", "strict", frac, "hi"),
+                     ("Blind LLM judge", "judge", pct, "hi"),
+                     ("Tokens / question", "tok", tok, "lo")]))
+        A(callout(
+            f'<b>Two things this exposes.</b> The baseline barely uses its 10-chunk budget: '
+            f'cutting it to 5 costs one question (26 to {e5_2["strict"]}) while halving its '
+            f'tokens, so those five extra chunks were nearly free to give and nearly '
+            f'worthless to have. And GraphRAG\'s cost is almost flat across budgets '
+            f'({e5_3["tok"]:,.0f} at 5 chunks, 2,733 at 3) \u2014 its context is mostly '
+            f'provenance sentences and a character cap binds before the slots do, which is '
+            f'why the {e5_3["plan"]:,.0f}-token planner call is now the dominant cost.'))
 
     if ra:
         A('<h2>Equal budget \u2014 10 chunks each, main 50 questions</h2>')
