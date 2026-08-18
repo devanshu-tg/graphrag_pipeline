@@ -678,20 +678,15 @@ def main() -> int:
 
     ent_metrics = [
         ("Strict pass (exact set)", "strict", frac, "hi"),
-        ("Strict pass rate", "strict_pct", pct, "hi"),
-        ("Set F1", "f1", dec, "hi"),
         ("Blind LLM judge", "judge", pct, "hi"),
         ("BERTScore F1", "bert", dec, "hi"),
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
-        ("Latency (s)", "lat", sec_f, "lo"),
     ]
     sec_metrics = [
         ("Strict pass (exact)", "strict", frac, "hi"),
-        ("Strict pass rate", "strict_pct", pct, "hi"),
         ("Blind LLM judge", "judge", pct, "hi"),
         ("Tokens / question", "tok", tok, "lo"),
-        ("Latency (s)", "lat", sec_f, "lo"),
     ]
 
     red = 100.0 * (E["p2rr"]["tok"] - E["p3"]["tok"]) / E["p2rr"]["tok"]
@@ -714,7 +709,7 @@ def main() -> int:
     A(f'<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · '
       f'20 single-doc / 10 directory / 20 multi-hop · single run</p>')
     A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
-    A('<p class="sub">Three pipelines over the same 20,182-document corpus. Same generator '
+    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator '
       '(gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge '
       '(gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph '
       '<i>and</i> vector store — so does the baseline, which removes the vector store as a '
@@ -729,10 +724,9 @@ def main() -> int:
            "Leak gate — the company is fictional", "neutral"))
     A('</div>')
 
-    A('<h2>Ask it yourself</h2>')
     A(CONSOLE)
     A(callout(
-        '<b>Every question below has a verified answer key</b>, so the console grades each '
+        '<b>Every question above has a verified answer key</b>, so the console grades each '
         'reply rather than leaving you to judge it. With a backend configured it runs all '
         'three pipelines live; without one it replays the recorded run — the same measured '
         'answer either way, and the card says <code>recorded</code> when that is what '
@@ -843,6 +837,12 @@ def main() -> int:
                      ("Blind LLM judge", "judge", pct, "hi"),
                      ("Tokens / question", "tok", tok, "lo")]))
         A(callout(
+            '<b>Why the tokens look level here.</b> This run predates the 3-chunk configuration, '
+            'so it shows the 10-chunk token profile — 5,443 against 5,489, a 1% difference. It is '
+            'an accuracy control, not a token measurement, and the token claim above comes from '
+            'the 3-chunk run. Kept visible rather than trimmed, because a missing row invites a '
+            'worse assumption than an explained one.'))
+        A(callout(
             f'<b>{H["p3"]["strict"]}/{H["p3"]["n"]} on questions never developed against.</b> '
             f'Generated from a different seed with 103 source entities excluded, and gated on '
             f'reproducing the original answer key before it was allowed to be written. This is '
@@ -872,7 +872,7 @@ def main() -> int:
       'two-phase Gemini extraction into a curated knowledge graph, TigerGraph Savanna as '
       'graph and vector store, the three pipelines, and the blind judging layer." '
       'loading="lazy">'
-      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in two ways that '
+      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in four ways that '
       'matter — see below.</figcaption></figure>')
     A(callout(
         '<b>What the enterprise build does differently.</b> Four things in that diagram do '
@@ -902,6 +902,12 @@ def main() -> int:
     A('<h2>SEC filings — 50 questions</h2>')
     A(dataset_card('sec'))
     A(per_question(sec, SEC_ARMS))
+    A(callout(
+        '<b>‡</b> marks a gold answer the dataset authors flagged as non-exhaustive — the '
+        'listed companies are correct but the set may be incomplete, so an answer naming an '
+        'unlisted-but-valid company is not necessarily wrong. Three questions carry it '
+        '(EQ32, EQ33, EQ34) and all three are scored the same way as the rest, which means '
+        'those three understate every arm.'))
 
     # ---- what we do not claim
     A('</section><section>')
@@ -910,7 +916,7 @@ def main() -> int:
     A(callout(
         '<b>All 50 enterprise questions are relationship traversals</b> — the shape a graph is '
         'built for. The answer key was computed BY traversal and then independently re-derived '
-        'from 20,182 raw documents (30/30) to check it was correct — but correct is not the same '
+        'from 20,364 raw documents (30/30) to check it was correct — but correct is not the same '
         'as unbiased, and the question set favours the graph by construction. The SEC tab is the '
         'honest counterweight: same architecture, and it loses single-fact lookup by 38 points.'))
     A(callout(
