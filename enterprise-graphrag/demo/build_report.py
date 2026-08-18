@@ -248,6 +248,16 @@ pre.arch{font-family:var(--mono);font-size:.74rem;line-height:1.5;background:var
   font-size:.78rem;color:var(--faint)}
 a{color:var(--p3)}
 
+/* ---- nav ----------------------------------------------------------------- */
+.nav{display:flex;align-items:center;gap:1.1rem;padding:.7rem 0 1.6rem;
+  border-bottom:1px solid var(--line);margin-bottom:2.4rem;flex-wrap:wrap}
+.nav .brand{font-weight:660;letter-spacing:-.015em;font-size:.95rem;margin-right:auto;
+  display:flex;align-items:center;gap:.5rem}
+.nav .brand i{width:10px;height:10px;border-radius:3px;background:var(--p3);display:inline-block}
+.nav a{font-size:.83rem;color:var(--dim);text-decoration:none;padding:.25rem 0}
+.nav a:hover{color:var(--p3)}
+.nav a.here{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--p3)}
+
 /* ---- query console ------------------------------------------------------- */
 .console{border:1px solid var(--line);border-radius:10px;padding:1.25rem;background:var(--panel)}
 .ask{display:flex;gap:.6rem;margin:0 0 .9rem}
@@ -447,7 +457,7 @@ loadChips();
 def main() -> int:
     init_console()
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=str(ROOT.parent / "docs" / "report.html"))
+    ap.add_argument("--out", default=str(ROOT.parent / "docs" / "index.html"))
     ap.add_argument("--live-url", default="",
                     help="backend base URL; omit for a replay-only build")
     ap.add_argument("--live-token", default="",
@@ -504,6 +514,10 @@ def main() -> int:
     A = H1.append
 
     A('<div class="wrap">')
+    A('<div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span>'
+      '<a href="#" class="here">Scorecard</a>'
+      '<a href="dashboard.html">Interactive dashboard</a>'
+      '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
 
     # ---- enterprise
     A('<section>')
