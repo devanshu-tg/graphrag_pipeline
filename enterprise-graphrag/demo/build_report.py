@@ -167,6 +167,64 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
     return "".join(out)
 
 
+
+# Corpus facts, MEASURED on 2026-08-18 and hardcoded rather than computed at build time.
+# documents.jsonl is 119 MB and corpus.jsonl 142 MB, both gitignored for size — parsing them on
+# every page build would be slow and would break on a fresh clone that does not have them.
+# Re-derive with:
+#   python -c "import json,collections;rows=[json.loads(l) for l in open(
+#     'datasets/enterprise/documents.jsonl',encoding='utf-8') if l.strip()];
+#     print(len(rows), collections.Counter(r.get('source') for r in rows))"
+DATASETS = {
+    "enterprise": [
+        ("What it is", "A <b>fictional</b> SaaS company's internal record — the whole point, "
+                       "because nothing in it is answerable from model memory. That is what makes "
+                       "the no-retrieval arm's 0.8% a control rather than a curiosity."),
+        ("Documents", "<b>20,364</b><span class='sub2'>slack 11,154 · gmail 4,739 · linear 1,378 · "
+                      "google_drive 979 · hubspot 586 · fireflies 397 · directory 364 · "
+                      "github 314 · jira 239 · confluence 214</span>"),
+        ("Size", "<b>114.3M characters</b> ≈ 28.6M tokens<span class='sub2'>Chunked into "
+                 "<b>73,613</b> retrievable chunks</span>"),
+        ("Graph", "<b>128,282</b> provenance edges, 11 relation types<span class='sub2'>"
+                  "participated_in 88,188 · has_label 11,546 · in_channel 11,146 · authored 6,645 "
+                  "· in_team 5,377 · reports_to 160</span>"),
+        ("Built from", "Metadata fields only — <b>no LLM extraction</b><span class='sub2'>Author, "
+                       "channel, department and project were already on every document. "
+                       "employee_directory.yaml (167 people) supplies the org chart and is the one "
+                       "authored input.</span>"),
+        ("Questions", "<b>50</b> — 20 single-document, 10 directory lookup, 20 multi-hop"
+                      "<span class='sub2'>Generated from the graph, then the answer key was "
+                      "independently re-derived from the raw documents, 30/30.</span>"),
+    ],
+    "sec": [
+        ("What it is", "<b>Real</b> filings from 100 S&amp;P-100 companies. The model has read "
+                       "these, which is visible in the numbers: the no-retrieval arm scores 38% "
+                       "here against 0.8% on the fictional corpus."),
+        ("Documents", "<b>400</b><span class='sub2'>10-K ×100 (financials, risk, competitors) · "
+                      "DEF 14A ×100 (auditor, board, governance) · 8-K ×200 (appointments, "
+                      "dividends, buybacks, acquisitions)</span>"),
+        ("Size", "<b>87.0M characters</b> ≈ 21.7M tokens<span class='sub2'>Chunked into "
+                 "<b>61,777</b> section-aware chunks</span>"),
+        ("Built from", "Two-phase LLM extraction, then canonicalisation<span class='sub2'>"
+                       "The expensive path — see the architecture diagram above. This is what the "
+                       "enterprise build avoided.</span>"),
+        ("Questions", "<b>50</b> held out — A 8 single-lookup, B 16 two-hop bridge, "
+                      "C 20 aggregation, D 6 cross-doc<span class='sub2'>Tuned on a separate "
+                      "24-question dev set, so the 50 were never developed against.</span>"),
+        ("Answer shape", "Numbers and dates, not name sets<span class='sub2'>So set-F1 does not "
+                         "transfer; correctness here is the blind judge's call and "
+                         "<i>strict</i> means it awarded 100.</span>"),
+    ],
+}
+
+
+def dataset_card(key: str) -> str:
+    rows = "".join(f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>'
+                   for k, v in DATASETS[key])
+    return (f'<div class="dswrap"><h4>The corpus</h4>'
+            f'<table class="ds"><tbody>{rows}</tbody></table></div>')
+
+
 CSS = """
 :root{
   --fs:16px;
@@ -253,6 +311,18 @@ figure.arch{margin:0;border:1px solid var(--line);border-radius:8px;background:v
 figure.arch img{display:block;width:100%;max-width:1024px;height:auto;margin:0 auto;
   border-radius:4px;background:#fff}
 figure.arch figcaption{margin-top:.7rem;font-size:.76rem;color:var(--faint);text-align:center}
+table.ds{width:100%;border-collapse:collapse;font-size:.83rem;margin:0 0 1.1rem}
+table.ds td{padding:.5rem .7rem;border-bottom:1px solid var(--line);vertical-align:top;
+  text-align:left}
+table.ds tr:last-child td{border-bottom:0}
+table.ds td.k{width:11rem;color:var(--dim);white-space:nowrap}
+table.ds td.v{color:var(--ink)}
+table.ds td.v b{font-family:var(--mono);font-weight:600}
+table.ds td.v .sub2{display:block;color:var(--faint);font-size:.78rem;margin-top:.15rem}
+.dswrap{border:1px solid var(--line);border-radius:9px;padding:1rem 1.15rem;background:var(--panel);
+  margin:0 0 1.2rem}
+.dswrap h4{margin:0 0 .7rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim);font-weight:700}
 .foot-note{margin-top:3.4rem;padding-top:1.4rem;border-top:1px solid var(--line);
   font-size:.78rem;color:var(--faint)}
 a{color:var(--p3)}
@@ -827,8 +897,10 @@ def main() -> int:
     A('<p class="sub">Including the ones the graph loses. PART means partially correct — some '
       'of the gold set returned, not all.</p>')
     A('<h2>EnterpriseRAG-Bench — 50 questions</h2>')
+    A(dataset_card('enterprise'))
     A(per_question(ent, ENT_ARMS))
     A('<h2>SEC filings — 50 questions</h2>')
+    A(dataset_card('sec'))
     A(per_question(sec, SEC_ARMS))
 
     # ---- what we do not claim
