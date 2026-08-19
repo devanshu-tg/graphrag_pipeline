@@ -111,6 +111,10 @@ VEC_SLOTS = int(os.getenv("P3_VEC_SLOTS", str(config.CONTEXT_NUM_CHUNKS)))
 # v2 holds no provenance. So this proves traversal runs in TigerGraph; it does not make the
 # provenance graph-resident.
 TG_TRAVERSE = os.getenv("P3_TG_TRAVERSE", "0") != "0"
+# How many independent planner draws to try before conceding the graph found nothing. 1 is the
+# historical behaviour and keeps published runs byte-identical; >1 is for live demos, where a
+# question that silently degrades to vector search is a question that visibly fails on stage.
+GRAPH_PLAN_TRIES = max(1, int(os.getenv("P3_GRAPH_PLAN_TRIES", "1")))
 TG_V2_GRAPH = os.getenv("TG_V2_GRAPH", "enterprise_v2")
 # The same 800-node frontier cap the local walk uses, so a capped hop truncates identically in
 # both modes. HOP_BATCH keeps one POST body a sane size.
@@ -574,14 +578,34 @@ def run_single(question: str, vectorstore=None, num_hops: int = 2) -> CallMetric
     facts, graph_doc_ids, route_name = "", [], "vector"
 
     plan = {"legs": [], "combine": "union", "tail": [], "intent": "lookup"}
+    landed: list[str] = []
+    trail: list[dict] = []          # stays empty when the planner returns no legs
     if not ROUTER_OFF and not GRAPH_OFF:
-        plan = schema_router.plan(question, get_llm_response)
+        # A SYNTACTICALLY VALID PLAN THAT TRAVERSES TO NOTHING IS ALSO A FAILURE.
+        # schema_router.plan() retries a plan that fails to PARSE, but a plan can parse
+        # perfectly and still walk to an empty set — wrong relation, wrong direction, or a seed
+        # spelled differently from the vertex. That case used to fall straight through to
+        # route="vector" with no retry and no message: measured on MX31, which answers
+        # correctly on one draw and lands nothing on the next, because the planner is
+        # non-deterministic even at temperature 0. Re-draw the plan instead of accepting the
+        # first dud, and say so when every draw lands nothing.
+        for _try in range(GRAPH_PLAN_TRIES):
+            plan = schema_router.plan(question, get_llm_response)
+            if not plan["legs"]:
+                break                       # plan() already reported the no-plan case
+            landed, trail = _walk(plan)
+            if landed:
+                break
+            if _try + 1 < GRAPH_PLAN_TRIES:
+                print(f"[p3] plan walked to 0 results, re-planning "
+                      f"({_try + 2}/{GRAPH_PLAN_TRIES}): {question[:70]!r}")
+            else:
+                print(f"[p3] EVERY plan walked to 0 results after {GRAPH_PLAN_TRIES} draws — "
+                      f"falling back to vector search: {question[:70]!r}")
 
     ids: list[str] = []
     context = ""
-    trail: list[dict] = []          # stays empty when the planner returns no legs
     if plan["legs"]:
-        landed, trail = _walk(plan)
         if landed:
             legs = " ; ".join(
                 f"{leg['seed']} -> " + " -> ".join(f"{r}({d})" for r, d in leg["path"])

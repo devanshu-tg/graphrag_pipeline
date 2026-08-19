@@ -5,6 +5,7 @@ Only the *answering* LLM uses this; the judge in accuracy.py is independent.
 """
 
 from __future__ import annotations
+import os
 import random
 import time
 from typing import Any
@@ -28,6 +29,10 @@ def get_llm_response(prompt: str, json_mode: bool = False) -> tuple[str, Any]:
 
 _GEMINI_MAX_RETRIES = 5
 _GEMINI_BACKOFF_BASE = 2.0
+# Upper bound for the truncation escalation below. 32k is generous for this workload — the
+# largest visible answer in any published run is 344 tokens (a 35-ticker Tier-C list) — so
+# hitting this ceiling means something is wrong, not that the question was merely big.
+_GEMINI_MAX_OUTPUT_CEILING = int(os.getenv("GEMINI_MAX_OUTPUT_CEILING", "32768"))
 
 
 def _gemini_call(prompt: str, json_mode: bool = False) -> tuple[str, Any]:
@@ -60,6 +65,25 @@ def _gemini_call(prompt: str, json_mode: bool = False) -> tuple[str, Any]:
                 content = ""
                 if cand and cand[0].get("content", {}).get("parts"):
                     content = cand[0]["content"]["parts"][0].get("text", "").strip()
+                # TRUNCATION IS NOT SUCCESS. finishReason=MAX_TOKENS means thinking plus output
+                # exhausted the budget, so `content` is a fragment — and HTTP is still 200.
+                # Returning it silently is what made the router's JSON plan arrive as
+                # '{"legs": [{"seed": "Allison Gr' , fail json.loads, and drop P3 to plain
+                # vector search with no error anywhere. Escalate the budget and retry instead
+                # of guessing a fixed ceiling: a question whose answer is a 35-company list
+                # needs more room than one answered in three words, and neither the caller nor
+                # config.MAX_TOKENS can know which is which in advance.
+                if cand and cand[0].get("finishReason") == "MAX_TOKENS":
+                    cur = gen["maxOutputTokens"]
+                    if cur < _GEMINI_MAX_OUTPUT_CEILING:
+                        gen["maxOutputTokens"] = min(cur * 2, _GEMINI_MAX_OUTPUT_CEILING)
+                        print(f"[llm] truncated at {cur} output tokens "
+                              f"(thinking+output); retrying at {gen['maxOutputTokens']}")
+                        last_err = RuntimeError(f"truncated at maxOutputTokens={cur}")
+                        continue
+                    raise RuntimeError(
+                        f"Gemini truncated at the {_GEMINI_MAX_OUTPUT_CEILING}-token ceiling; "
+                        "refusing to return a partial answer")
                 usage_dict = {
                     "prompt_tokens":     usage.get("promptTokenCount", 0),
                     "completion_tokens": usage.get("candidatesTokenCount", 0),

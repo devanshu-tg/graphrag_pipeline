@@ -38,6 +38,13 @@ from pathlib import Path
 
 SCHEMA_PATH = Path(os.getenv("TG_SCHEMA", "datasets/enterprise/schema.json"))
 
+# Attempts at a valid plan before giving up and letting P3 degrade to vector search. Default
+# stays 2 so the published runs reproduce exactly; raise it for live demos, where one dropped
+# plan is a question that visibly fails in front of an audience. The call is non-deterministic
+# even at temperature 0 (see plan() below), so a retry is a genuinely fresh draw rather than a
+# repeat of the same failure.
+PLAN_RETRIES = max(1, int(os.getenv("P3_PLAN_RETRIES", "2")))
+
 _schema_cache: dict | None = None
 _plan_tokens = {"prompt": 0, "output": 0, "calls": 0}
 
@@ -153,7 +160,7 @@ def plan(question: str, get_llm_response) -> dict:
                 out.append((rel, "in" if d == "in" else "out"))
         return out
 
-    for _attempt in range(2):
+    for _attempt in range(PLAN_RETRIES):
         try:
             text, raw = get_llm_response(prompt, json_mode=True)
             u = raw.get("usage", {})
@@ -178,6 +185,12 @@ def plan(question: str, get_llm_response) -> dict:
         intent = data.get("intent") if data.get("intent") in ("set", "lookup") else "lookup"
         return {"legs": legs, "combine": combine, "tail": hops(data.get("tail")),
                 "intent": intent}
+    # SAY SO. An empty plan is not a neutral outcome: pipeline.py leaves route_name as
+    # "vector", so P3 answers from plain vector search and presents as working while the graph
+    # contributed nothing. Silent degradation is the one failure this project cares most about
+    # catching, and it cost a full debugging pass to notice from the route field alone.
+    print(f"[router] NO PLAN after {PLAN_RETRIES} attempts — P3 will fall back to vector "
+          f"search for: {question[:80]!r}")
     return empty
 
 
