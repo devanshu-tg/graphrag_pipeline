@@ -719,7 +719,6 @@ def main() -> int:
     A('<div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span>'
       '<button class="tab on" id="tabF">Factual \u00b7 SEC</button>'
       '<button class="tab" id="tabT">Textual \u00b7 Enterprise</button>'
-      '<a href="dashboard.html">Dashboard</a>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
     # ---- console, above both datasets because it serves both
     A('<section>')
