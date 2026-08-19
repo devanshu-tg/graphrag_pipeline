@@ -63,3 +63,10 @@ enterprise-graphrag/pipeline3_round3/index_v2/edges_prov.json
 **/__pycache__/
 *.pyc
 enterprise-graphrag/datasets/enterprise/corpus.jsonl.bak
+
+# Data-transfer archives. These carry corpus.jsonl / documents.jsonl / edges_prov.json, each of
+# which is ignored individually above for exceeding GitHub's 100 MB limit — so committing the
+# tarball would push exactly the payload those rules exist to keep out. Moved between machines
+# by Drive, not by git.
+*.tar.gz
+*.tgz
