@@ -63,6 +63,14 @@ def agg(rows: list[dict], arm: str, tier: str | None = None) -> dict | None:
         "plan": st.mean([r.get("planner_tokens", 0) for r in R]),
         "lat": st.mean([r.get("latency_s", 0) or 0 for r in R]),
         "zero": sum(1 for r in R if not r["exact"] and r["f1"] == 0),
+        # Four mutually exclusive outcomes, so a reader can see WHERE a score comes from: a
+        # declined answer and a confidently wrong one both score zero and are not the same
+        # failure. The 25 -> 35 jump on this set was entirely declines turning into answers.
+        "emptyc": sum(1 for r in R if r.get("empty")),
+        "part": sum(1 for r in R if not r.get("empty") and not r["exact"]
+                    and (r.get("judge_pct") or 0) > 0),
+        "wrongc": sum(1 for r in R if not r.get("empty") and not r["exact"]
+                      and (r.get("judge_pct") or 0) == 0),
     }
 
 
@@ -285,8 +293,8 @@ DATASETS = {
     ],
     "sec": [
         ("What it is", "<b>Real</b> filings from 100 S&amp;P-100 companies. The model has read "
-                       "these, which is visible in the numbers: the no-retrieval arm scores 38% "
-                       "here against 0.8% on the fictional corpus."),
+                       "these, which is visible in the numbers: the no-retrieval arm scores "
+                       "{P1JUDGE} here against 0.8% on the fictional corpus."),
         ("Documents", "<b>400</b><span class='sub2'>10-K ×100 (financials, risk, competitors) · "
                       "DEF 14A ×100 (auditor, board, governance) · 8-K ×200 (appointments, "
                       "dividends, buybacks, acquisitions)</span>"),
@@ -305,10 +313,16 @@ DATASETS = {
 }
 
 
-def dataset_card(key: str) -> str:
+def dataset_card(key: str, subs: dict | None = None) -> str:
     """Data overview + corpus table. Sits near the top of each tab: what the data IS has to come
-    before what the pipelines scored on it, otherwise the numbers arrive without context."""
-    rows = "".join(f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>'
+    before what the pipelines scored on it, otherwise the numbers arrive without context.
+
+    `subs` fills {PLACEHOLDER}s in the table with measured values. DATASETS is a module-level
+    constant so it cannot read the results itself, and the contamination figure it quotes moved
+    when the run was re-measured — hardcoding it is how a corpus card ends up contradicting the
+    scorecard two inches below it."""
+    rows = "".join(f'<tr><td class="k">{k}</td><td class="v">{v.format(**(subs or {}))}</td></tr>'
+                   if subs else f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>'
                    for k, v in DATASETS[key])
     return (f'<h2>Data overview</h2><div class="dswrap"><h4>The corpus</h4>'
             f'<table class="ds"><tbody>{rows}</tbody></table></div>')
@@ -931,7 +945,14 @@ def main() -> int:
     args = ap.parse_args()
 
     ent = load("eval_pub50.jsonl")
-    sec = load("eval_sec_published.jsonl")   # v2 rubric + 2 corrected gold answers
+    # Re-measured 2026-08-20: gemini-3.7-flash, no-refusal prompt applied to ALL THREE arms
+    # (the config the published figures were meant to use and which was silently off), 8,192
+    # token budget, judged by gemini-3.1-pro-preview under the v2 rubric. GraphRAG 35/50
+    # against the previous 29/50; the baseline gained too (21 -> 26) and LLM-only most of all
+    # (8 -> 16), which is the contamination this corpus carries, not a win.
+    sec = load("eval_sec_norefusal.jsonl")
+    if not sec:
+        sec = load("eval_sec_published.jsonl")   # fallback: the older v2-rubric run
     held = load("eval_v3fixed.jsonl")
     rep_a = load("eval_mixfixed.jsonl")
     rep_b = load("eval_mixfixed_r2.jsonl")
@@ -976,6 +997,9 @@ def main() -> int:
     sec_metrics = [
         ("Strict pass (exact)", "strict", frac, "hi"),
         ("Blind LLM judge", "judge", pct, "hi"),
+        ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
+        ("Wrong (answered, 0%)", "wrongc", lambda v, _: f"{int(v)}", "lo"),
+        ("Declined / empty", "emptyc", lambda v, _: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
     ]
 
@@ -987,6 +1011,10 @@ def main() -> int:
     # retriever structurally cannot compete, and where the graph's advantage concentrates.
     _c3, _c2 = agg(sec, "p3", "C"), agg(sec, "p2", "C")
     secC3, secC2, secCn = _c3["strict"], _c2["strict"], _c3["n"]
+    # tier A is the one the graph LOSES, and the page says so — derived, not typed, so the
+    # admission stays true after a re-measure instead of quietly becoming false.
+    _a3, _a2 = agg(sec, "p3", "A"), agg(sec, "p2", "A")
+    secA3, secA2, secAn = _a3["strict"], _a2["strict"], _a3["n"]
 
     ra, rb = agg(rep_a, "p3"), agg(rep_b, "p3")
 
@@ -1027,7 +1055,7 @@ def main() -> int:
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
     A('<h1>Generalization to real filings \u2014 including where the graph loses.</h1>')
     A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
-    A(dataset_card('sec'))
+    A(dataset_card('sec', {'P1JUDGE': f"{S['p1']['judge']:.0f}%"}))
 
     A('</section></div>')
     A('<div class="pane pane-textual" id="paneT" hidden>')
@@ -1101,7 +1129,7 @@ def main() -> int:
         'answer, so <b>strict pass is the figure to trust</b>, not the percentage.'),
         ('The graph wins the hardest tier and loses the easiest',
         '<b>The graph wins the hardest tier and loses the easiest.</b> On aggregation it is '
-        '12/20 against 3/20 — four times the baseline. On single lookup it is 4/8 against 7/8: '
+        f'{secC3}/{secCn} against {secC2}/{secCn} \u2014 'f'{secC3/max(secC2,1):.0f}x the baseline. On single lookup it is {secA3}/{secAn} 'f'against {secA2}/{secAn}: '
         'for one number in one filing, vector retrieval is simply the better tool and the '
         'planner call is wasted overhead. <b>A system that wins everything is a system that '
         'has not been tested properly.</b>')
@@ -1155,7 +1183,7 @@ def main() -> int:
     A('<h1>What this does not show.</h1>')
     A(callout(
         '<b>These companies are real and the model has read their filings.</b> LLM-only '
-        'scores 38% with no retrieval at all, so some of every arm\'s score here is memory '
+        f'scores {S["p1"]["judge"]:.0f}% with no retrieval at all, so some of every arm\'s score here is memory '
         'rather than retrieval. The enterprise tab is the clean measurement \u2014 fictional '
         'company, 0.8% with no retrieval.'))
     A(callout(
