@@ -358,6 +358,17 @@ table.bg .sub2{display:block;font-family:var(--mono);font-size:.72rem;font-weigh
   color:var(--ink2);margin-top:.2rem}
 .gridnote{margin:.7rem 0 0;font-size:.83rem;color:var(--ink2)}
 .gridnote b{color:var(--ink)}
+/* Per-query rollup. Deliberately reuses .stats/.stat from the page KPIs so the same shape
+   means the same thing in both places — the only difference is scope: those are 50-question
+   averages, these are the one query on screen. Tighter type, because three of them sit inside
+   the console rather than heading a page. */
+.qstats{margin:.9rem 0 0}
+.qstats .stats{margin:0;gap:.7rem;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.qstats .stat{padding:.8rem .9rem;border-radius:8px}
+.qstats .stat .big{font-size:1.45rem}
+.qstats .stat .lbl{margin-top:.3rem;font-size:.78rem;line-height:1.3}
+.qstats .stat .foot2{margin-top:.3rem;font-family:var(--mono);font-size:.7rem;color:var(--dim)}
+.qstats .stat.bad .big{color:var(--p2)}
 .statsonly{margin:1.4rem 0 0}
 .statsonly .stats{margin:0}
 .stat{border:1px solid var(--line);border-radius:10px;padding:1.15rem 1.25rem;background:var(--bg)}
@@ -509,6 +520,10 @@ a{color:var(--p3)}
 .gold .lbl{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;
   color:var(--okink)}
 .gold .val{font-size:.95rem;font-weight:600}
+/* qid and question type ride with the label, quieter than it, so the key itself stays
+   the loudest thing on the line. */
+.gold .gmeta{font-weight:400;letter-spacing:.04em;opacity:.72;text-transform:none;
+  font-family:var(--mono);font-size:.92em}
 
 .verdict{margin-left:.45rem;font-size:.6rem;font-weight:800;letter-spacing:.06em;
   padding:.2rem .45rem;border-radius:4px;text-transform:uppercase}
@@ -527,6 +542,9 @@ a{color:var(--p3)}
 .rc .cn i{width:.48rem;height:.48rem;border-radius:2px;display:block;flex:none}
 .rc .rt{font-size:.7rem;color:var(--dim);font-family:var(--mono);
   background:rgba(15,23,42,.06);padding:.18rem .42rem;border-radius:4px;white-space:nowrap}
+/* "router" is the label, the value is what matters — so the label recedes and the route reads
+   as the value it is. Same treatment the foot row gives tokens/chunks/latency. */
+.rc .rt .rtk{opacity:.62;font-weight:400}
 .rc .body{padding:.85rem .9rem}
 .rc .ans{font-size:.95rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;
   min-height:2.4rem}
@@ -564,9 +582,14 @@ a{color:var(--p3)}
 .chip .qt{flex:1;min-width:0;line-height:1.42;overflow-wrap:anywhere}
 .tag{font-weight:700;font-size:.66rem;line-height:1;text-transform:uppercase;
   letter-spacing:.07em;padding:.26rem .42rem;border-radius:4px;flex:none;font-family:inherit}
-.tag.multi_hop,.tag.multi,.tag.C{background:rgba(227,82,5,.13);color:var(--brand2)}
-.tag.single_dir,.tag.B{background:rgba(37,99,235,.13);color:#1d4ed8}
-.tag.single_doc,.tag.A,.tag.D{background:rgba(15,23,42,.07);color:var(--dim)}
+/* Two vocabularies land here: the enterprise tiers (single_doc / single_dir / multi_hop) and
+   the SEC ones, which are stored as A-D and rendered through the same readable names the live
+   server uses. Both spellings are kept so a chip cannot lose its colour if either side changes
+   first. Aggregation is the tier the graph wins outright, so it shares multi-hop's accent. */
+.tag.multi_hop,.tag.multi,.tag.C,.tag.aggregation{background:rgba(227,82,5,.13);
+  color:var(--brand2)}
+.tag.single_dir,.tag.B,.tag.multi_doc{background:rgba(37,99,235,.13);color:#1d4ed8}
+.tag.single_doc,.tag.A,.tag.D,.tag.hard{background:rgba(15,23,42,.07);color:var(--dim)}
 .spin{display:inline-block;width:9px;height:9px;border:2px solid var(--line2);
   border-top-color:var(--brand);border-radius:50%;animation:sp .7s linear infinite;
   vertical-align:-1px}
@@ -593,6 +616,10 @@ CONSOLE = """
   </div>
   <div class="state" id="state"></div>
   <div id="goldBox"></div>
+  <!-- Per-query rollup. The KPI tiles at the top of the page are dataset-wide averages over
+       50 questions; these are the same shapes computed for the ONE query just run, so a
+       visitor can see whether this question behaved like the average or not. -->
+  <div class="qstats" id="qstats"></div>
   <div class="cards" id="cards"></div>
   <div class="chiphint" id="chipHint"></div>
   <div class="chips" id="chips"></div>
@@ -649,10 +676,64 @@ async function askArm(q, arm){
   return replay(q, arm);
 }
 
-function drawGold(g, qid){
+function drawGold(g, qid, tier){
+  const bits = [qid ? esc(qid) : "", tier ? esc(tier.replace(/_/g," ")) : ""].filter(Boolean);
   document.getElementById("goldBox").innerHTML =
-    '<div class="gold"><span class="lbl">Correct answer'+(qid?" &middot; "+esc(qid):"")+
+    '<div class="gold"><span class="lbl">Correct answer'+
+    (bits.length ? ' <span class="gmeta">' + bits.join(" &middot; ") + '</span>' : '')+
     '</span><span class="val">'+esc(g)+'</span></div>';
+}
+
+// Per-query rollup, computed from the three cards that just ran — never from the published
+// averages. A question where GraphRAG spends MORE than the baseline is a real outcome and has
+// to show as one; silently hiding it would make the tiles decoration rather than measurement.
+function drawQueryStats(got, arms){
+  const box = document.getElementById("qstats");
+  const base = got[arms[1]], graph = got["p3"];        // arms[1] is the RAG baseline on both tabs
+  if(!base || !graph || !graph.tokens || !base.tokens){ box.innerHTML = ""; return; }
+
+  const cut = 100 * (base.tokens - graph.tokens) / base.tokens;
+  const tiles = [];
+
+  // 1. token difference. Sign decides the wording AND the colour — "-49%" and "+12%" must not
+  //    look alike at a glance.
+  tiles.push({
+    big: (cut >= 0 ? "-" : "+") + Math.abs(cut).toFixed(0) + "%",
+    lbl: cut >= 0 ? "Fewer tokens than Basic RAG" : "MORE tokens than Basic RAG",
+    foot: graph.tokens.toLocaleString() + " vs " + base.tokens.toLocaleString(),
+    tone: cut >= 0 ? "" : "warn"
+  });
+
+  // 2. accuracy, only where the answer key can be matched automatically. The SEC tab is judged,
+  //    not set-scored, so it gets the honest em-dash rather than an invented number.
+  const gg = graph.grade, bg = base.grade;
+  if(gg){
+    tiles.push({
+      big: Math.round(gg.score*100) + "%",
+      lbl: "GraphRAG accuracy",
+      foot: "Basic RAG " + (bg ? Math.round(bg.score*100) + "%" : "n/a"),
+      tone: gg.score === 1 ? "" : (gg.score > 0 ? "warn" : "bad")
+    });
+  } else {
+    tiles.push({big:"&mdash;", lbl:"Accuracy not auto-scored",
+                foot:"judged tab &mdash; compare with the key above", tone:"neutral"});
+  }
+
+  // 3. context actually read. This is the claim in its rawest form: the same question answered
+  //    from fewer passages.
+  if(graph.chunks || base.chunks){
+    tiles.push({
+      big: (graph.chunks||0) + " vs " + (base.chunks||0),
+      lbl: "Chunks read (GraphRAG vs Basic RAG)",
+      foot: "router " + esc(graph.route||"-"),
+      tone: "neutral"
+    });
+  }
+
+  box.innerHTML = '<div class="stats">' + tiles.map(t =>
+    '<div class="stat'+(t.tone?" "+t.tone:"")+'"><div class="big">'+t.big+'</div>'+
+    '<div class="lbl">'+t.lbl+'</div><div class="foot2">'+t.foot+'</div></div>').join("") +
+    '</div>';
 }
 
 function drawCard(x, cheap){
@@ -669,7 +750,18 @@ function drawCard(x, cheap){
   el.innerHTML =
     '<div class="cap"><div class="cn"><i style="background:'+COL[x.arm]+'"></i>'+
       NAMES[x.arm]+badge+'</div>'+
-    '<span class="rt">'+esc(x.replayed ? "recorded" : (x.route||"-"))+'</span></div>'+
+    // Labelled, because printed bare the route reads as decoration rather than as the decision
+    // it records — and "vector" on the GraphRAG card means the graph contributed nothing and
+    // the arm silently degraded to the baseline, which must be legible at a glance.
+    //
+    // Only P3 says "router": it is the only arm that HAS one. Its value comes from
+    // pipeline.py's route_name, i.e. what the LLM planner chose and whether the walk landed.
+    // P1 and P2 have their route hardcoded by the server ("no retrieval", "vector top-k") —
+    // those are retrieval methods, not decisions, and calling them a router would imply a
+    // component that does not exist in those arms.
+    '<span class="rt">'+(x.replayed ? "recorded"
+      : '<span class="rtk">'+(x.arm==="p3" ? "router" : "retrieval")+'</span> '+
+        esc(x.route||"-"))+'</span></div>'+
     '<div class="body">'+
       '<div class="ans'+(empty?" empty":"")+'">'+
         (empty ? "no answer returned" : esc(x.answer))+'</div>'+
@@ -685,6 +777,17 @@ function drawCard(x, cheap){
 
         (x.chunks ? '<span>chunks <b>'+x.chunks+'</b></span>' : '')+
         (x.latency ? '<span>latency <b>'+x.latency+'s</b></span>' : '')+
+        // Accuracy sits with the other measurements, not only in the coloured badge, so the
+        // number can be read off rather than inferred from a word. The em-dash case is the
+        // SEC tab: its gold answers are numbers written as prose ("$57,048M (~$57.0B), down 2%
+        // YoY"), so the set-matcher that grades the enterprise tab would mark every correct
+        // answer wrong. demo/build_static.py disables grading on that tab for the same reason.
+        // Showing a fabricated percentage there would be worse than showing none.
+        (gr ? '<span>accuracy <b'+(gr.score===1?' class="best"':'')+'>'+
+                Math.round(gr.score*100)+'%</b></span>'
+            : '<span title="This tab is judged, not set-scored: its gold answers are numeric '+
+              'prose, so an automatic set match would mark correct answers wrong. Compare '+
+              'against the answer key shown above.">accuracy <b>&mdash;</b></span>')+
       '</div></div>';
 }
 
@@ -694,6 +797,7 @@ async function ask(){
   const btn = document.getElementById("go"), st = document.getElementById("state");
   btn.disabled = true;
   document.getElementById("goldBox").innerHTML = "";
+  document.getElementById("qstats").innerHTML = "";
   // Each arm is its own request, fired together. One combined request would make the console
   // wait for the SUM rather than the slowest arm.
   document.getElementById("cards").innerHTML = arms.map(a =>
@@ -713,16 +817,25 @@ async function ask(){
       const d = await askArm(q, a);
       if(d.error){ got[a] = {arm:a, answer:"could not run: "+d.error, tokens:0, route:"error"}; }
       else{
-        if(d.gold && !gold){ gold = d.gold; drawGold(d.gold, d.qid); }
+        // The SEC worker's reply carries no gold, so fall back to the key baked in at build
+        // time. Without this the whole tab claimed to have no answer key while its keys sat
+        // in eval_sec_published.jsonl.
+        const meta = (PASSING[view]||[]).find(e => e.q === q) || {};
+        const key = d.gold || meta.gold || "";
+        if(key && !gold){ gold = key; drawGold(key, d.qid || meta.qid, meta.tier); }
         const x = (d.results||[]).find(z=>z.arm===a) || (d.results||[])[0];
         if(x){ x.arm = a; got[a] = x; }
       }
     }catch(e){ got[a] = {arm:a, answer:"could not run: "+e, tokens:0, route:"error"}; }
     done++; paint();
+    if(done === arms.length) drawQueryStats(got, arms);
+    // One fact per line. This used to read "all 3 finished in 7.4s - question type single doc -
+    // no answer key for this question", which is three unrelated statements competing for the
+    // same sentence. Timing stays here; the question type and the key belong together on the
+    // answer-key line below, and a missing key needs no apology.
     st.innerHTML = done < arms.length
       ? '<span class="spin"></span> running - '+done+'/'+arms.length+' done'
-      : 'all '+arms.length+' finished in <b>'+((Date.now()-t0)/1000).toFixed(1)+'s</b>'+
-        (gold ? ' &middot; graded against the answer key' : ' &middot; no answer key for this question');
+      : 'all '+arms.length+' finished in <b>'+((Date.now()-t0)/1000).toFixed(1)+'s</b>';
   }));
   btn.disabled = false;
 }
@@ -732,7 +845,11 @@ function drawChips(){
   const box = document.getElementById("chips");
   if(!list.length){ box.innerHTML = '<div class="state">No questions match this filter.</div>'; return; }
   box.innerHTML = list.map(e =>
-    '<button class="chip" data-q="'+esc(e.q)+'"><span class="tag '+esc(e.tier||"")+'">'+
+    // The class is a SLUG and the label is the readable form. Passing the tier straight into
+    // class= turned "multi doc" into two classes ("multi" and "doc"), neither of which is a
+    // rule, so those chips silently lost their colour.
+    '<button class="chip" data-q="'+esc(e.q)+'"><span class="tag '+
+    esc((e.tier||"").replace(/ /g,"_"))+'">'+
     esc((e.tier||"").replace(/_/g," ")||"q")+'</span><span class="qt">'+esc(e.q)+'</span></button>'
   ).join("");
   // Fill, focus, scroll — do NOT run. Selecting a question and having three pipelines fire
@@ -766,6 +883,7 @@ function setView(v){
     ? "Ask about an S&P-100 filing..." : "Ask something about the company...";
   document.getElementById("cards").innerHTML = "";
   document.getElementById("goldBox").innerHTML = "";
+  document.getElementById("qstats").innerHTML = "";
   document.getElementById("state").innerHTML = "";
   document.getElementById("q").value = "";
   loadChips();
@@ -904,6 +1022,53 @@ def main() -> int:
       f'why LLM-only scores {S["p1"]["judge"]:.1f}% here with no retrieval at all, against '
       f'{E["p1"]["judge"]:.1f}% on the fictional corpus.</p>')
     A(scorecard(SEC_ARMS, S, sec_metrics))
+    # ---- the corpus itself, after the result it produced
+    A('</section><section>')
+    A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
+    A('<h1>Generalization to real filings \u2014 including where the graph loses.</h1>')
+    A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
+    A(dataset_card('sec'))
+
+    A('</section></div>')
+    A('<div class="pane pane-textual" id="paneT" hidden>')
+    # ---- SCORECARD FIRST, same reasoning as the factual pane above.
+    A('<section>')
+    A('<h2>Scorecard</h2>')
+    A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
+      '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
+      f'GraphRAG still answers {E["p3"]["strict"]}/{E["p3"]["n"]} against '
+      f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} for '
+      f'<b>{100.0*(E["p2rr"]["tok"]-E["p3"]["tok"])/E["p2rr"]["tok"]:.1f}% fewer tokens</b>.</p>')
+    A(scorecard(ENT_ARMS, E, ent_metrics))
+    # ---- the corpus, after the result
+    A('</section><section>')
+    A('<p class="eyebrow">EnterpriseRAG-Bench 20k \u00b7 50 questions \u00b7 20 single-doc / 10 directory / 20 multi-hop \u00b7 single run</p>')
+    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
+    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store \u2014 so does the baseline, which removes the vector store as a variable.</p>')
+    A(dataset_card('enterprise'))
+
+    A('</section></div>')
+    # ---- QUERY CONSOLE, 4th on the page. Shared by both datasets, so it lives BETWEEN the two
+    # halves of each pane rather than inside them: two consoles would mean duplicate element ids
+    # and one of them silently dead.
+    A('<section>')
+    A('<p class="eyebrow">Run it yourself</p>')
+    A('<h2>Query console \u2014 query specific</h2>')
+    A(CONSOLE)
+    A(callout(
+        '<b>Every question below has a verified answer key</b>, so the console grades each '
+        'reply rather than leaving you to judge it. With a backend configured it runs all '
+        'three pipelines live; without one it replays the recorded run \u2014 the same measured '
+        'answer either way, and the card says <code>recorded</code> when that is what '
+        'happened.'))
+    A('</section>')
+    A('<div class="pane pane-factual" id="paneF2">')
+    A('<section>')
+    # ---- The scorecard's caveats sit HERE, after the console, rather than directly
+    # under the table they qualify. The table plus five collapsed notes plus the corpus
+    # card pushed the console far down the page; the reader now meets the numbers, the
+    # corpus and the console first, and the qualifications immediately after. Nothing is
+    # dropped — these are the reason the numbers can be trusted.
     A(drops(
         ('Two scoring changes, applied to all three arms &mdash; and every arm gained',
         '<b>Two scoring changes, applied to all three arms.</b> First, the rubric was '
@@ -942,80 +1107,6 @@ def main() -> int:
         'has not been tested properly.</b>')
     ))
 
-    # ---- the corpus itself, after the result it produced
-    A('</section><section>')
-    A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
-    A('<h1>Generalization to real filings \u2014 including where the graph loses.</h1>')
-    A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
-    A(dataset_card('sec'))
-
-    A('</section></div>')
-    A('<div class="pane pane-textual" id="paneT" hidden>')
-    # ---- SCORECARD FIRST, same reasoning as the factual pane above.
-    A('<section>')
-    A('<h2>Scorecard</h2>')
-    A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
-      '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
-      f'GraphRAG still answers {E["p3"]["strict"]}/{E["p3"]["n"]} against '
-      f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} for '
-      f'<b>{100.0*(E["p2rr"]["tok"]-E["p3"]["tok"])/E["p2rr"]["tok"]:.1f}% fewer tokens</b>.</p>')
-    A(scorecard(ENT_ARMS, E, ent_metrics))
-    A(drops(
-        ('Read strict pass, not the judge',
-        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
-        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
-        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
-        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
-        f'is the number of record.'),
-        ('The budgets are deliberately unequal, in the baseline&rsquo;s favour',
-        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
-        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
-        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
-        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
-        f'at a 3-chunk budget.'),
-        ('A fixed share of GraphRAG&rsquo;s tokens is the planner call',
-        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
-        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
-        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
-        f'a number to leave out.'),
-        ('BERTScore is shown and is not the number of record',
-        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
-        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
-        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
-        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
-        f'already know the answer is not evidence.'),
-        ('This is the whole result &mdash; the only variable is whether the question needs a join',
-        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
-        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
-        'questions. The only variable is whether the question needs a join. Five of those 20 '
-        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
-        'fixes that, because nothing puts 1,065 documents into 10 slots.')
-    ))
-
-    # ---- the corpus, after the result
-    A('</section><section>')
-    A('<p class="eyebrow">EnterpriseRAG-Bench 20k \u00b7 50 questions \u00b7 20 single-doc / 10 directory / 20 multi-hop \u00b7 single run</p>')
-    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
-    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store \u2014 so does the baseline, which removes the vector store as a variable.</p>')
-    A(dataset_card('enterprise'))
-
-    A('</section></div>')
-    # ---- QUERY CONSOLE, 4th on the page. Shared by both datasets, so it lives BETWEEN the two
-    # halves of each pane rather than inside them: two consoles would mean duplicate element ids
-    # and one of them silently dead.
-    A('<section>')
-    A('<p class="eyebrow">Run it yourself</p>')
-    A('<h2>Query console \u2014 query specific</h2>')
-    A(CONSOLE)
-    A(callout(
-        '<b>Every question below has a verified answer key</b>, so the console grades each '
-        'reply rather than leaving you to judge it. With a backend configured it runs all '
-        'three pipelines live; without one it replays the recorded run \u2014 the same measured '
-        'answer either way, and the card says <code>recorded</code> when that is what '
-        'happened.'))
-    A('</section>')
-    A('<div class="pane pane-factual" id="paneF2">')
-    A('<section>')
     # ---- architecture
     A('</section><section>')
     A('<p class="eyebrow">How it works</p>')
@@ -1079,6 +1170,40 @@ def main() -> int:
     A('</section></div>')
     A('<div class="pane pane-textual" id="paneT2" hidden>')
     A('<section>')
+    # ---- Same move as the factual pane: the scorecard's caveats sit after the console,
+    # not wedged between the table and the corpus card. Both tabs now read the same way.
+    A(drops(
+        ('Read strict pass, not the judge',
+        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
+        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
+        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
+        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
+        f'is the number of record.'),
+        ('The budgets are deliberately unequal, in the baseline&rsquo;s favour',
+        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
+        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
+        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
+        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
+        f'at a 3-chunk budget.'),
+        ('A fixed share of GraphRAG&rsquo;s tokens is the planner call',
+        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
+        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
+        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
+        f'a number to leave out.'),
+        ('BERTScore is shown and is not the number of record',
+        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
+        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
+        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
+        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
+        f'already know the answer is not evidence.'),
+        ('This is the whole result &mdash; the only variable is whether the question needs a join',
+        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
+        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
+        'questions. The only variable is whether the question needs a join. Five of those 20 '
+        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
+        'fixes that, because nothing puts 1,065 documents into 10 slots.')
+    ))
+
     # ---- equal budget + held out
     A('</section><section>')
     A('<p class="eyebrow">Fairness and overfitting controls</p>')
@@ -1194,13 +1319,25 @@ def main() -> int:
     # Only questions the GRAPH answers correctly. Enterprise is 50/50 so all 50 survive;
     # SEC is 23/50, so the console offers 23. Everything it gets wrong stays visible in the
     # per-question tables — the filter is on the console, not on the evidence.
+    # The SEC set stores its tiers as bare letters. "question type A" tells a viewer nothing,
+    # and the chips were already printing the letter. Same mapping demo/server.py:443 uses for
+    # /api/examples, so the built page and the live server cannot disagree about what a tier
+    # is called. The enterprise set already stores readable tiers and passes through unchanged.
+    SEC_TIER = {"A": "single doc", "B": "multi doc", "C": "aggregation", "D": "hard"}
+
     def passing(rows, arm):
         seen, out = set(), []
         for r in rows:
             if r["arm"] == arm and r["exact"] and r["question"] not in seen:
                 seen.add(r["question"])
-                out.append({"q": r["question"], "tier": r.get("tier", ""),
-                            "qid": r.get("question_id", "")})
+                t = r.get("tier", "")
+                # The gold answer travels with the question. The SEC worker does not return one
+                # (its /query reply carries only results), so without this the console showed
+                # "no answer key for this question" on a tab whose keys are sitting in
+                # eval_sec_published.jsonl. Baked in at build time for BOTH tabs, so the key is
+                # always available to display and to score against.
+                out.append({"q": r["question"], "tier": SEC_TIER.get(t, t),
+                            "qid": r.get("question_id", ""), "gold": r.get("gold", "")})
         return out
 
     # KPI cards that switch with the console's dataset toggle, exactly as the old dashboard
