@@ -84,9 +84,19 @@ def callout(body_html: str) -> str:
     return f'<div class="note">{body_html}</div>'
 
 
+def _split_label(n: str) -> tuple[str, str]:
+    """A label may carry its context budget after a newline: "GraphRAG\n3 chunks"."""
+    name, _, note = n.partition(chr(10))
+    return name, note
+
+
 def scorecard(arms: list[tuple[str, str]], data: dict, metrics: list[tuple]) -> str:
     """metrics: (label, key, fmt, better) where better is 'hi' | 'lo' | None."""
-    head = "".join(f"<th>{esc(n)}</th>" for _, n in arms)
+    def _th(n: str) -> str:
+        name, note = _split_label(n)
+        extra = f'<span class="cb">{esc(note)}</span>' if note else ""
+        return f"<th>{esc(name)}{extra}</th>"
+    head = "".join(_th(n) for _, n in arms)
     out = [f'<table class="sc"><thead><tr><th class="ml">METRIC</th>{head}</tr></thead><tbody>']
     for label, key, fmt, better in metrics:
         vals = {a: (data.get(a) or {}).get(key) for a, _ in arms}
@@ -112,7 +122,9 @@ def tier_bars(rows: list[dict], arms: list[tuple[str, str, str]],
     for _, name, cls in arms:
         key.append(f"<span class='k {cls}'></span>{esc(name)}")
     key.append("</div>")
-    head = "".join(f"<th>{esc(n.upper())}</th>" for _, n, _ in arms)
+    head = "".join(f'<th>{esc(_split_label(n)[0].upper())}'
+                   + (f'<span class="cb">{esc(_split_label(n)[1].upper())}</span>'
+                      if _split_label(n)[1] else "") + "</th>" for _, n, _ in arms)
     out = ["".join(key),
            f'<table class="tb"><thead><tr><th class="ml">TIER</th>{head}</tr></thead><tbody>']
     for tkey, tname in tiers:
@@ -140,7 +152,9 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
     ids = sorted(by)
     if limit:
         ids = ids[:limit]
-    head = "".join(f"<th>{esc(n.upper())}</th>" for _, n in arms)
+    head = "".join(f'<th>{esc(_split_label(n)[0].upper())}'
+                   + (f'<span class="cb">{esc(_split_label(n)[1].upper())}</span>'
+                      if _split_label(n)[1] else "") + "</th>" for _, n in arms)
     out = [f'<div class="scroll"><table class="pq"><thead><tr><th>ID</th><th>TIER</th>{head}'
            f'<th class="ml">QUESTION</th><th class="ml">GOLD</th><th>TOKENS</th></tr></thead><tbody>']
     last_arm = arms[-1][0]
@@ -188,10 +202,6 @@ DATASETS = {
         ("Graph", "<b>128,282</b> provenance edges, 11 relation types<span class='sub2'>"
                   "participated_in 88,188 · has_label 11,546 · in_channel 11,146 · authored 6,645 "
                   "· in_team 5,377 · reports_to 160</span>"),
-        ("Built from", "Metadata fields only — <b>no LLM extraction</b><span class='sub2'>Author, "
-                       "channel, department and project were already on every document. "
-                       "employee_directory.yaml (167 people) supplies the org chart and is the one "
-                       "authored input.</span>"),
         ("Questions", "<b>50</b> — 20 single-document, 10 directory lookup, 20 multi-hop"
                       "<span class='sub2'>Generated from the graph, then the answer key was "
                       "independently re-derived from the raw documents, 30/30.</span>"),
@@ -219,9 +229,11 @@ DATASETS = {
 
 
 def dataset_card(key: str) -> str:
+    """Data overview + corpus table. Sits near the top of each tab: what the data IS has to come
+    before what the pipelines scored on it, otherwise the numbers arrive without context."""
     rows = "".join(f'<tr><td class="k">{k}</td><td class="v">{v}</td></tr>'
                    for k, v in DATASETS[key])
-    return (f'<div class="dswrap"><h4>The corpus</h4>'
+    return (f'<h2>Data overview</h2><div class="dswrap"><h4>The corpus</h4>'
             f'<table class="ds"><tbody>{rows}</tbody></table></div>')
 
 
@@ -274,6 +286,9 @@ tbody tr:last-child td{border-bottom:0}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 td.win{color:var(--win);font-weight:600}
 table.sc tbody td.ml{color:var(--ink2)}
+thead th .cb{display:block;margin-top:.2rem;font-family:var(--mono);font-size:.7rem;
+  font-weight:500;letter-spacing:0;text-transform:none;color:var(--faint)}
+.budgetline{margin:-.3rem 0 1rem;font-size:.88rem;color:var(--ink2)}
 
 .key{display:flex;gap:1.1rem;align-items:center;font-size:.76rem;color:var(--dim);
   margin:0 0 .8rem}
@@ -547,7 +562,7 @@ function drawCard(x, cheap){
       '<div class="foot">'+
         '<span>tokens <b'+(x.tokens===cheap?' class="best"':'')+'>'+
           (x.tokens||0).toLocaleString()+'</b></span>'+
-        (x.planner_tokens ? '<span>planner <b>'+x.planner_tokens.toLocaleString()+'</b></span>' : '')+
+
         (x.chunks ? '<span>chunks <b>'+x.chunks+'</b></span>' : '')+
         (x.latency ? '<span><b>'+x.latency+'s</b></span>' : '')+
       '</div></div>';
@@ -615,7 +630,7 @@ function drawChips(){
 function loadChips(){
   CHIPS = PASSING[view] || [];
   document.getElementById("chipHint").textContent =
-    CHIPS.length + " questions GraphRAG answers correctly - click one to load it, then press Run";
+    "Click a question to load it, then press Run";
   drawChips();
 }
 
@@ -685,8 +700,20 @@ def main() -> int:
     sec_f = lambda v, _: f"{v:.1f}"
     frac = lambda v, d: f"{int(v)}/{d['n']}"
 
-    ENT_ARMS = [("p1", "LLM only"), ("p2rr", "Basic RAG"), ("p3", "GraphRAG")]
-    SEC_ARMS = [("p1", "LLM only"), ("p2", "Basic RAG"), ("p3", "GraphRAG")]
+    # The chunk budget is part of each pipeline's identity and belongs in the label. The
+    # enterprise run is deliberately UNEQUAL and in the baseline's favour — Basic RAG reads
+    # 10 chunks, GraphRAG reads 3 — and that is the efficiency claim, so it has to be
+    # readable off the scorecard instead of buried in a callout underneath it.
+    # SEC is NOT 3-vs-10: MasterGraph's config.CONTEXT_NUM_CHUNKS is 10 and feeds both arms, so
+    # both read 10 there and GraphRAG still spends less because its context is provenance
+    # sentences rather than chunk text. Labelling SEC "3 chunks" would be false.
+    _B = chr(10)          # separator: everything after it renders as the small 2nd line
+    ENT_ARMS = [("p1", "LLM only" + _B + "no retrieval"),
+                ("p2rr", "Basic RAG" + _B + "10 chunks"),
+                ("p3", "GraphRAG" + _B + "3 chunks")]
+    SEC_ARMS = [("p1", "LLM only" + _B + "no retrieval"),
+                ("p2", "Basic RAG" + _B + "10 chunks"),
+                ("p3", "GraphRAG" + _B + "10 chunks")]
 
     ent_metrics = [
         ("Strict pass (exact set)", "strict", frac, "hi"),
@@ -723,8 +750,10 @@ def main() -> int:
     # ---- console, above both datasets because it serves both
     A('<section>')
     A('<p class="eyebrow">Run it yourself</p>')
-    A('<h1>Ask any of the questions the graph answers correctly.</h1>')
-    A('<p class="sub">Three pipelines, the same question, side by side, graded against a verified answer key. The list is restricted to questions GraphRAG gets right — every question it gets <i>wrong</i> is still in the per-question tables further down, with the verdict.</p>')
+    A('<h1>Ask a question. Three pipelines, side by side.</h1>')
+    A('<p class="sub">Three pipelines, the same question, side by side, each graded against a '
+      'verified answer key. Every question and every verdict — wins and losses — is in '
+      'the per-question tables further down.</p>')
     A(CONSOLE)
     A(callout(
         '<b>Every question above has a verified answer key</b>, so the console grades each '
@@ -744,15 +773,7 @@ def main() -> int:
       'than name sets. Run under a corrected config — 8,192-token budget and no-refusal prompt '
       'applied to <i>all</i> arms, both of which raised the baseline too.</p>')
 
-    A('<div class="stats">')
-    A(card(f"−{sec_red:.0f}%", "Tokens vs Basic RAG",
-           f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question"))
-    A(card(f"{S['p3']['strict']}/{S['p3']['n']}", "GraphRAG strict pass",
-           f"Basic RAG {S['p2']['strict']}/{S['p2']['n']} · LLM-only {S['p1']['strict']}/{S['p1']['n']}",
-           "neutral"))
-    A(card(f"{S['p1']['judge']:.0f}%", "LLM-only judged score",
-           "Real companies — contamination, measured", "warn"))
-    A('</div>')
+    A(dataset_card('sec'))
 
     A('<h2>Scorecard</h2>')
     A(scorecard(SEC_ARMS, S, sec_metrics))
@@ -788,13 +809,6 @@ def main() -> int:
         'real figures from the wrong fiscal year. For financial QA a wrong number is a wrong '
         'answer, so <b>strict pass is the figure to trust</b>, not the percentage.'))
 
-    A('<h2>Strict pass rate by question tier</h2>')
-    A(tier_bars(sec, [("p1", "LLM only", "a1"), ("p2", "Basic RAG", "a2"),
-                      ("p3", "GraphRAG", "a3")],
-                [("A", "<b>A · Single lookup</b> — one number in one filing"),
-                 ("B", "<b>B · Two-hop bridge</b> — relation, then a number"),
-                 ("C", "<b>C · Aggregation</b> — every company matching a property"),
-                 ("D", "<b>D · Cross-doc / temporal</b>")]))
     A(callout(
         '<b>The graph wins the hardest tier and loses the easiest.</b> On aggregation it is '
         '12/20 against 3/20 — four times the baseline. On single lookup it is 4/8 against 7/8: '
@@ -838,8 +852,6 @@ def main() -> int:
     A('<h1>Every question, every verdict.</h1>')
     A('<p class="sub">Including the ones the graph loses. PART means partially correct \u2014 '
       'some of the gold set returned, not all.</p>')
-    A('<h2>SEC filings \u2014 50 questions</h2>')
-    A(dataset_card('sec'))
     A(per_question(sec, SEC_ARMS))
     A(callout(
         '<b>\u2021</b> marks a gold answer the dataset authors flagged as non-exhaustive \u2014 '
@@ -877,17 +889,15 @@ def main() -> int:
       '<i>and</i> vector store — so does the baseline, which removes the vector store as a '
       'variable.</p>')
 
-    A('<div class="stats">')
-    A(card(f"−{red:.0f}%", "Tokens vs Basic RAG",
-           f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question"))
-    A(card(f"+{gap:.0f} pts", "Strict pass vs Basic RAG",
-           f"GraphRAG {E['p3']['strict']}/{E['p3']['n']} · RAG {E['p2rr']['strict']}/{E['p2rr']['n']}"))
-    A(card(f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
-           "Leak gate — the company is fictional", "neutral"))
-    A('</div>')
+    A(dataset_card('enterprise'))
 
 
     A('<h2>Scorecard</h2>')
+    A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
+      '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
+      f'GraphRAG still answers {E["p3"]["strict"]}/{E["p3"]["n"]} against '
+      f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} for '
+      f'<b>{100.0*(E["p2rr"]["tok"]-E["p3"]["tok"])/E["p2rr"]["tok"]:.1f}% fewer tokens</b>.</p>')
     A(scorecard(ENT_ARMS, E, ent_metrics))
 
     A(callout(
@@ -917,12 +927,6 @@ def main() -> int:
         f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
         f'already know the answer is not evidence.'))
 
-    A('<h2>Strict pass rate by question tier</h2>')
-    A(tier_bars(ent, [("p1", "LLM only", "a1"), ("p2rr", "Basic RAG", "a2"),
-                      ("p3", "GraphRAG", "a3")],
-                [("single_doc", "<b>Single document</b> — one doc holds the answer"),
-                 ("single_dir", "<b>Directory lookup</b> — one hop in the org chart"),
-                 ("multi_hop", "<b>Multi-hop</b> — needs a join across documents")]))
     A(callout(
         '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
         'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
@@ -1006,8 +1010,6 @@ def main() -> int:
     A('<h1>Every question, every verdict.</h1>')
     A('<p class="sub">PART means partially correct \u2014 some of the gold set returned, '
       'not all.</p>')
-    A('<h2>EnterpriseRAG-Bench \u2014 50 questions</h2>')
-    A(dataset_card('enterprise'))
     A(per_question(ent, ENT_ARMS))
     A('</section><section>')
     A('<p class="eyebrow">Limits</p>')
@@ -1053,12 +1055,9 @@ def main() -> int:
         "factual": [
             (f"-{sec_red:.0f}%", "Tokens vs Basic RAG",
              f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question", ""),
-            # 23/50 is the honest overall figure and it sits in the scorecard below, but as a
-            # headline it undersells what actually happened: the graph's win is concentrated in
-            # the aggregation tier, where it is a multiple of the baseline rather than a few
-            # points ahead. Computed, not typed, so it stays true if the run changes.
-            (f"{secC3 / max(secC2, 1):.0f}x", "Aggregation tier vs Basic RAG",
-             f"{secC3}/{secCn} correct against {secC2}/{secCn} — the hardest tier", ""),
+            # The aggregation-tier multiple used to sit here. It is still the most interesting
+            # SEC result, so it stays in the callout under the scorecard —
+            # only the headline card is gone, to keep this row to two cards.
             # GraphRAG's judged score leads the card, with the other two arms on the
             # sub-line. LLM-only's 38.3% is the contamination figure and stays visible there,
             # plus in the SEC scorecard and its callout below — moved down the page, not dropped.
@@ -1069,9 +1068,6 @@ def main() -> int:
         "textual": [
             (f"-{red:.0f}%", "Tokens vs Basic RAG",
              f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question", ""),
-            (f"+{gap:.0f} pts", "Strict pass vs Basic RAG",
-             f"GraphRAG {E['p3']['strict']}/{E['p3']['n']} · RAG "
-             f"{E['p2rr']['strict']}/{E['p2rr']['n']}", ""),
             (f"{E['p1']['judge']:.1f}%", "LLM-only with no retrieval",
              "Leak gate — the company is fictional", "neutral"),
         ],

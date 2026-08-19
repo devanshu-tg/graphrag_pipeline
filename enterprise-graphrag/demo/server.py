@@ -328,7 +328,11 @@ def warm() -> None:
             p3._connect()
             import pipeline1_llm_only as p1
             import pipeline2_basic_rag as p2
-            _mods.update({"p1": p1, "p2": p2, "p3": p3})
+            # The published baseline is the RERANKED one. The console sends arm "p2rr" and
+            # without this key the dispatch below fell through to else: and ran GraphRAG, so
+            # the "Basic RAG" row was a second GraphRAG run wearing the baseline's label.
+            import pipeline2rr_rerank as p2rr
+            _mods.update({"p1": p1, "p2": p2, "p2rr": p2rr, "p3": p3})
             _warm["state"] = "ready"
         except Exception as e:
             _warm["state"] = "error"
@@ -348,6 +352,9 @@ def run_query(question: str, arms: list[str]) -> dict:
             elif arm == "p2":
                 m = _mods["p2"].run_single(question)
                 route = "vector top-k"
+            elif arm == "p2rr":
+                m = _mods["p2rr"].run_single(question)
+                route = getattr(m, "route", "rerank")
             elif arm == "p2p":
                 import pipeline2plus_iterative as p2p
                 m = p2p.run_single(question)
@@ -724,8 +731,23 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path in ("/", "/index.html"):
-            self._send(200, (Path(__file__).parent / "index.html").read_bytes(),
-                       "text/html; charset=utf-8")
+            # Prefer the BUILT report page (docs/index.html from build_report.py): the light
+            # two-tab scorecard, with the live URL and token already baked in. demo/index.html
+            # is the older dark dashboard and is only a fallback for a tree that has never
+            # been built. Netlify blocks deploys once account credits run out, so the tunnel
+            # has to be able to serve the real page by itself.
+            built = Path(__file__).resolve().parents[2] / "docs" / "index.html"
+            src = built if built.exists() else Path(__file__).parent / "index.html"
+            self._send(200, src.read_bytes(), "text/html; charset=utf-8")
+        elif path == "/architecture-sec.png":
+            # the page references this by relative path, so it must be served alongside it
+            img = Path(__file__).resolve().parents[2] / "docs" / "architecture-sec.png"
+            if not img.exists():
+                img = Path(__file__).parent / "architecture-sec.png"
+            if img.exists():
+                self._send(200, img.read_bytes(), "image/png")
+            else:
+                self._send(404, json.dumps({"error": "not found"}))
         elif path == "/api/metrics":
             self._send(200, json.dumps({"textual": textual_metrics("tuned"),
                                         "heldout": textual_metrics("heldout"),
