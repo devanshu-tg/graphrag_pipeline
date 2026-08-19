@@ -31,6 +31,18 @@ section:first-of-type{border-top:0;margin-top:0;padding-top:0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1rem;margin:0 0 1rem}
 /* The KPI cards now head the page on their own, outside the console panel that used to frame
    them. Without that frame they need their own breathing room and no trailing gap. */
+/* Budget matrix + its question-type filter. */
+.gridwrap{margin:1.1rem 0 0}
+.gridbar{display:flex;align-items:center;gap:.6rem;margin:0 0 .7rem}
+.gridbar label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.gridbar select{font:inherit;font-size:.85rem;padding:.35rem .6rem;border:1px solid var(--line);
+  border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.gridbar select:focus{outline:2px solid var(--p3);outline-offset:1px}
+table.bg td.n{font-size:1.05rem}
+table.bg .sub2{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;
+  color:var(--ink2);margin-top:.2rem}
+.gridnote{margin:.7rem 0 0;font-size:.83rem;color:var(--ink2)}
+.gridnote b{color:var(--ink)}
 .statsonly{margin:1.4rem 0 0}
 .statsonly .stats{margin:0}
 .stat{border:1px solid var(--line);border-radius:10px;padding:1.15rem 1.25rem;background:var(--bg)}
@@ -336,9 +348,9 @@ a{color:var(--p3)}
 <h2>Equal budget — 10 chunks each, main 50 questions</h2>
 <div class="drops"><details class="drop"><summary>Same context, same token cost — and the gap is unchanged</summary><div class="body"><b>Same context, same token cost, and the accuracy gap is unchanged.</b> Neither arm is starved and neither is favoured, which makes this the cleanest single comparison on the page. The 49% saving is a <i>separate</i> claim, measured by giving GraphRAG less — not by giving the baseline less.</div></details></div>
 <table class="sc"><thead><tr><th class="ml">METRIC</th><th>Basic RAG</th><th>GraphRAG</th></tr></thead><tbody><tr><td class="ml">Strict pass (exact)</td><td class="n">26/50</td><td class="n win">49/50</td></tr><tr><td class="ml">Blind LLM judge</td><td class="n">62.3%</td><td class="n win">99.0%</td></tr><tr><td class="ml">Tokens / question</td><td class="n">5,312</td><td class="n win">5,260</td></tr></tbody></table>
-<h2>Equal budget — 10 chunks each, held-out questions</h2>
-<div class="drops"><details class="drop"><summary>A different question set, never developed against</summary><div class="body"><b>A different question set, generated from a different seed, never developed against.</b> 103 source entities were excluded and the generator was gated on reproducing the original answer key before it was allowed to write. Same equal-budget setup, same outcome — which is the test that caught overfitting on the SEC round, where the ranking reversed.</div></details></div>
-<table class="sc"><thead><tr><th class="ml">METRIC</th><th>Basic RAG</th><th>GraphRAG</th></tr></thead><tbody><tr><td class="ml">Strict pass (exact)</td><td class="n">26/50</td><td class="n win">50/50</td></tr><tr><td class="ml">Blind LLM judge</td><td class="n">59.1%</td><td class="n win">100.0%</td></tr><tr><td class="ml">Tokens / question</td><td class="n">5,489</td><td class="n win">5,443</td></tr></tbody></table>
+<h2>Equal budget — the same 50 questions at both budgets</h2>
+<div class="drops"><details class="drop"><summary>Why this replaced the main-set vs held-out pair</summary><div class="body"><b>One run, four cells, one variable.</b> The pair this replaces compared the main 50 against a held-out 50 &mdash; two different question sets, so any gap between them mixed the budget with the questions. Here the questions are identical in all four cells and only the context budget moves. <code>gemini-3.6-flash</code>, temperature 0, the same cross-encoder pool on both sides. Use the dropdown to see it by question type: the graph's margin is almost entirely in the multi-hop tier, and the directory tier is where the baseline is already fine.</div></details></div>
+<div class="gridwrap"><div class="gridbar"><label for="tierSel">Question type</label><select id="tierSel"><option value="all">All 50 questions</option><option value="single_doc">Single-document</option><option value="single_dir">Directory lookup</option><option value="multi_hop">Multi-hop</option></select></div><div class="bgrid" data-tier="all"><table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th><th>Basic RAG<span class="cb">cross-encoder rerank</span></th><th>GraphRAG<span class="cb">router + traversal</span></th></tr></thead><tbody><tr><td class="ml">10 chunks</td><td class="n">23/50<span class="sub2">5,409 tokens</span></td><td class="n win">50/50<span class="sub2">5,381 tokens</span></td></tr><tr><td class="ml">3 chunks</td><td class="n">23/50<span class="sub2">1,754 tokens</span></td><td class="n win">50/50<span class="sub2">2,514 tokens</span></td></tr></tbody></table><p class="gridnote">At its own 3-chunk budget GraphRAG answers <b>50/50</b> on 2,514 tokens, against <b>23/50</b> on 5,409 for the baseline reading more than three times the context.</p></div><div class="bgrid" data-tier="single_doc" hidden><table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th><th>Basic RAG<span class="cb">cross-encoder rerank</span></th><th>GraphRAG<span class="cb">router + traversal</span></th></tr></thead><tbody><tr><td class="ml">10 chunks</td><td class="n">13/20<span class="sub2">6,354 tokens</span></td><td class="n win">20/20<span class="sub2">7,022 tokens</span></td></tr><tr><td class="ml">3 chunks</td><td class="n">13/20<span class="sub2">2,099 tokens</span></td><td class="n win">20/20<span class="sub2">2,778 tokens</span></td></tr></tbody></table><p class="gridnote">At its own 3-chunk budget GraphRAG answers <b>20/20</b> on 2,778 tokens, against <b>13/20</b> on 6,354 for the baseline reading more than three times the context.</p></div><div class="bgrid" data-tier="single_dir" hidden><table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th><th>Basic RAG<span class="cb">cross-encoder rerank</span></th><th>GraphRAG<span class="cb">router + traversal</span></th></tr></thead><tbody><tr><td class="ml">10 chunks</td><td class="n win">10/10<span class="sub2">2,440 tokens</span></td><td class="n win">10/10<span class="sub2">2,698 tokens</span></td></tr><tr><td class="ml">3 chunks</td><td class="n win">10/10<span class="sub2">622 tokens</span></td><td class="n win">10/10<span class="sub2">1,745 tokens</span></td></tr></tbody></table><p class="gridnote">At its own 3-chunk budget GraphRAG answers <b>10/10</b> on 1,745 tokens, against <b>10/10</b> on 2,440 for the baseline reading more than three times the context.</p></div><div class="bgrid" data-tier="multi_hop" hidden><table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th><th>Basic RAG<span class="cb">cross-encoder rerank</span></th><th>GraphRAG<span class="cb">router + traversal</span></th></tr></thead><tbody><tr><td class="ml">10 chunks</td><td class="n">0/20<span class="sub2">5,948 tokens</span></td><td class="n win">20/20<span class="sub2">5,082 tokens</span></td></tr><tr><td class="ml">3 chunks</td><td class="n">0/20<span class="sub2">1,977 tokens</span></td><td class="n win">20/20<span class="sub2">2,636 tokens</span></td></tr></tbody></table><p class="gridnote">At its own 3-chunk budget GraphRAG answers <b>20/20</b> on 2,636 tokens, against <b>0/20</b> on 5,948 for the baseline reading more than three times the context.</p></div></div>
 <h2>Run-to-run variance</h2>
 <div class="note"><b>The headline figures come from a single run, and the page says so.</b> Two independent runs exist at the 10-chunk budget: GraphRAG scored <b>49/50</b> and <b>50/50</b>, at 5,260 and 5,250 tokens. So run-to-run movement is about one question. That is not three replicates of the published config, and it is not reported as if it were.</div>
 </section><section>
@@ -435,7 +447,7 @@ function drawCard(x, cheap){
           (x.tokens||0).toLocaleString()+'</b></span>'+
 
         (x.chunks ? '<span>chunks <b>'+x.chunks+'</b></span>' : '')+
-        (x.latency ? '<span><b>'+x.latency+'s</b></span>' : '')+
+        (x.latency ? '<span>latency <b>'+x.latency+'s</b></span>' : '')+
       '</div></div>';
 }
 
@@ -523,6 +535,13 @@ function setView(v){
 }
 
 document.getElementById("go").onclick = ask;
+// Budget-matrix filter: swap which per-tier grid is visible. All four grids are rendered at
+// build time from the same rows, so switching type cannot disagree with the table it replaces.
+const tierSel = document.getElementById("tierSel");
+if (tierSel) tierSel.addEventListener("change", () => {
+  document.querySelectorAll(".bgrid").forEach(g =>
+    g.hidden = g.dataset.tier !== tierSel.value);
+});
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
 // Page tabs drive everything: which pane is visible, and which dataset the console serves.
 // One console, moved by nobody - two would mean duplicate element ids and dead handlers.

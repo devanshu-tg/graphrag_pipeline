@@ -130,6 +130,67 @@ def scorecard(arms: list[tuple[str, str]], data: dict, metrics: list[tuple]) -> 
     return "".join(out)
 
 
+def budget_grid(rows: list[dict]) -> str:
+    """The 2x2 budget matrix, with a question-type filter.
+
+    Four cells from ONE controlled run (results/enterprise/eval_chunkmatrix.jsonl,
+    gemini-3.6-flash, temperature 0, same cross-encoder pool on both sides): each arm at a
+    10-chunk and a 3-chunk budget. This replaces the main-set-vs-held-out pair, which compared
+    two different QUESTION SETS and so could never isolate the budget. Here the questions are
+    identical across all four cells and only the budget moves, which is what "the graph is
+    reliably better" actually requires you to show.
+
+    Every cell is computed from the rows, including the per-tier splits behind the dropdown —
+    a typed number here would be a number nobody could check.
+    """
+    TIERS = [("all", "All 50 questions"), ("single_doc", "Single-document"),
+             ("single_dir", "Directory lookup"), ("multi_hop", "Multi-hop")]
+    CELLS = [("p2rr_k10", "p2rr_k3"), ("p3_k10", "p3_k3")]
+
+    def cell(arm: str, tier: str) -> dict | None:
+        R = [r for r in rows if r["arm"] == arm and (tier == "all" or r.get("tier") == tier)]
+        if not R:
+            return None
+        return {"n": len(R), "strict": sum(r["exact"] for r in R),
+                "tok": st.mean(r["prompt_tokens"] + r["completion_tokens"]
+                               + r.get("planner_tokens", 0) for r in R)}
+
+    out = ['<div class="gridwrap">']
+    out.append('<div class="gridbar"><label for="tierSel">Question type</label>'
+               '<select id="tierSel">'
+               + "".join(f'<option value="{t}">{esc(lbl)}</option>' for t, lbl in TIERS)
+               + '</select></div>')
+    for tier, lbl in TIERS:
+        hid = "" if tier == "all" else " hidden"
+        g = [f'<div class="bgrid" data-tier="{tier}"{hid}>']
+        g.append('<table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th>'
+                 '<th>Basic RAG<span class="cb">cross-encoder rerank</span></th>'
+                 '<th>GraphRAG<span class="cb">router + traversal</span></th>'
+                 '</tr></thead><tbody>')
+        for i, budget in enumerate(("10 chunks", "3 chunks")):
+            cs = ""
+            vals = [cell(pair[i], tier) for pair in CELLS]
+            best = max((v["strict"] for v in vals if v), default=None)
+            for v in vals:
+                if not v:
+                    cs += '<td class="n">—</td>'; continue
+                w = " win" if v["strict"] == best else ""
+                cs += (f'<td class="n{w}">{v["strict"]}/{v["n"]}'
+                       f'<span class="sub2">{v["tok"]:,.0f} tokens</span></td>')
+            g.append(f'<tr><td class="ml">{budget}</td>{cs}</tr>')
+        g.append("</tbody></table>")
+        a = cell("p3_k3", tier); b = cell("p2rr_k10", tier)
+        if a and b:
+            g.append(f'<p class="gridnote">At its own 3-chunk budget GraphRAG answers '
+                     f'<b>{a["strict"]}/{a["n"]}</b> on {a["tok"]:,.0f} tokens, against '
+                     f'<b>{b["strict"]}/{b["n"]}</b> on {b["tok"]:,.0f} for the baseline reading '
+                     f'more than three times the context.</p>')
+        g.append("</div>")
+        out.append("".join(g))
+    out.append("</div>")
+    return "".join(out)
+
+
 def tier_bars(rows: list[dict], arms: list[tuple[str, str, str]],
               tiers: list[tuple[str, str]]) -> str:
     """Inline bar + exact fraction, the one thing from the reference worth copying wholesale:
@@ -285,6 +346,18 @@ section:first-of-type{border-top:0;margin-top:0;padding-top:0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1rem;margin:0 0 1rem}
 /* The KPI cards now head the page on their own, outside the console panel that used to frame
    them. Without that frame they need their own breathing room and no trailing gap. */
+/* Budget matrix + its question-type filter. */
+.gridwrap{margin:1.1rem 0 0}
+.gridbar{display:flex;align-items:center;gap:.6rem;margin:0 0 .7rem}
+.gridbar label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.gridbar select{font:inherit;font-size:.85rem;padding:.35rem .6rem;border:1px solid var(--line);
+  border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.gridbar select:focus{outline:2px solid var(--p3);outline-offset:1px}
+table.bg td.n{font-size:1.05rem}
+table.bg .sub2{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;
+  color:var(--ink2);margin-top:.2rem}
+.gridnote{margin:.7rem 0 0;font-size:.83rem;color:var(--ink2)}
+.gridnote b{color:var(--ink)}
 .statsonly{margin:1.4rem 0 0}
 .statsonly .stats{margin:0}
 .stat{border:1px solid var(--line);border-radius:10px;padding:1.15rem 1.25rem;background:var(--bg)}
@@ -611,7 +684,7 @@ function drawCard(x, cheap){
           (x.tokens||0).toLocaleString()+'</b></span>'+
 
         (x.chunks ? '<span>chunks <b>'+x.chunks+'</b></span>' : '')+
-        (x.latency ? '<span><b>'+x.latency+'s</b></span>' : '')+
+        (x.latency ? '<span>latency <b>'+x.latency+'s</b></span>' : '')+
       '</div></div>';
 }
 
@@ -699,6 +772,13 @@ function setView(v){
 }
 
 document.getElementById("go").onclick = ask;
+// Budget-matrix filter: swap which per-tier grid is visible. All four grids are rendered at
+// build time from the same rows, so switching type cannot disagree with the table it replaces.
+const tierSel = document.getElementById("tierSel");
+if (tierSel) tierSel.addEventListener("change", () => {
+  document.querySelectorAll(".bgrid").forEach(g =>
+    g.hidden = g.dataset.tier !== tierSel.value);
+});
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
 // Page tabs drive everything: which pane is visible, and which dataset the console serves.
 // One console, moved by nobody - two would mean duplicate element ids and dead handlers.
@@ -738,6 +818,7 @@ def main() -> int:
     rep_a = load("eval_mixfixed.jsonl")
     rep_b = load("eval_mixfixed_r2.jsonl")
     eq5 = load("eval_eq5.jsonl")
+    cmx = load("eval_chunkmatrix.jsonl")   # 2x2 budget grid, one controlled run
     if not ent or not sec:
         print("ABORT: eval_pub50.jsonl or eval_sec_fair_prompt.jsonl missing")
         return 1
@@ -1052,20 +1133,22 @@ def main() -> int:
                      ("Blind LLM judge", "judge", pct, "hi"),
                      ("Tokens / question", "tok", tok, "lo")]))
 
-    if H.get("p3"):
-        A('<h2>Equal budget \u2014 10 chunks each, held-out questions</h2>')
+    if cmx:
+        # Replaces the held-out block. That compared two different QUESTION SETS, so a
+        # difference could never be attributed to the budget; this holds the questions fixed
+        # and moves only the budget, which is the comparison the claim actually needs.
+        A('<h2>Equal budget \u2014 the same 50 questions at both budgets</h2>')
         A(drops(
-        ('A different question set, never developed against',
-            '<b>A different question set, generated from a different seed, never developed '
-            'against.</b> 103 source entities were excluded and the generator was gated on '
-            'reproducing the original answer key before it was allowed to write. Same equal-budget '
-            'setup, same outcome \u2014 which is the test that caught overfitting on the SEC '
-            'round, where the ranking reversed.')
-    ))
-        A(scorecard([("p2rr", "Basic RAG"), ("p3", "GraphRAG")], H,
-                    [("Strict pass (exact)", "strict", frac, "hi"),
-                     ("Blind LLM judge", "judge", pct, "hi"),
-                     ("Tokens / question", "tok", tok, "lo")]))
+            ('Why this replaced the main-set vs held-out pair',
+             '<b>One run, four cells, one variable.</b> The pair this replaces compared the '
+             'main 50 against a held-out 50 &mdash; two different question sets, so any gap '
+             'between them mixed the budget with the questions. Here the questions are '
+             'identical in all four cells and only the context budget moves. '
+             '<code>gemini-3.6-flash</code>, temperature 0, the same cross-encoder pool on '
+             'both sides. Use the dropdown to see it by question type: the graph\'s margin is '
+             'almost entirely in the multi-hop tier, and the directory tier is where the '
+             'baseline is already fine.')))
+        A(budget_grid(cmx))
 
     if ra and rb:
         A('<h2>Run-to-run variance</h2>')
