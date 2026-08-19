@@ -336,6 +336,13 @@ a{color:var(--p3)}
 .nav a{font-size:.83rem;color:var(--dim);text-decoration:none;padding:.25rem 0}
 .nav a:hover{color:var(--p3)}
 .nav a.here{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--p3)}
+.nav .tab{font:inherit;font-size:.86rem;font-weight:600;background:none;border:0;
+  color:var(--dim);cursor:pointer;padding:.3rem 0;transition:.15s}
+.nav .tab:hover{color:var(--ink)}
+.nav .tab.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--brand)}
+/* Each pane opens with its own <section>, so the first-of-type rule that suppresses the top
+   rule no longer fires inside a pane. Restated per pane. */
+.pane>section:first-child{border-top:0;margin-top:0;padding-top:0}
 
 /* ---- query console — ported from demo/index.html, light-adapted ----------- */
 .console{border:1px solid var(--line);border-radius:10px;padding:1.3rem;background:var(--panel)}
@@ -444,10 +451,6 @@ CONSOLE = """
 <div class="console">
   <div class="chead"><h3 id="askHead">Query console</h3>
     <span class="hint" id="askHint"></span></div>
-  <div class="seg">
-    <button id="dsF" class="on"><span class="sw"></span>Factual · SEC</button>
-    <button id="dsT"><span class="sw"></span>Textual · Enterprise</button>
-  </div>
   <div class="stats" id="dsStats"></div>
   <div class="ask">
     <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
@@ -618,8 +621,6 @@ function loadChips(){
 
 function setView(v){
   view = v;
-  document.getElementById("dsT").className = v==="textual" ? "on" : "";
-  document.getElementById("dsF").className = v==="factual" ? "on" : "";
   document.getElementById("askHint").textContent = LIVE_URL
     ? "runs all three pipelines live; falls back to the recorded run if the backend is offline"
     : "replays the recorded run - every answer and token count is measured, not generated now";
@@ -637,9 +638,19 @@ function setView(v){
 
 document.getElementById("go").onclick = ask;
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
-document.getElementById("dsT").onclick = () => setView("textual");
-document.getElementById("dsF").onclick = () => setView("factual");
-setView("factual");
+// Page tabs drive everything: which pane is visible, and which dataset the console serves.
+// One console, moved by nobody - two would mean duplicate element ids and dead handlers.
+function setTab(v){
+  document.getElementById("paneF").hidden = v !== "factual";
+  document.getElementById("paneT").hidden = v !== "textual";
+  document.getElementById("tabF").className = "tab" + (v==="factual" ? " on" : "");
+  document.getElementById("tabT").className = "tab" + (v==="textual" ? " on" : "");
+  setView(v);
+  window.scrollTo({top:0, behavior:"instant"});
+}
+document.getElementById("tabF").onclick = () => setTab("factual");
+document.getElementById("tabT").onclick = () => setTab("textual");
+setTab("factual");
 </script>
 """
 
@@ -706,10 +717,10 @@ def main() -> int:
 
     A('<div class="wrap">')
     A('<div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span>'
-      '<a href="#" class="here">Scorecard</a>'
-      '<a href="index.html">Interactive dashboard</a>'
+      '<button class="tab on" id="tabF">Factual \u00b7 SEC</button>'
+      '<button class="tab" id="tabT">Textual \u00b7 Enterprise</button>'
+      '<a href="dashboard.html">Dashboard</a>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
-
     # ---- console, above both datasets because it serves both
     A('<section>')
     A('<p class="eyebrow">Run it yourself</p>')
@@ -722,8 +733,10 @@ def main() -> int:
         'three pipelines live; without one it replays the recorded run — the same measured '
         'answer either way, and the card says <code>recorded</code> when that is what '
         'happened.'))
+    A('</section>')
+    A('<div class="pane" id="paneF">')
     # ---- generalisation
-    A('</section><section>')
+    A('<section>')
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings · 50 questions · 100 S&amp;P-100 companies '
       '· different corpus, different schema, real entities</p>')
     A('<h1>Generalization to real filings — including where the graph loses.</h1>')
@@ -771,8 +784,72 @@ def main() -> int:
         'planner call is wasted overhead. <b>A system that wins everything is a system that '
         'has not been tested properly.</b>'))
 
-    # ---- enterprise
+    # ---- architecture
     A('</section><section>')
+    A('<p class="eyebrow">How it works</p>')
+    A('<h1>Two builds, one comparison harness.</h1>')
+    A('<p class="sub">The diagram below is the SEC round: filings chunked, entities and '
+      'relations extracted by an LLM in two passes, canonicalised into a curated graph, then '
+      'three pipelines judged blind. The enterprise build reuses the harness and replaces the '
+      'expensive half — see the note under the diagram.</p>')
+    A('<figure class="arch">'
+      '<img src="architecture-sec.png" alt="End-to-end architecture: SEC filings corpus, '
+      'two-phase Gemini extraction into a curated knowledge graph, TigerGraph Savanna as '
+      'graph and vector store, the three pipelines, and the blind judging layer." '
+      'loading="lazy">'
+      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in four ways that '
+      'matter — see below.</figcaption></figure>')
+    A(callout(
+        '<b>What the enterprise build does differently.</b> Four things in that diagram do '
+        'not apply to it. <b>No extraction:</b> every document already names its author, its '
+        'channel and its project, so 128,282 provenance edges came from metadata fields at '
+        'zero LLM cost and 100% coverage — there is no two-phase Gemini pass and no '
+        'canonicalisation step. <b>No ChromaDB:</b> TigerGraph Savanna is the vector store '
+        'for <i>both</i> retrieval arms, which is what removes the vector store as a '
+        'variable. The graph is <code>enterprise</code>, not <code>finance</code>, and the '
+        'judge is gemini-3.1-pro-preview rather than gpt-4o-mini.'))
+    A(callout(
+        '<b>The baseline retrieves through TigerGraph too.</b> Both arms use the same vector '
+        'store, the same embedder and the same corpus, so the only difference between them is '
+        'whether the graph is consulted. And the baseline is the <i>reranked</i> one — a '
+        'cross-encoder over a 200-candidate pool, which took it from 0.30 to 0.53 set-F1 at the '
+        'same token cost. Beating a weak baseline would prove nothing.'))
+
+    A('</section><section>')
+    A('<p class="eyebrow">The full working</p>')
+    A('<h1>Every question, every verdict.</h1>')
+    A('<p class="sub">Including the ones the graph loses. PART means partially correct \u2014 '
+      'some of the gold set returned, not all.</p>')
+    A('<h2>SEC filings \u2014 50 questions</h2>')
+    A(dataset_card('sec'))
+    A(per_question(sec, SEC_ARMS))
+    A(callout(
+        '<b>\u2021</b> marks a gold answer the dataset authors flagged as non-exhaustive \u2014 '
+        'the listed companies are correct but the set may be incomplete, so an answer naming '
+        'an unlisted-but-valid company is not necessarily wrong. Three questions carry it '
+        '(EQ32, EQ33, EQ34) and all three are scored like the rest, which means those three '
+        'understate every arm.'))
+    A('</section><section>')
+    A('<p class="eyebrow">Limits</p>')
+    A('<h1>What this does not show.</h1>')
+    A(callout(
+        '<b>These companies are real and the model has read their filings.</b> LLM-only '
+        'scores 38% with no retrieval at all, so some of every arm\'s score here is memory '
+        'rather than retrieval. The enterprise tab is the clean measurement \u2014 fictional '
+        'company, 0.8% with no retrieval.'))
+    A(callout(
+        '<b>The judge is lenient on numbers.</b> It awarded 75% to two real figures from the '
+        'wrong fiscal year. For financial QA a wrong number is a wrong answer, so strict pass '
+        'is the figure of record here, not the percentage.'))
+    A(callout(
+        '<b>Single run, no mean \u00b1 std.</b> Ablations (graph off / router off / compression '
+        'off) and a citation-validity judge are not run \u2014 so citations are <i>not</i> '
+        'evidence anywhere on this page: LLM-only emitted <code>Citations: [1],[2],[3]</code> '
+        'having been given no context at all.'))
+    A('</section></div>')
+    A('<div class="pane" id="paneT" hidden>')
+    # ---- enterprise
+    A('<section>')
     A(f'<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · '
       f'20 single-doc / 10 directory / 20 multi-hop · single run</p>')
     A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
@@ -906,78 +983,34 @@ def main() -> int:
             f'question. That is not three replicates of the published config, and it is not '
             f'reported as if it were.'))
 
-    # ---- architecture
-    A('</section><section>')
-    A('<p class="eyebrow">How it works</p>')
-    A('<h1>Two builds, one comparison harness.</h1>')
-    A('<p class="sub">The diagram below is the SEC round: filings chunked, entities and '
-      'relations extracted by an LLM in two passes, canonicalised into a curated graph, then '
-      'three pipelines judged blind. The enterprise build reuses the harness and replaces the '
-      'expensive half — see the note under the diagram.</p>')
-    A('<figure class="arch">'
-      '<img src="architecture-sec.png" alt="End-to-end architecture: SEC filings corpus, '
-      'two-phase Gemini extraction into a curated knowledge graph, TigerGraph Savanna as '
-      'graph and vector store, the three pipelines, and the blind judging layer." '
-      'loading="lazy">'
-      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in four ways that '
-      'matter — see below.</figcaption></figure>')
-    A(callout(
-        '<b>What the enterprise build does differently.</b> Four things in that diagram do '
-        'not apply to it. <b>No extraction:</b> every document already names its author, its '
-        'channel and its project, so 128,282 provenance edges came from metadata fields at '
-        'zero LLM cost and 100% coverage — there is no two-phase Gemini pass and no '
-        'canonicalisation step. <b>No ChromaDB:</b> TigerGraph Savanna is the vector store '
-        'for <i>both</i> retrieval arms, which is what removes the vector store as a '
-        'variable. The graph is <code>enterprise</code>, not <code>finance</code>, and the '
-        'judge is gemini-3.1-pro-preview rather than gpt-4o-mini.'))
-    A(callout(
-        '<b>The baseline retrieves through TigerGraph too.</b> Both arms use the same vector '
-        'store, the same embedder and the same corpus, so the only difference between them is '
-        'whether the graph is consulted. And the baseline is the <i>reranked</i> one — a '
-        'cross-encoder over a 200-candidate pool, which took it from 0.30 to 0.53 set-F1 at the '
-        'same token cost. Beating a weak baseline would prove nothing.'))
-
-    # ---- per question
     A('</section><section>')
     A('<p class="eyebrow">The full working</p>')
     A('<h1>Every question, every verdict.</h1>')
-    A('<p class="sub">Including the ones the graph loses. PART means partially correct — some '
-      'of the gold set returned, not all.</p>')
-    A('<h2>EnterpriseRAG-Bench — 50 questions</h2>')
+    A('<p class="sub">PART means partially correct \u2014 some of the gold set returned, '
+      'not all.</p>')
+    A('<h2>EnterpriseRAG-Bench \u2014 50 questions</h2>')
     A(dataset_card('enterprise'))
     A(per_question(ent, ENT_ARMS))
-    A('<h2>SEC filings — 50 questions</h2>')
-    A(dataset_card('sec'))
-    A(per_question(sec, SEC_ARMS))
-    A(callout(
-        '<b>‡</b> marks a gold answer the dataset authors flagged as non-exhaustive — the '
-        'listed companies are correct but the set may be incomplete, so an answer naming an '
-        'unlisted-but-valid company is not necessarily wrong. Three questions carry it '
-        '(EQ32, EQ33, EQ34) and all three are scored the same way as the rest, which means '
-        'those three understate every arm.'))
-
-    # ---- what we do not claim
     A('</section><section>')
     A('<p class="eyebrow">Limits</p>')
     A('<h1>What this does not show.</h1>')
     A(callout(
-        '<b>All 50 enterprise questions are relationship traversals</b> — the shape a graph is '
-        'built for. The answer key was computed BY traversal and then independently re-derived '
-        'from 20,364 raw documents (30/30) to check it was correct — but correct is not the same '
-        'as unbiased, and the question set favours the graph by construction. The SEC tab is the '
-        'honest counterweight: same architecture, and it loses single-fact lookup by 38 points.'))
+        '<b>All 50 questions here are relationship traversals</b> \u2014 the shape a graph is '
+        'built for. The answer key was computed BY traversal and then independently '
+        're-derived from 20,364 raw documents (30/30) to check it was correct \u2014 but '
+        'correct is not the same as unbiased, and the question set favours the graph by '
+        'construction. The Factual tab is the counterweight: same architecture, and it loses '
+        'single-fact lookup by 38 points.'))
     A(callout(
         '<b>Chunk overlap is 0, not the configured 200.</b> The corpus builder ignores the '
-        'setting, so facts spanning a chunk boundary are unreachable — and this penalises the '
-        'baseline only, since GraphRAG does not read chunks on a graph route. An asymmetry that '
-        'favours the system under test, disclosed rather than fixed.'))
+        'setting, so facts spanning a chunk boundary are unreachable \u2014 and this '
+        'penalises the baseline only, since GraphRAG does not read chunks on a graph route. '
+        'An asymmetry that favours the system under test, disclosed rather than fixed.'))
     A(callout(
-        '<b>Single run for the published configuration</b>, no mean ± std. Two runs exist at a '
-        'neighbouring config and moved by one question. Ablations (graph off / router off / '
-        'compression off) and a citation-validity judge are not run — and citations are '
-        'therefore <i>not</i> evidence anywhere on this page: LLM-only emitted '
-        '<code>Citations: [1],[2],[3]</code> having been given no context at all.'))
-
+        '<b>Single run for the published configuration</b>, no mean \u00b1 std. Two runs exist '
+        'at the 10-chunk budget and moved by one question. Ablations and a citation-validity '
+        'judge are not run.'))
+    A('</section></div>')
     A('<div class="foot-note">Every figure on this page is computed from '
       '<code>results/enterprise/*.jsonl</code> by <code>demo/build_report.py</code> at build '
       'time. None are typed by hand.</div>')

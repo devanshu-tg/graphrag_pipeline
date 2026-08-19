@@ -1,0 +1,64 @@
+﻿The 3 pipelines:
+* LLM - base case, this should fail else there is no need for enhanced retrieval
+* RAG - similarity search using ChromaDB, optimized or un-optimized?  
+   * Confirm if RAG pipeline is optimized and if so how
+   * Apple to Apple
+* GraphRAG - deterministic router to determine retrieval methods, optimized - filtering, re-ranking, pack & compress
+* Chunks comparison - Textual data
+   * 10 chunks equal comparison
+   * 10 vs 3 chunks comparison
+   * 3 vs 3 chunks comparison
+* Dataset
+   * Need details
+      * Data type
+      * Data size
+      * How is the graph created
+         * Entities, relationships
+         * Chunks
+         * Chunking strategy
+   * Could the routing be implemented with LLM 
+   * Explain the difference between the dataset
+      * Corpus
+      * Data size
+      * Number of edges & nodes
+      * Chunking strategy
+Show the 4 question tiers - 
+* Aggregation tier was the only tier that did not start/seed with similarity search
+* Validate with MasterCard:
+   * The router and seed per question type
+   * Is there hybrid approach or is it always similarity or entity linking
+   * Could Temporal and Comparison start with Entity linking seed
+
+
+Issue 
+  
+
+Need better visual for the question tiers
+  
+
+
+
+
+
+Validate with MasterCard if this is correct
+
+
+  
+
+
+
+How to interpret this chart
+
+
+  
+
+
+
+How do you interpret this chart
+
+
+  
+
+
+
+Why so many question failures?  Can we improve on this?  Also, can we use Gemini flash 3.7 instead of 2.5
