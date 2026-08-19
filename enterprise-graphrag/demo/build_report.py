@@ -84,6 +84,22 @@ def callout(body_html: str) -> str:
     return f'<div class="note">{body_html}</div>'
 
 
+def drops(*items: tuple[str, str]) -> str:
+    """A stack of collapsed caveats: (summary, body_html) pairs.
+
+    The notes stay in the page verbatim — nothing is deleted or softened, because several of
+    them are the reason a number can be trusted (corrected rubrics, wrong gold answers,
+    contamination). They are merely closed, so the tables read as tables instead of being
+    separated by six paragraphs of qualification.
+    """
+    out = ['<div class="drops">']
+    for summary, body in items:
+        out.append(f'<details class="drop"><summary>{summary}</summary>'
+                   f'<div class="body">{body}</div></details>')
+    out.append('</div>')
+    return "".join(out)
+
+
 def _split_label(n: str) -> tuple[str, str]:
     """A label may carry its context budget after a newline: "GraphRAG\n3 chunks"."""
     name, _, note = n.partition(chr(10))
@@ -267,6 +283,10 @@ section{border-top:1px solid var(--line);margin-top:3.6rem;padding-top:2.6rem}
 section:first-of-type{border-top:0;margin-top:0;padding-top:0}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1rem;margin:0 0 1rem}
+/* The KPI cards now head the page on their own, outside the console panel that used to frame
+   them. Without that frame they need their own breathing room and no trailing gap. */
+.statsonly{margin:1.4rem 0 0}
+.statsonly .stats{margin:0}
 .stat{border:1px solid var(--line);border-radius:10px;padding:1.15rem 1.25rem;background:var(--bg)}
 .stat .big{font-size:1.95rem;font-weight:660;letter-spacing:-.03em;font-family:var(--mono);
   color:var(--win);line-height:1.1}
@@ -307,6 +327,25 @@ td.barcell{position:relative;min-width:190px}
 .note code{font-family:var(--mono);font-size:.92em;background:#eef0f3;padding:.08em .32em;
   border-radius:3px}
 .note.warn{border-left-color:var(--p2)}
+
+/* Collapsed caveats. The prose is the honest part of this page — every one of these notes
+   exists because a number needed qualifying — but eight stacked notes between a table and the
+   next table buries the tables. Closed by default, one click to read, nothing removed. */
+.drops{margin:1.1rem 0 0;display:flex;flex-direction:column;gap:.4rem}
+.drop{background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  border-left:3px solid var(--p3)}
+.drop>summary{cursor:pointer;padding:.6rem .9rem;font-size:.82rem;font-weight:600;
+  color:var(--ink);list-style:none;display:flex;align-items:center;gap:.5rem}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary::before{content:"+";font-family:var(--mono);font-weight:700;color:var(--p3);
+  width:.8em;flex:none}
+.drop[open]>summary::before{content:"\2212"}
+.drop>summary:hover{color:var(--p3)}
+.drop .body{padding:0 .9rem .8rem;font-size:.85rem;color:var(--ink2);line-height:1.55}
+.drop .body b{color:var(--ink)}
+.drop .body code{font-family:var(--mono);font-size:.92em;background:#eef0f3;
+  padding:.08em .32em;border-radius:3px}
+.drop .body>*+*{margin-top:.6rem}
 
 .pill{display:inline-block;font-family:var(--mono);font-size:.68rem;font-weight:600;
   padding:.16rem .45rem;border-radius:4px;letter-spacing:.04em}
@@ -462,11 +501,19 @@ a{color:var(--p3)}
 """
 
 
+# The headline numbers, split out of the console so they can head the page as "overall
+# performance" while the interactive console sits lower, after the scorecard and the corpus.
+# Still ONE #dsStats element — the JS fills it by id and does not care where it lives.
+STATS_PANEL = """
+<div class="statsonly">
+  <div class="stats" id="dsStats"></div>
+</div>
+"""
+
 CONSOLE = """
 <div class="console">
   <div class="chead"><h3 id="askHead">Query console</h3>
     <span class="hint" id="askHint"></span></div>
-  <div class="stats" id="dsStats"></div>
   <div class="ask">
     <input type="text" id="q" autocomplete="off" placeholder="Ask something about the company...">
     <button class="run" id="go">Run</button>
@@ -656,8 +703,11 @@ document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Ente
 // Page tabs drive everything: which pane is visible, and which dataset the console serves.
 // One console, moved by nobody - two would mean duplicate element ids and dead handlers.
 function setTab(v){
-  document.getElementById("paneF").hidden = v !== "factual";
-  document.getElementById("paneT").hidden = v !== "textual";
+  // Each dataset owns TWO pane blocks, not one: the shared query console sits between them so
+  // it lands 4th on the page (after scorecard and corpus) while still being a single element
+  // with a single set of ids. querySelectorAll keeps both halves in step.
+  document.querySelectorAll(".pane-factual").forEach(p => p.hidden = v !== "factual");
+  document.querySelectorAll(".pane-textual").forEach(p => p.hidden = v !== "textual");
   document.getElementById("tabF").className = "tab" + (v==="factual" ? " on" : "");
   document.getElementById("tabT").className = "tab" + (v==="textual" ? " on" : "");
   setView(v);
@@ -675,7 +725,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT.parent / "docs" / "index.html"))
     ap.add_argument("--live-url", default="",
-                    help="backend base URL; omit for a replay-only build")
+                    help="backend base URL, or 'same-origin' to call whatever host served the "
+                         "page (recommended: live under demo/server.py, replay when static); "
+                         "omit for a replay-only build")
     ap.add_argument("--live-token", default="",
                     help="X-Demo-Token value; it ends up in the published page")
     args = ap.parse_args()
@@ -747,37 +799,32 @@ def main() -> int:
       '<button class="tab on" id="tabF">Factual \u00b7 SEC</button>'
       '<button class="tab" id="tabT">Textual \u00b7 Enterprise</button>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
-    # ---- console, above both datasets because it serves both
+    # ---- OVERALL PERFORMANCE: headline + the two KPI cards. The interactive console used to
+    # sit here, which meant the page opened with an empty input box before the reader had seen
+    # a single result. The numbers lead; the console is 4th, once the scorecard and the corpus
+    # have earned it.
     A('<section>')
-    A('<p class="eyebrow">Run it yourself</p>')
+    A('<p class="eyebrow">Overall performance</p>')
     A('<h1>Ask a question. Three pipelines, side by side.</h1>')
     A('<p class="sub">Three pipelines, the same question, side by side, each graded against a '
-      'verified answer key. Every question and every verdict — wins and losses — is in '
+      'verified answer key. Every question and every verdict \u2014 wins and losses \u2014 is in '
       'the per-question tables further down.</p>')
-    A(CONSOLE)
-    A(callout(
-        '<b>Every question above has a verified answer key</b>, so the console grades each '
-        'reply rather than leaving you to judge it. With a backend configured it runs all '
-        'three pipelines live; without one it replays the recorded run — the same measured '
-        'answer either way, and the card says <code>recorded</code> when that is what '
-        'happened.'))
+    A(STATS_PANEL)
     A('</section>')
-    A('<div class="pane" id="paneF">')
-    # ---- generalisation
+    A('<div class="pane pane-factual" id="paneF">')
+    # ---- SCORECARD FIRST. The result is what the reader came for; the corpus description and
+    # the architecture explain it afterwards. Previously the numbers sat below a data-overview
+    # table, so the first thing on the page was a description of the corpus rather than the
+    # finding.
     A('<section>')
-    A('<p class="eyebrow">SEC 10-K / DEF 14A filings · 50 questions · 100 S&amp;P-100 companies '
-      '· different corpus, different schema, real entities</p>')
-    A('<h1>Generalization to real filings — including where the graph loses.</h1>')
-    A('<p class="sub">A second corpus with none of the first one\'s properties: real companies '
-      'the model has already read, extraction-built rather than metadata-built, numbers rather '
-      'than name sets. Run under a corrected config — 8,192-token budget and no-refusal prompt '
-      'applied to <i>all</i> arms, both of which raised the baseline too.</p>')
-
-    A(dataset_card('sec'))
-
     A('<h2>Scorecard</h2>')
+    A('<p class="budgetline">SEC 10-K / DEF 14A filings &middot; 50 questions &middot; '
+      '100 S&amp;P-100 companies. Real entities the model has already read &mdash; which is '
+      f'why LLM-only scores {S["p1"]["judge"]:.1f}% here with no retrieval at all, against '
+      f'{E["p1"]["judge"]:.1f}% on the fictional corpus.</p>')
     A(scorecard(SEC_ARMS, S, sec_metrics))
-    A(callout(
+    A(drops(
+        ('Two scoring changes, applied to all three arms &mdash; and every arm gained',
         '<b>Two scoring changes, applied to all three arms.</b> First, the rubric was '
         'corrected: it had been penalising answers for omitting <i>derived</i> detail — '
         'gold written as "$57,048M (~$57.0B), down 2% YoY" against an answer of '
@@ -787,35 +834,107 @@ def main() -> int:
         'weakest gained most</b> — LLM-only +3.6, Basic RAG +2.1, GraphRAG +0.9 — '
         'so the gap over the baseline narrowed, which is the evidence the change was not '
         'bent in our favour. A third, more lenient rubric was built and <b>rejected</b>: it '
-        'scored 100 to answers reciting real figures from the wrong fiscal year.'))
-    A(callout(
+        'scored 100 to answers reciting real figures from the wrong fiscal year.'),
+        ('Two gold answers were wrong, and are corrected here',
         '<b>Two gold answers were wrong and are corrected here.</b> EQ25 and EQ37 omitted '
         'Citigroup from the KPMG-audited list. The corpus is explicit — '
         '<code>&quot;/s/ KPMG LLP &mdash; auditor since 1969&quot;</code>, '
         'across 20 Citigroup chunks. All three arms had listed it and all three were marked '
         'down for being more complete than the key. Correcting it gained GraphRAG 2 and the '
         'baseline 1. The frozen answer key on disk is not edited; the correction lives in '
-        '<code>build/make_sec_published.py</code>.'))
-
-    A(callout(
+        '<code>build/make_sec_published.py</code>.'),
+        ('Contamination is visible here and absent on the enterprise set',
         f'<b>Contamination is visible here and absent on the enterprise set.</b> With no '
         f'retrieval at all, LLM-only scores {S["p1"]["judge"]:.0f}% on real filings and '
         f'{E["p1"]["judge"]:.1f}% on the fictional corpus. The model has read these filings. '
-        f'That is why the enterprise result is the one to trust — and why the leak gate matters.'))
-
-    A(callout(
+        f'That is why the enterprise result is the one to trust — and why the leak gate matters.'),
+        ('The judge inflates every arm here',
         '<b>The judge inflates every arm here.</b> It awarded 75% to '
         '<code>Walmart $611,289M; Apple $383,285M</code> when gold was $713.2B and $416.2B — '
         'real figures from the wrong fiscal year. For financial QA a wrong number is a wrong '
-        'answer, so <b>strict pass is the figure to trust</b>, not the percentage.'))
-
-    A(callout(
+        'answer, so <b>strict pass is the figure to trust</b>, not the percentage.'),
+        ('The graph wins the hardest tier and loses the easiest',
         '<b>The graph wins the hardest tier and loses the easiest.</b> On aggregation it is '
         '12/20 against 3/20 — four times the baseline. On single lookup it is 4/8 against 7/8: '
         'for one number in one filing, vector retrieval is simply the better tool and the '
         'planner call is wasted overhead. <b>A system that wins everything is a system that '
-        'has not been tested properly.</b>'))
+        'has not been tested properly.</b>')
+    ))
 
+    # ---- the corpus itself, after the result it produced
+    A('</section><section>')
+    A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
+    A('<h1>Generalization to real filings \u2014 including where the graph loses.</h1>')
+    A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
+    A(dataset_card('sec'))
+
+    A('</section></div>')
+    A('<div class="pane pane-textual" id="paneT" hidden>')
+    # ---- SCORECARD FIRST, same reasoning as the factual pane above.
+    A('<section>')
+    A('<h2>Scorecard</h2>')
+    A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
+      '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
+      f'GraphRAG still answers {E["p3"]["strict"]}/{E["p3"]["n"]} against '
+      f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} for '
+      f'<b>{100.0*(E["p2rr"]["tok"]-E["p3"]["tok"])/E["p2rr"]["tok"]:.1f}% fewer tokens</b>.</p>')
+    A(scorecard(ENT_ARMS, E, ent_metrics))
+    A(drops(
+        ('Read strict pass, not the judge',
+        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
+        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
+        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
+        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
+        f'is the number of record.'),
+        ('The budgets are deliberately unequal, in the baseline&rsquo;s favour',
+        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
+        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
+        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
+        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
+        f'at a 3-chunk budget.'),
+        ('A fixed share of GraphRAG&rsquo;s tokens is the planner call',
+        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
+        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
+        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
+        f'a number to leave out.'),
+        ('BERTScore is shown and is not the number of record',
+        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
+        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
+        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
+        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
+        f'already know the answer is not evidence.'),
+        ('This is the whole result &mdash; the only variable is whether the question needs a join',
+        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
+        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
+        'questions. The only variable is whether the question needs a join. Five of those 20 '
+        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
+        'fixes that, because nothing puts 1,065 documents into 10 slots.')
+    ))
+
+    # ---- the corpus, after the result
+    A('</section><section>')
+    A('<p class="eyebrow">EnterpriseRAG-Bench 20k \u00b7 50 questions \u00b7 20 single-doc / 10 directory / 20 multi-hop \u00b7 single run</p>')
+    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
+    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store \u2014 so does the baseline, which removes the vector store as a variable.</p>')
+    A(dataset_card('enterprise'))
+
+    A('</section></div>')
+    # ---- QUERY CONSOLE, 4th on the page. Shared by both datasets, so it lives BETWEEN the two
+    # halves of each pane rather than inside them: two consoles would mean duplicate element ids
+    # and one of them silently dead.
+    A('<section>')
+    A('<p class="eyebrow">Run it yourself</p>')
+    A('<h2>Query console \u2014 query specific</h2>')
+    A(CONSOLE)
+    A(callout(
+        '<b>Every question below has a verified answer key</b>, so the console grades each '
+        'reply rather than leaving you to judge it. With a backend configured it runs all '
+        'three pipelines live; without one it replays the recorded run \u2014 the same measured '
+        'answer either way, and the card says <code>recorded</code> when that is what '
+        'happened.'))
+    A('</section>')
+    A('<div class="pane pane-factual" id="paneF2">')
+    A('<section>')
     # ---- architecture
     A('</section><section>')
     A('<p class="eyebrow">How it works</p>')
@@ -877,63 +996,8 @@ def main() -> int:
         'evidence anywhere on this page: LLM-only emitted <code>Citations: [1],[2],[3]</code> '
         'having been given no context at all.'))
     A('</section></div>')
-    A('<div class="pane" id="paneT" hidden>')
-    # ---- enterprise
+    A('<div class="pane pane-textual" id="paneT2" hidden>')
     A('<section>')
-    A(f'<p class="eyebrow">EnterpriseRAG-Bench 20k · 50 questions · '
-      f'20 single-doc / 10 directory / 20 multi-hop · single run</p>')
-    A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
-    A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator '
-      '(gemini-3.6-flash), same embedder (bge-small-en-v1.5), same blind judge '
-      '(gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph '
-      '<i>and</i> vector store — so does the baseline, which removes the vector store as a '
-      'variable.</p>')
-
-    A(dataset_card('enterprise'))
-
-
-    A('<h2>Scorecard</h2>')
-    A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
-      '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
-      f'GraphRAG still answers {E["p3"]["strict"]}/{E["p3"]["n"]} against '
-      f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} for '
-      f'<b>{100.0*(E["p2rr"]["tok"]-E["p3"]["tok"])/E["p2rr"]["tok"]:.1f}% fewer tokens</b>.</p>')
-    A(scorecard(ENT_ARMS, E, ent_metrics))
-
-    A(callout(
-        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
-        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
-        f'the baseline: Basic RAG scores {E["p2rr"]["judge"]:.1f}% judged but only '
-        f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]} exactly right. Where the two disagree, strict '
-        f'is the number of record.'))
-
-    A(callout(
-        f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
-        f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
-        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
-        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
-        f'at a 3-chunk budget.'))
-
-    A(callout(
-        f'<b>{E["p3"]["plan"]:,.0f} of GraphRAG\'s {E["p3"]["tok"]:,.0f} tokens are the planner '
-        f'call</b> — {100*E["p3"]["plan"]/E["p3"]["tok"]:.0f}% of its spend, and a fixed cost '
-        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
-        f'a number to leave out.'))
-
-    A(callout(
-        f'<b>BERTScore is shown and is not the number of record.</b> Here it happens to rank the '
-        f'arms correctly ({E["p1"]["bert"]:.3f} / {E["p2rr"]["bert"]:.3f} / {E["p3"]["bert"]:.3f}). '
-        f'On the SEC set it put LLM-only <i>above</i> Basic RAG (0.839 vs 0.830) while LLM-only '
-        f'got 5 of 50 right — it rewards fluent wrong answers. A metric that only works when you '
-        f'already know the answer is not evidence.'))
-
-    A(callout(
-        '<b>This is the whole result.</b> Basic RAG gets <b>0 of 20</b> exactly right on '
-        'multi-hop and <b>10 of 10</b> on directory lookups — same corpus, same model, same '
-        'questions. The only variable is whether the question needs a join. Five of those 20 '
-        'questions require combining 102–1,065 documents against a 10-chunk budget: no reranker '
-        'fixes that, because nothing puts 1,065 documents into 10 slots.'))
-
     # ---- equal budget + held out
     A('</section><section>')
     A('<p class="eyebrow">Fairness and overfitting controls</p>')
@@ -948,33 +1012,39 @@ def main() -> int:
         e5_2, e5_3 = agg(eq5, "p2rr"), agg(eq5, "p3")
         gap5 = abs(100 * (e5_3['tok'] - e5_2['tok']) / e5_2['tok'])
         A('<h2>Equal budget \u2014 5 chunks each, main 50 questions</h2>')
-        A(callout(
+        A(drops(
+        ('Why this is the cleanest comparison on the page',
             f'<b>The cleanest comparison on this page.</b> Both arms read 5 chunks, both '
             f'cost about {e5_2["tok"]:,.0f} tokens \u2014 {gap5:.0f}% apart \u2014 and '
             f'GraphRAG gets {e5_3["strict"]}/{e5_3["n"]} against '
             f'{e5_2["strict"]}/{e5_2["n"]}. Identical budget, identical cost, nearly twice '
-            f'the accuracy. Nothing is starved and nothing is favoured.'))
+            f'the accuracy. Nothing is starved and nothing is favoured.')
+    ))
         A(scorecard([("p2rr", "Basic RAG"), ("p3", "GraphRAG")],
                     {"p2rr": e5_2, "p3": e5_3},
                     [("Strict pass (exact)", "strict", frac, "hi"),
                      ("Blind LLM judge", "judge", pct, "hi"),
                      ("Tokens / question", "tok", tok, "lo")]))
-        A(callout(
+        A(drops(
+        ('Two things this exposes about both arms',
             f'<b>Two things this exposes.</b> The baseline barely uses its 10-chunk budget: '
             f'cutting it to 5 costs one question (26 to {e5_2["strict"]}) while halving its '
             f'tokens, so those five extra chunks were nearly free to give and nearly '
             f'worthless to have. And GraphRAG\'s cost is almost flat across budgets '
             f'({e5_3["tok"]:,.0f} at 5 chunks, 2,733 at 3) \u2014 its context is mostly '
             f'provenance sentences and a character cap binds before the slots do, which is '
-            f'why the {e5_3["plan"]:,.0f}-token planner call is now the dominant cost.'))
+            f'why the {e5_3["plan"]:,.0f}-token planner call is now the dominant cost.')
+    ))
 
     if ra:
         A('<h2>Equal budget \u2014 10 chunks each, main 50 questions</h2>')
-        A(callout(
+        A(drops(
+        ('Same context, same token cost — and the gap is unchanged',
             '<b>Same context, same token cost, and the accuracy gap is unchanged.</b> Neither arm '
             'is starved and neither is favoured, which makes this the cleanest single comparison '
             'on the page. The 49% saving is a <i>separate</i> claim, measured by giving GraphRAG '
-            'less \u2014 not by giving the baseline less.'))
+            'less \u2014 not by giving the baseline less.')
+    ))
         rb2 = agg(rep_a, "p2rr")
         A(scorecard([("p2rr", "Basic RAG"), ("p3", "GraphRAG")],
                     {"p2rr": rb2, "p3": ra},
@@ -984,12 +1054,14 @@ def main() -> int:
 
     if H.get("p3"):
         A('<h2>Equal budget \u2014 10 chunks each, held-out questions</h2>')
-        A(callout(
+        A(drops(
+        ('A different question set, never developed against',
             '<b>A different question set, generated from a different seed, never developed '
             'against.</b> 103 source entities were excluded and the generator was gated on '
             'reproducing the original answer key before it was allowed to write. Same equal-budget '
             'setup, same outcome \u2014 which is the test that caught overfitting on the SEC '
-            'round, where the ranking reversed.'))
+            'round, where the ranking reversed.')
+    ))
         A(scorecard([("p2rr", "Basic RAG"), ("p3", "GraphRAG")], H,
                     [("Strict pass (exact)", "strict", frac, "hi"),
                      ("Blind LLM judge", "judge", pct, "hi"),
@@ -1077,9 +1149,17 @@ def main() -> int:
     print(f"  console offers {len(json.loads(passing_js)['textual'])} enterprise + "
           f"{len(json.loads(passing_js)['factual'])} SEC questions (GraphRAG passes only)")
 
+    # "same-origin" emits a JS EXPRESSION, not a string literal, so the page asks whatever host
+    # served it. That is the only value that is correct in both places this file gets served
+    # from: under demo/server.py the console goes genuinely live with no CORS and no token
+    # (loopback is gate-exempt), and on a static host /api/query simply 404s and the existing
+    # fallback replays the recorded run. A hardcoded URL is correct in neither for long — the
+    # tunnel baked in previously had died, so every "live" query silently replayed instead.
+    live_url_js = ("location.origin" if args.live_url in ("same-origin", ".")
+                   else json.dumps(args.live_url.rstrip('/')))
     js = (CONSOLE_JS.replace('__PASSING__', passing_js)
                     .replace('__STATS__', stats_js)
-                    .replace('__LIVE_URL__', json.dumps(args.live_url.rstrip('/')))
+                    .replace('__LIVE_URL__', live_url_js)
                     .replace('__LIVE_TOKEN__', json.dumps(args.live_token)))
     doc = (f'<title>GraphRAG evaluation — scorecard</title>\n<style>{CSS}</style>\n'
            + "\n".join(H1) + js)
