@@ -1,0 +1,35 @@
+{
+  "p1": {
+    "exact": 1,
+    "n": 10,
+    "recall": 0.1,
+    "precision": 0.1,
+    "f1": 0.1,
+    "prompt": 260.3,
+    "completion": 4.6,
+    "planner": 0,
+    "total": 264.9
+  },
+  "p2rr": {
+    "exact": 3,
+    "n": 10,
+    "recall": 0.38333,
+    "precision": 0.5,
+    "f1": 0.41667,
+    "prompt": 4682.2,
+    "completion": 3.5,
+    "planner": 0,
+    "total": 4685.7
+  },
+  "p3": {
+    "exact": 10,
+    "n": 10,
+    "recall": 1.0,
+    "precision": 1.0,
+    "f1": 1.0,
+    "prompt": 1196,
+    "completion": 6.7,
+    "planner": 1386,
+    "total": 2588.7
+  }
+}
