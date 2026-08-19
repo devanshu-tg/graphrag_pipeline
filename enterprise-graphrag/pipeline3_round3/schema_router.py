@@ -103,6 +103,17 @@ PLAN_PROMPT = (
     '     legs [{{"Legal team", [in_team:in]}}, {{"Q3 offsite", [attended:in]}}],\n'
     '     combine intersect, tail []\n'
     '     (each seed reaches PEOPLE by a different route, so each leg has its own path)\n\n'
+    "Choosing BETWEEN relations that both look plausible:\n"
+    "- Match the question's own verb. 'involving', 'mentions', 'takes part in', 'appears in' "
+    "are BROAD participation. 'wrote', 'authored', 'created' are narrow authorship. They are "
+    "not interchangeable: authorship is a special case of participation.\n"
+    "- Each relation shows the share of documents it covers. When two relations could both "
+    "answer the question, prefer the one with HIGHER coverage unless the question explicitly "
+    "asks for the narrower one.\n"
+    "- This matters most with 'intersect'. A narrow relation intersected across two different "
+    "people is usually EMPTY — two people rarely both author the same document, though they "
+    "routinely both take part in one. An empty result answers nothing, so when the question "
+    "asks what two people have in common, choose the relation they can genuinely share.\n\n"
     "Rules:\n"
     "- Use ONLY relation names from the list above. Never invent one.\n"
     "- Seeds are entities NAMED IN THE QUESTION, spelled as the question spells them.\n"
@@ -139,8 +150,13 @@ def plan(question: str, get_llm_response) -> dict:
     since P3 then falls back to plain vector search.
     """
     rels = graph_relations()
+    # Coverage is shown because the planner cannot otherwise tell a broad relation from a
+    # narrow one, and picking the narrow one under 'intersect' returns an empty set: measured on
+    # five questions of the form "channels containing documents involving both X and Y", where
+    # `authored` (33% coverage) intersected to nothing every time while `participated_in` (89%)
+    # returned the gold answer exactly. Same failure shape, one wrong relation.
     listing = "\n".join(
-        f"  {r['relation']}"
+        f"  {r['relation']}  [covers {100 * r.get('coverage', 0):.0f}% of documents]"
         + (f"   e.g. ({_short(r['example_sources'][0])}) -> ({_short(r['example_targets'][0])})"
            if r["example_sources"] and r["example_targets"] else "")
         for r in rels)
