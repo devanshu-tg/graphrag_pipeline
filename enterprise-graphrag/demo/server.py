@@ -481,6 +481,70 @@ def factual_live(question: str) -> dict | None:
         return None
 
 
+# ---------------------------------------------------------------- live SEC judging
+# The SEC tab could not show an accuracy figure, for a concrete reason: _grade() below is a
+# substring matcher over a set of names, and these gold answers are numbers written as prose.
+# "$416,161M (~$416.2B)" against a correct "$416,161 million" normalises to "416161m4162b" vs
+# "416161million" — no substring, score 0.0. Every right answer would be marked wrong, which is
+# why demo/build_static.py passes grade=False for this tab.
+#
+# The fix is the rubric that produced the PUBLISHED column, not a new one. build/judge_sec.py
+# patches llm_judge.RUBRIC to treat units, separators, abbreviation and sensible rounding as
+# equivalent; the same patch is applied here so a live verdict and the published table are
+# scored by identical rules. The judge is gemini-3.1-pro-preview — a different family from the
+# generator, so it stays blind.
+#
+# Costs one extra call per arm (~1-3s). SEC_JUDGE=0 turns it off and restores the em-dash.
+SEC_JUDGE = os.getenv("SEC_JUDGE", "1") != "0"
+_judge_mod = None
+
+
+def _sec_judge():
+    """Import llm_judge once, pinned to the v2 rubric. None if unavailable.
+
+    v2 is the rubric the PUBLISHED SEC column was scored under, and it exists for exactly the
+    complaint this tab produced: v1 penalised answers for omitting DERIVED detail. Gold is
+    written "$57,048M (~$57.0B), down 2% YoY" — one fact plus two annotations of it — and the
+    question only asked for net income. v1 scored the correct "$57,048 million" at 0.85/0.95 for
+    missing an annotation nobody asked for; v2 states outright that a restated unit, a bracketed
+    approximation and a year-on-year change are annotations, not required facts.
+
+    Set through the environment because llm_judge._rubric() reads LLM_JUDGE_RUBRIC per call —
+    patching RUBRIC (v1) instead, as this first did, leaves v1 selected and the bug in place.
+    """
+    global _judge_mod
+    if _judge_mod is not None or not SEC_JUDGE:
+        return _judge_mod
+    try:
+        os.environ.setdefault("LLM_JUDGE_RUBRIC", "v2")
+        import llm_judge
+        print(f"[sec-judge] {llm_judge.JUDGE_MODEL}, rubric="
+              f"{os.getenv('LLM_JUDGE_RUBRIC')} (same rubric as the published column)")
+        _judge_mod = llm_judge
+    except Exception as e:
+        print(f"[sec-judge] unavailable, accuracy will stay blank: {e}")
+        _judge_mod = None
+    return _judge_mod
+
+
+def _judge_factual(out: dict, question: str, gold: str) -> None:
+    """Attach a grade to each arm, in place. Fails soft: no grade means the card shows an
+    em-dash, which is what it did before — never a fabricated number."""
+    j = _sec_judge()
+    if not j or not gold:
+        return
+    out["gold"] = gold
+    for r in out.get("results", []):
+        try:
+            score, why = j.judge_one(question, gold, r.get("answer", "") or "")
+            if score < 0:                      # judge itself failed; stay silent
+                continue
+            r["grade"] = {"score": round(score / 100.0, 2), "why": why,
+                          "found": [], "missed": [], "wrong": [], "judged": True}
+        except Exception as e:
+            print(f"[sec-judge] {r.get('arm')}: {e}")
+
+
 def factual_query(question: str) -> dict:
     # Use the live worker ONLY if every arm succeeded. A partial live result — two good
     # answers and an error card — is worse on stage than a clean replay, and right now
@@ -490,6 +554,15 @@ def factual_query(question: str) -> dict:
     if live and live.get("results") and not any(
             r.get("route") == "error" or str(r.get("answer", "")).startswith("ERROR:")
             for r in live["results"]):
+        # The worker returns answers only — no gold, no grade. Resolve the key from the frozen
+        # eval set and judge here, so the live tab reports accuracy under the same rubric the
+        # published column used.
+        qsl, _ = _sec_recorded()
+        hitl = next((qid for qid, qq in qsl.items()
+                     if qq["question"].strip().lower() == question.strip().lower()), None)
+        if hitl:
+            live["qid"] = hitl
+            _judge_factual(live, question, qsl[hitl].get("answer", ""))
         return live
     qs, ans = _sec_recorded()
     hit = next((qid for qid, q in qs.items()
@@ -510,7 +583,9 @@ def factual_query(question: str) -> dict:
                     "prompt_tokens": pt, "completion_tokens": ct, "planner_tokens": 0,
                     "tokens": pt + ct, "route": r.get("route", "") or "recorded",
                     "latency": r.get("latency_s", 0), "chunks": 0})
-    return {"results": out, "recorded": True, "qid": hit}
+    res = {"results": out, "recorded": True, "qid": hit}
+    _judge_factual(res, question, qs[hit].get("answer", ""))
+    return res
 
 
 _GOLD: dict | None = None
