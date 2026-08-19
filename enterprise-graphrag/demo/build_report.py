@@ -666,7 +666,7 @@ def main() -> int:
     args = ap.parse_args()
 
     ent = load("eval_pub50.jsonl")
-    sec = load("eval_sec_fair_prompt.jsonl")
+    sec = load("eval_sec_published.jsonl")   # v2 rubric + 2 corrected gold answers
     held = load("eval_v3fixed.jsonl")
     rep_a = load("eval_mixfixed.jsonl")
     rep_b = load("eval_mixfixed_r2.jsonl")
@@ -756,6 +756,25 @@ def main() -> int:
 
     A('<h2>Scorecard</h2>')
     A(scorecard(SEC_ARMS, S, sec_metrics))
+    A(callout(
+        '<b>Two scoring changes, applied to all three arms.</b> First, the rubric was '
+        'corrected: it had been penalising answers for omitting <i>derived</i> detail — '
+        'gold written as "$57,048M (~$57.0B), down 2% YoY" against an answer of '
+        '"$57,048 million", which is that fact exactly. The rubric now treats the same '
+        'number in another unit as identical, a ticker as a company name, and citations as '
+        'ignorable. It still does not forgive a missing fact. <b>Every arm gained and the '
+        'weakest gained most</b> — LLM-only +3.6, Basic RAG +2.1, GraphRAG +0.9 — '
+        'so the gap over the baseline narrowed, which is the evidence the change was not '
+        'bent in our favour. A third, more lenient rubric was built and <b>rejected</b>: it '
+        'scored 100 to answers reciting real figures from the wrong fiscal year.'))
+    A(callout(
+        '<b>Two gold answers were wrong and are corrected here.</b> EQ25 and EQ37 omitted '
+        'Citigroup from the KPMG-audited list. The corpus is explicit — '
+        '<code>&quot;/s/ KPMG LLP &mdash; auditor since 1969&quot;</code>, '
+        'across 20 Citigroup chunks. All three arms had listed it and all three were marked '
+        'down for being more complete than the key. Correcting it gained GraphRAG 2 and the '
+        'baseline 1. The frozen answer key on disk is not edited; the correction lives in '
+        '<code>build/make_sec_published.py</code>.'))
 
     A(callout(
         f'<b>Contamination is visible here and absent on the enterprise set.</b> With no '

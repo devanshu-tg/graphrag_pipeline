@@ -1,0 +1,193 @@
+{
+  "tag": "chunkmatrix",
+  "n": 50,
+  "questions": "datasets\\enterprise\\eval_mixed50.jsonl",
+  "model": "gemini-3.6-flash",
+  "temperature": 0.0,
+  "budgets": [
+    10,
+    3
+  ],
+  "workers": 6,
+  "knobs": {
+    "p2rr_k10": {
+      "RR_POOL": 50,
+      "RR_KEEP": 10,
+      "chars_per_item": 2000
+    },
+    "p3_k10": {
+      "MAX_CTX_CHUNKS": 10,
+      "VEC_SLOTS": 10,
+      "PROV_SLOTS": 5,
+      "RR_POOL": 50,
+      "chars_per_item": 2000
+    },
+    "p2rr_k3": {
+      "RR_POOL": 50,
+      "RR_KEEP": 3,
+      "chars_per_item": 2000
+    },
+    "p3_k3": {
+      "MAX_CTX_CHUNKS": 3,
+      "VEC_SLOTS": 3,
+      "PROV_SLOTS": 1,
+      "RR_POOL": 50,
+      "chars_per_item": 2000
+    }
+  },
+  "baseline": "pipeline2rr_rerank (cross-encoder, pool 50)",
+  "summary": {
+    "p2rr_k10": {
+      "n": 50,
+      "scored": 50,
+      "errors": 0,
+      "exact": 23,
+      "recall": 0.53133,
+      "precision": 0.606666,
+      "f1": 0.545046,
+      "prompt": 5403.78,
+      "completion": 4.9,
+      "planner": 0,
+      "total_tokens": 5408.68,
+      "items_in_context": 10,
+      "latency_s": 25.43532,
+      "graph_routed": 0,
+      "kind": "p2rr",
+      "budget": 10,
+      "by_tier": {
+        "single_doc": {
+          "n": 20,
+          "f1": 0.65,
+          "exact": 13,
+          "total_tokens": 6353.5
+        },
+        "single_dir": {
+          "n": 10,
+          "f1": 1.0,
+          "exact": 10,
+          "total_tokens": 2440.4
+        },
+        "multi_hop": {
+          "n": 20,
+          "f1": 0.212615,
+          "exact": 0,
+          "total_tokens": 5948
+        }
+      }
+    },
+    "p3_k10": {
+      "n": 50,
+      "scored": 50,
+      "errors": 0,
+      "exact": 50,
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "prompt": 4187.9,
+      "completion": 6.14,
+      "planner": 1187,
+      "total_tokens": 5381.04,
+      "items_in_context": 10,
+      "latency_s": 23.93392,
+      "graph_routed": 50,
+      "kind": "p3",
+      "budget": 10,
+      "by_tier": {
+        "single_doc": {
+          "n": 20,
+          "f1": 1.0,
+          "exact": 20,
+          "total_tokens": 7022.1
+        },
+        "single_dir": {
+          "n": 10,
+          "f1": 1.0,
+          "exact": 10,
+          "total_tokens": 2697.8
+        },
+        "multi_hop": {
+          "n": 20,
+          "f1": 1.0,
+          "exact": 20,
+          "total_tokens": 5081.6
+        }
+      }
+    },
+    "p2rr_k3": {
+      "n": 50,
+      "scored": 50,
+      "errors": 0,
+      "exact": 23,
+      "recall": 0.534664,
+      "precision": 0.606666,
+      "f1": 0.549332,
+      "prompt": 1749.78,
+      "completion": 4.66,
+      "planner": 0,
+      "total_tokens": 1754.44,
+      "items_in_context": 3,
+      "latency_s": 23.94802,
+      "graph_routed": 0,
+      "kind": "p2rr",
+      "budget": 3,
+      "by_tier": {
+        "single_doc": {
+          "n": 20,
+          "f1": 0.65,
+          "exact": 13,
+          "total_tokens": 2098.65
+        },
+        "single_dir": {
+          "n": 10,
+          "f1": 1.0,
+          "exact": 10,
+          "total_tokens": 621.5
+        },
+        "multi_hop": {
+          "n": 20,
+          "f1": 0.22333,
+          "exact": 0,
+          "total_tokens": 1976.7
+        }
+      }
+    },
+    "p3_k3": {
+      "n": 50,
+      "scored": 50,
+      "errors": 0,
+      "exact": 50,
+      "recall": 1.0,
+      "precision": 1.0,
+      "f1": 1.0,
+      "prompt": 1321.38,
+      "completion": 6.08,
+      "planner": 1187,
+      "total_tokens": 2514.46,
+      "items_in_context": 3,
+      "latency_s": 18.26938,
+      "graph_routed": 50,
+      "kind": "p3",
+      "budget": 3,
+      "by_tier": {
+        "single_doc": {
+          "n": 20,
+          "f1": 1.0,
+          "exact": 20,
+          "total_tokens": 2777.55
+        },
+        "single_dir": {
+          "n": 10,
+          "f1": 1.0,
+          "exact": 10,
+          "total_tokens": 1745.3
+        },
+        "multi_hop": {
+          "n": 20,
+          "f1": 1.0,
+          "exact": 20,
+          "total_tokens": 2635.95
+        }
+      }
+    }
+  }
+}
