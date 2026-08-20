@@ -1178,23 +1178,6 @@ def main() -> int:
         'an unlisted-but-valid company is not necessarily wrong. Three questions carry it '
         '(EQ32, EQ33, EQ34) and all three are scored like the rest, which means those three '
         'understate every arm.'))
-    A('</section><section>')
-    A('<p class="eyebrow">Limits</p>')
-    A('<h1>What this does not show.</h1>')
-    A(callout(
-        '<b>These companies are real and the model has read their filings.</b> LLM-only '
-        f'scores {S["p1"]["judge"]:.0f}% with no retrieval at all, so some of every arm\'s score here is memory '
-        'rather than retrieval. The enterprise tab is the clean measurement \u2014 fictional '
-        'company, 0.8% with no retrieval.'))
-    A(callout(
-        '<b>The judge is lenient on numbers.</b> It awarded 75% to two real figures from the '
-        'wrong fiscal year. For financial QA a wrong number is a wrong answer, so strict pass '
-        'is the figure of record here, not the percentage.'))
-    A(callout(
-        '<b>Single run, no mean \u00b1 std.</b> Ablations (graph off / router off / compression '
-        'off) and a citation-validity judge are not run \u2014 so citations are <i>not</i> '
-        'evidence anywhere on this page: LLM-only emitted <code>Citations: [1],[2],[3]</code> '
-        'having been given no context at all.'))
     A('</section></div>')
     A('<div class="pane pane-textual" id="paneT2" hidden>')
     A('<section>')
@@ -1319,25 +1302,6 @@ def main() -> int:
     A('<p class="sub">PART means partially correct \u2014 some of the gold set returned, '
       'not all.</p>')
     A(per_question(ent, ENT_ARMS))
-    A('</section><section>')
-    A('<p class="eyebrow">Limits</p>')
-    A('<h1>What this does not show.</h1>')
-    A(callout(
-        '<b>All 50 questions here are relationship traversals</b> \u2014 the shape a graph is '
-        'built for. The answer key was computed BY traversal and then independently '
-        're-derived from 20,364 raw documents (30/30) to check it was correct \u2014 but '
-        'correct is not the same as unbiased, and the question set favours the graph by '
-        'construction. The Factual tab is the counterweight: same architecture, and it loses '
-        'single-fact lookup by 38 points.'))
-    A(callout(
-        '<b>Chunk overlap is 0, not the configured 200.</b> The corpus builder ignores the '
-        'setting, so facts spanning a chunk boundary are unreachable \u2014 and this '
-        'penalises the baseline only, since GraphRAG does not read chunks on a graph route. '
-        'An asymmetry that favours the system under test, disclosed rather than fixed.'))
-    A(callout(
-        '<b>Single run for the published configuration</b>, no mean \u00b1 std. Two runs exist '
-        'at the 10-chunk budget and moved by one question. Ablations and a citation-validity '
-        'judge are not run.'))
     A('</section></div>')
     A('<div class="foot-note">Every figure on this page is computed from '
       '<code>results/enterprise/*.jsonl</code> by <code>demo/build_report.py</code> at build '
