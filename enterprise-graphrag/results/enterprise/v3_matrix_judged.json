@@ -1,0 +1,164 @@
+{
+ "_meta": {
+  "n": 50,
+  "questions": "datasets/enterprise/eval_final50_v3.jsonl",
+  "model": "gemini-3.7-flash",
+  "judge": "gemini-3.1-pro-preview",
+  "rubric": "v2",
+  "rr_pool": 500,
+  "temperature": 0.0,
+  "note": "per-tier judged run of the SAME 50 questions the scorecard reports; full = judge score 100, pct = mean judge score"
+ },
+ "rag3": {
+  "single_dir": {
+   "n": 10,
+   "full": 10,
+   "pct": 100.0,
+   "tok": 621
+  },
+  "single_doc": {
+   "n": 13,
+   "full": 10,
+   "pct": 76.9,
+   "tok": 2134
+  },
+  "basic": {
+   "n": 9,
+   "full": 7,
+   "pct": 88.9,
+   "tok": 1864
+  },
+  "small_set": {
+   "n": 11,
+   "full": 1,
+   "pct": 30.8,
+   "tok": 1992
+  },
+  "multi_hop": {
+   "n": 7,
+   "full": 0,
+   "pct": 16.6,
+   "tok": 1886
+  },
+  "all": {
+   "n": 50,
+   "full": 28,
+   "pct": 65.1,
+   "tok": 1717
+  }
+ },
+ "rag10": {
+  "single_dir": {
+   "n": 10,
+   "full": 10,
+   "pct": 100.0,
+   "tok": 2836
+  },
+  "single_doc": {
+   "n": 13,
+   "full": 10,
+   "pct": 76.9,
+   "tok": 6397
+  },
+  "basic": {
+   "n": 9,
+   "full": 8,
+   "pct": 88.9,
+   "tok": 5656
+  },
+  "small_set": {
+   "n": 11,
+   "full": 1,
+   "pct": 32.4,
+   "tok": 5829
+  },
+  "multi_hop": {
+   "n": 7,
+   "full": 0,
+   "pct": 28.4,
+   "tok": 6366
+  },
+  "all": {
+   "n": 50,
+   "full": 29,
+   "pct": 67.1,
+   "tok": 5422
+  }
+ },
+ "graph3": {
+  "single_dir": {
+   "n": 10,
+   "full": 10,
+   "pct": 100.0,
+   "tok": 2032
+  },
+  "single_doc": {
+   "n": 13,
+   "full": 13,
+   "pct": 100.0,
+   "tok": 2959
+  },
+  "basic": {
+   "n": 9,
+   "full": 7,
+   "pct": 90.0,
+   "tok": 6020
+  },
+  "small_set": {
+   "n": 11,
+   "full": 11,
+   "pct": 100.0,
+   "tok": 2976
+  },
+  "multi_hop": {
+   "n": 7,
+   "full": 7,
+   "pct": 100.0,
+   "tok": 3169
+  },
+  "all": {
+   "n": 50,
+   "full": 48,
+   "pct": 98.2,
+   "tok": 3358
+  }
+ },
+ "graph10": {
+  "single_dir": {
+   "n": 10,
+   "full": 10,
+   "pct": 100.0,
+   "tok": 3068
+  },
+  "single_doc": {
+   "n": 13,
+   "full": 13,
+   "pct": 100.0,
+   "tok": 7622
+  },
+  "basic": {
+   "n": 9,
+   "full": 8,
+   "pct": 88.9,
+   "tok": 9398
+  },
+  "small_set": {
+   "n": 11,
+   "full": 11,
+   "pct": 100.0,
+   "tok": 5865
+  },
+  "multi_hop": {
+   "n": 7,
+   "full": 7,
+   "pct": 100.0,
+   "tok": 5298
+  },
+  "all": {
+   "n": 50,
+   "full": 49,
+   "pct": 98.0,
+   "tok": 6319
+  }
+ }
+}
