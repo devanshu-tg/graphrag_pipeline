@@ -1,0 +1,37 @@
+{
+ "textual": {
+  "n": 50,
+  "rag_total": 271102,
+  "graph_total": 167886,
+  "rag_mean": 5422,
+  "graph_mean": 3358,
+  "rag_median": 5922,
+  "graph_median": 2498,
+  "cheaper_on": 42,
+  "eq_rag_mean": 5422,
+  "eq_graph_mean": 6319,
+  "eq_cheaper_on": 22,
+  "rag_label": "Basic RAG 10 chunks",
+  "graph_label": "GraphRAG 3 chunks"
+ },
+ "factual": {
+  "n": 50,
+  "rag_total": 241884,
+  "graph_total": 124873,
+  "rag_mean": 4838,
+  "graph_mean": 2497,
+  "rag_median": 4737,
+  "graph_median": 2483,
+  "cheaper_on": 42,
+  "eq_rag_mean": 4838,
+  "eq_graph_mean": 2497,
+  "eq_cheaper_on": 42,
+  "rag_label": "Basic RAG 10 chunks",
+  "graph_label": "GraphRAG 10 chunks"
+ },
+ "_meta": {
+  "note": "per-question token totals across the 50-question evaluation set of each tab; SEC is already an equal-budget (10 v 10) comparison",
+  "textual_source": "results/enterprise/v3_perq_k{3,10}.json",
+  "factual_source": "results/enterprise/eval_sec_norefusal.jsonl"
+ }
+}
