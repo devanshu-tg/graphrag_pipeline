@@ -1,0 +1,50 @@
+{
+ "rag3": {
+  "n": 50,
+  "full": 27,
+  "part": 13,
+  "zero": 10,
+  "judge": 63.8,
+  "tok": 1730
+ },
+ "rag10": {
+  "n": 50,
+  "full": 31,
+  "part": 10,
+  "zero": 9,
+  "judge": 68.4,
+  "tok": 5442
+ },
+ "graph3": {
+  "n": 50,
+  "full": 48,
+  "part": 2,
+  "zero": 0,
+  "judge": 98.4,
+  "tok": 3795
+ },
+ "graph10": {
+  "n": 50,
+  "full": 49,
+  "part": 0,
+  "zero": 1,
+  "judge": 98.0,
+  "tok": 6235
+ },
+ "_meta": {
+  "n": 50,
+  "model": "gemini-3.7-flash",
+  "judge": "gemini-3.1-pro-preview",
+  "rubric": "v2",
+  "rr_pool": 500,
+  "note": "count rows are exact set match; the judge row is the blind LLM judge with partial credit"
+ },
+ "p1": {
+  "n": 50,
+  "full": 1,
+  "part": 1,
+  "zero": 48,
+  "judge": 8.2,
+  "tok": 270
+ }
+}

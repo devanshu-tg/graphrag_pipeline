@@ -45,27 +45,42 @@ RR_MODEL = os.getenv("RR_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 _p3 = None
 _ce = None
+# Both loaders are called from the demo server's request threads, so two concurrent queries can
+# enter them at once. Without the lock the previous code published the module to the global
+# BEFORE exec_module() populated it, so the second thread got a half-built module and failed
+# with "module 'p3mod' has no attribute '_tg_vector_search'". Measured under 4-way concurrency:
+# every Basic RAG answer in a 50-question sweep errored that way. Build into a local, then
+# publish — and hold the lock so the second caller waits rather than racing.
+import threading as _threading
+_load_lock = _threading.Lock()
 
 
 def _pipeline():
     global _p3
-    if _p3 is None:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(
-            "p3mod", str(Path(__file__).resolve().parent / "pipeline3_round3" / "pipeline.py"))
-        _p3 = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(_p3)
-        _p3._load()
-        _p3._connect()
+    if _p3 is not None:
+        return _p3
+    with _load_lock:
+        if _p3 is None:                       # re-check: another thread may have finished
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "p3mod", str(Path(__file__).resolve().parent / "pipeline3_round3" / "pipeline.py"))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            mod._load()
+            mod._connect()
+            _p3 = mod                         # publish only once it is fully usable
     return _p3
 
 
 def _reranker():
     global _ce
-    if _ce is None:
-        from sentence_transformers import CrossEncoder
-        print(f"[rerank] loading {RR_MODEL}")
-        _ce = CrossEncoder(RR_MODEL)
+    if _ce is not None:
+        return _ce
+    with _load_lock:                          # same race: a cross-encoder takes seconds to load
+        if _ce is None:
+            from sentence_transformers import CrossEncoder
+            print(f"[rerank] loading {RR_MODEL}")
+            _ce = CrossEncoder(RR_MODEL)
     return _ce
 
 

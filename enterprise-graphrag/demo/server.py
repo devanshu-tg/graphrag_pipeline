@@ -837,6 +837,18 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, json.dumps(factual_examples() if ds == "factual" else examples()))
         elif path == "/api/status":
             self._send(200, json.dumps(_warm))
+        elif path.startswith("/api/") and path.endswith(".json"):
+            # The built page's replay fallback fetches these by RELATIVE path, so when the page
+            # is served from here (tunnel or localhost) they have to be served from here too.
+            # They 404'd, which is why a failed live call surfaced as "no recorded answer for
+            # that question" instead of quietly replaying the measured run. basename only: the
+            # path is attacker-controlled and must not be able to walk out of docs/api.
+            f = (Path(__file__).resolve().parents[2] / "docs" / "api"
+                 / Path(path).name)
+            if f.is_file():
+                self._send(200, f.read_bytes(), "application/json")
+            else:
+                self._send(404, json.dumps({"error": "not found"}))
         else:
             self._send(404, json.dumps({"error": "not found"}))
 
