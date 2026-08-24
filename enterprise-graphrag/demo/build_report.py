@@ -377,9 +377,24 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
     head = "".join(f'<th>{esc(_split_label(n)[0].upper())}'
                    + (f'<span class="cb">{esc(_split_label(n)[1].upper())}</span>'
                       if _split_label(n)[1] else "") + "</th>" for _, n in arms)
+    # Tokens PER QUESTION for both retrieval arms, not just the graph's. A single TOKENS column
+    # showed only the last arm, which made the cost comparison impossible to check row by row -
+    # the whole point of publishing the working. arms[-2] is the RAG baseline on both tabs
+    # (p2 on SEC, p2rr on enterprise) and arms[-1] is GraphRAG.
+    base_arm, graph_arm = arms[-2][0], arms[-1][0]
+    base_lbl = _split_label(arms[-2][1])[0].upper()
     out = [f'<div class="scroll"><table class="pq"><thead><tr><th>ID</th><th>TIER</th>{head}'
-           f'<th class="ml">QUESTION</th><th class="ml">GOLD</th><th>TOKENS</th></tr></thead><tbody>']
-    last_arm = arms[-1][0]
+           f'<th class="ml">QUESTION</th><th class="ml">GOLD</th>'
+           f'<th>TOKENS<span class="cb">{esc(base_lbl)}</span></th>'
+           f'<th>TOKENS<span class="cb">GRAPHRAG</span></th>'
+           f'</tr></thead><tbody>']
+
+    def _tok(r):
+        if not r:
+            return None
+        return (r.get("prompt_tokens", 0) + r.get("completion_tokens", 0)
+                + r.get("planner_tokens", 0))
+
     for qid in ids:
         q = by[qid]
         cells = ""
@@ -392,13 +407,20 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
             cls = "pass" if ok else ("part" if r["f1"] > 0 else "fail")
             txt = "PASS" if ok else ("PART" if r["f1"] > 0 else "FAIL")
             cells += f'<td><span class="pill {cls}">{txt}</span></td>'
-        tk = q["arms"].get(last_arm, {})
-        tok = tk.get("prompt_tokens", 0) + tk.get("completion_tokens", 0) + tk.get("planner_tokens", 0)
+        bt, gt = _tok(q["arms"].get(base_arm)), _tok(q["arms"].get(graph_arm))
+        if bt and gt:
+            # the cheaper cell is still marked, so the comparison reads at a glance without
+            # spending a column on it
+            bcell = f'<td class="n mono{"" if gt <= bt else " win"}">{bt:,}</td>'
+            gcell = f'<td class="n mono{" win" if gt <= bt else ""}">{gt:,}</td>'
+        else:
+            bcell = f'<td class="n mono">{bt:,}</td>' if bt else '<td class="n">—</td>'
+            gcell = f'<td class="n mono">{gt:,}</td>' if gt else '<td class="n">—</td>'
         out.append(f'<tr><td class="mono">{esc(qid)}</td>'
                    f'<td class="tier">{esc((q["tier"] or "").replace("_", " "))}</td>{cells}'
                    f'<td class="ml q">{esc(q["question"])}</td>'
                    f'<td class="ml g">{esc(q["gold"])}</td>'
-                   f'<td class="n mono">{tok:,}</td></tr>')
+                   f'{bcell}{gcell}</tr>')
     out.append("</tbody></table></div>")
     return "".join(out)
 
