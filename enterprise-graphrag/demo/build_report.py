@@ -183,39 +183,6 @@ def budget_pair(b: dict, g: dict, blab: str, glab: str) -> str:
                       ("Tokens / question", "tok", lambda v, _: f"{int(v):,}", "lo")])
 
 
-def token_totals(d: dict) -> str:
-    """Total tokens spent across the whole 50-question set, per arm.
-
-    The scorecard reports a per-question MEAN, which invites "that is only a couple of thousand
-    tokens". The total over the set is the number that actually shows up on a bill, and the
-    "cheaper on N of 50" count answers the obvious follow-up: is the average carried by a few
-    outliers, or does it hold question by question.
-    """
-    cut = 100.0 * (d["rag_total"] - d["graph_total"]) / d["rag_total"]
-    rows = [("Total tokens, all %d questions" % d["n"],
-             f'{d["rag_total"]:,}', f'{d["graph_total"]:,}', "graph"),
-            ("Mean per question", f'{d["rag_mean"]:,}', f'{d["graph_mean"]:,}', "graph"),
-            ("Median per question", f'{d["rag_median"]:,}', f'{d["graph_median"]:,}', "graph"),
-            ("Questions where it is cheaper",
-             f'{d["n"] - d["cheaper_on"]}/{d["n"]}', f'{d["cheaper_on"]}/{d["n"]}', "graph")]
-    out = ['<table class="sc"><thead><tr><th class="ml">TOKENS</th>'
-           f'<th>{esc(d["rag_label"].split(chr(32))[0])} {esc(d["rag_label"].split(chr(32))[1])}'
-           f'<span class="cb">{esc(" ".join(d["rag_label"].split()[2:]))}</span></th>'
-           f'<th>GraphRAG<span class="cb">{esc(" ".join(d["graph_label"].split()[1:]))}</span></th>'
-           '</tr></thead><tbody>']
-    for label, a, b, win in rows:
-        out.append(f'<tr><td class="ml">{esc(label)}</td>'
-                   f'<td class="n">{esc(a)}</td>'
-                   f'<td class="n win">{esc(b)}</td></tr>')
-    out.append("</tbody></table>")
-    out.append(f'<p class="gridnote">Across the whole set that is '
-               f'<b>{d["rag_total"]:,} tokens against {d["graph_total"]:,}</b> '
-               f'&mdash; <b>{cut:.0f}% fewer</b>, and it is not carried by a few outliers: '
-               f'GraphRAG is cheaper on <b>{d["cheaper_on"]} of the {d["n"]}</b> questions '
-               f'individually.</p>')
-    return "".join(out)
-
-
 def budget_types(d: dict) -> str:
     """Per-question-type budget matrix, with the type filter.
 
@@ -1142,8 +1109,6 @@ def main() -> int:
     # the second run actually returned.
     _rrp = RESULTS / "v3_matrix_judged.json"
     rerun = json.loads(_rrp.read_text(encoding="utf-8")) if _rrp.exists() else None
-    _tokp = RESULTS / "token_totals.json"
-    toks = json.loads(_tokp.read_text(encoding="utf-8")) if _tokp.exists() else None
     _v3p = RESULTS / "v3_types_published.json"
     v3m = json.loads(_v3p.read_text(encoding="utf-8")) if _v3p.exists() else None
     _b50p = RESULTS / "budget50_judge.json"
@@ -1240,14 +1205,7 @@ def main() -> int:
       f'why LLM-only scores {S["p1"]["judge"]:.1f}% here with no retrieval at all, against '
       f'{(b50["p1"]["judge"] if b50 else E["p1"]["judge"]):.1f}% on the fictional corpus.</p>')
     A(scorecard(SEC_ARMS, S, sec_metrics))
-    # SEC runs BOTH arms at 10 chunks, so this is already an equal-budget comparison and the
-    # token gap cannot be explained by giving GraphRAG less context.
-    if toks:
-        A('<h2>Token cost over the whole 50-question set</h2>')
-        A('<p class="budgetline">Both arms read <b>10 chunks</b> here, so this is an '
-          '<b>equal-budget</b> comparison &mdash; the token gap is not GraphRAG being given '
-          'less to read. Summed across the set, this is what each arm spends.</p>')
-        A(token_totals(toks["factual"]))
+
     # ---- the corpus itself, after the result it produced
     A('</section><section>')
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
@@ -1467,14 +1425,6 @@ def main() -> int:
           f'<b>{100*(_r10["tok"]-_g3["tok"])/_r10["tok"]:.0f}% fewer tokens</b> '
           f'({_g3["tok"]:,} vs {_r10["tok"]:,} per question).</p>')
         A(budget_pair(_r10, _g3, "Basic RAG\n10 chunks", "GraphRAG\n3 chunks"))
-
-        # ---- WHAT IT COSTS OVER THE WHOLE SET. The tables above are per-question means; this
-        # is the same comparison summed over all 50, which is the figure that lands on a bill.
-        if toks:
-            A('<h2>Token cost over the whole 50-question set</h2>')
-            A('<p class="budgetline">The tables above report a mean per question. Summed across '
-              'the set, this is what each arm actually spends.</p>')
-            A(token_totals(toks["textual"]))
 
     if v3m:
         # ---- BY QUESTION TYPE. The three tables above answer "does the budget explain the
