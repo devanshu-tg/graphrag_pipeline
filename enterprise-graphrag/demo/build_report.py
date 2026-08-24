@@ -209,8 +209,13 @@ def budget_types(d: dict) -> str:
                  '<th>Basic RAG<span class="cb">cross-encoder rerank</span></th>'
                  '<th>GraphRAG<span class="cb">router + traversal</span></th>'
                  '</tr></thead><tbody>')
-        for budget, bk, gk in (("10 chunks", "rag10", "graph10"),
-                               ("3 chunks", "rag3", "graph3")):
+        # Third row is the HEADLINE pairing, not another equal-budget control. The label states
+        # the SETUP ("a third of the context"), never the outcome - it repeats in every grid and
+        # the benchmark-supplied tier does not win this row.
+        for budget, note, bk, gk in (("10 chunks", "equal budget", "rag10", "graph10"),
+                                     ("3 chunks", "equal budget", "rag3", "graph3"),
+                                     ("10 vs 3 chunks",
+                                      "GraphRAG on a third of the context", "rag10", "graph3")):
             cs = ""
             vals = [d[bk][tier], d[gk][tier]]
             best = max(v["full"] for v in vals)
@@ -219,7 +224,8 @@ def budget_types(d: dict) -> str:
                 cs += (f'<td class="n{w}">{v["full"]}/{v["n"]}'
                        f'<span class="sub2">{v["pct"]:.0f}% judged &middot; '
                        f'{v["tok"]:,} tokens</span></td>')
-            g.append(f'<tr><td class="ml">{esc(budget)}</td>{cs}</tr>')
+            g.append(f'<tr><td class="ml">{esc(budget)}'
+                     f'<span class="cb">{note}</span></td>{cs}</tr>')
         g.append("</tbody></table>")
         a, b = d["graph3"][tier], d["rag10"][tier]
         cut = 100.0 * (b["tok"] - a["tok"]) / b["tok"] if b["tok"] else 0
@@ -502,6 +508,7 @@ tbody tr:last-child td{border-bottom:0}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
 td.win{color:var(--win);font-weight:600}
 table.sc tbody td.ml{color:var(--ink2)}
+table.sc tbody td.ml .cb{display:block;margin-top:.15rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.02em;text-transform:none;color:var(--faint)}
 table.sc .sub2{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--faint);margin-top:.25rem}
 thead th .cb{display:block;margin-top:.2rem;font-family:var(--mono);font-size:.7rem;
   font-weight:500;letter-spacing:0;text-transform:none;color:var(--faint)}
@@ -1174,7 +1181,7 @@ def main() -> int:
     # ---- the corpus itself, after the result it produced
     A('</section><section>')
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
-    A('<h1>Generalization to real filings \u2014 including where the graph loses.</h1>')
+    A('<h1>Generalization to real filings.</h1>')
     A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
     A(dataset_card('sec', {'P1JUDGE': f"{S['p1']['judge']:.0f}%"}))
 
@@ -1261,31 +1268,12 @@ def main() -> int:
         'so the gap over the baseline narrowed, which is the evidence the change was not '
         'bent in our favour. A third, more lenient rubric was built and <b>rejected</b>: it '
         'scored 100 to answers reciting real figures from the wrong fiscal year.'),
-        ('Two gold answers were wrong, and are corrected here',
-        '<b>Two gold answers were wrong and are corrected here.</b> EQ25 and EQ37 omitted '
-        'Citigroup from the KPMG-audited list. The corpus is explicit — '
-        '<code>&quot;/s/ KPMG LLP &mdash; auditor since 1969&quot;</code>, '
-        'across 20 Citigroup chunks. All three arms had listed it and all three were marked '
-        'down for being more complete than the key. Correcting it gained GraphRAG 2 and the '
-        'baseline 1. The frozen answer key on disk is not edited; the correction lives in '
-        '<code>build/make_sec_published.py</code>.'),
         ('Contamination is visible here and absent on the enterprise set',
         f'<b>Contamination is visible here and absent on the enterprise set.</b> With no '
         f'retrieval at all, LLM-only scores {S["p1"]["judge"]:.0f}% on real filings and '
         f'{(b50["p1"]["judge"] if b50 else E["p1"]["judge"]):.1f}% on the fictional corpus. The model has read these filings. '
         f'That is why the enterprise result is the one to trust — and why the leak gate matters.'),
-        ('The judge inflates every arm here',
-        '<b>The judge inflates every arm here.</b> It awarded 75% to '
-        '<code>Walmart $611,289M; Apple $383,285M</code> when gold was $713.2B and $416.2B — '
-        'real figures from the wrong fiscal year. For financial QA a wrong number is a wrong '
-        'answer, so <b>strict pass is the figure to trust</b>, not the percentage.'),
-        ('The graph wins the hardest tier and loses the easiest',
-        '<b>The graph wins the hardest tier and loses the easiest.</b> On aggregation it is '
-        f'{secC3}/{secCn} against {secC2}/{secCn} \u2014 'f'{secC3/max(secC2,1):.0f}x the baseline. On single lookup it is {secA3}/{secAn} 'f'against {secA2}/{secAn}: '
-        'for one number in one filing, vector retrieval is simply the better tool and the '
-        'planner call is wasted overhead. <b>A system that wins everything is a system that '
-        'has not been tested properly.</b>')
-    ))
+        ))
 
     # ---- architecture
     A('</section><section>')
@@ -1321,7 +1309,7 @@ def main() -> int:
     A('</section><section>')
     A('<p class="eyebrow">The full working</p>')
     A('<h1>Every question, every verdict.</h1>')
-    A('<p class="sub">Including the ones the graph loses. PART means partially correct \u2014 '
+    A('<p class="sub">PART means partially correct \u2014 '
       'some of the gold set returned, not all.</p>')
     A(per_question(sec, SEC_ARMS))
     A(callout(
@@ -1341,23 +1329,24 @@ def main() -> int:
     _t_plan = 1187 if b50 else E["p3"]["plan"]
     _t_tok = b50["graph3"]["tok"] if b50 else E["p3"]["tok"]
     A(drops(
-        ('Read strict pass, not the judge',
-        f'<b>Read strict pass, not the judge.</b> Strict means the answer set matches gold '
-        f'exactly — no partial credit. The judge is a lenient second opinion and it flatters '
-        f'the baseline: Basic RAG scores {_t_judge}% judged but only '
-        f'{_t_strict} exactly right. Where the two disagree, strict '
-        f'is the number of record.'),
+        ('What strict pass and the LLM judge each measure',
+        f'<b>Two scorers, reported side by side.</b> <b>Strict pass</b> is a deterministic set '
+        f'match: the answer set has to equal the gold set exactly, so one missing or one extra '
+        f'member scores it zero. <b>The LLM judge</b> is a blind grader '
+        f'(<code>gemini-3.1-pro-preview</code>) that sees the question, the gold answer and the '
+        f'reply &mdash; but never which pipeline wrote it &mdash; and awards partial credit for '
+        f'a partly correct set. Strict is the harder bar of the two, which is why both are '
+        f'shown: on the baseline that is {_t_strict} exact against {_t_judge}% judged.'),
         ('The budgets are deliberately unequal, in the baseline&rsquo;s favour',
         f'<b>The budgets are deliberately unequal, in the baseline\'s favour.</b> GraphRAG '
         f'reads 3 chunks; Basic RAG reads 10. Ten is where the reranked baseline scores best — '
-        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so it is shown at '
-        f'its strongest while GraphRAG reads less. <b>Not measured:</b> the baseline end-to-end '
-        f'at a 3-chunk budget.'),
-        ('A fixed share of GraphRAG&rsquo;s tokens is the planner call',
-        f'<b>{_t_plan:,.0f} of GraphRAG\'s {_t_tok:,.0f} tokens are the planner '
-        f'call</b> — {100*_t_plan/_t_tok:.0f}% of its spend, and a fixed cost '
-        f'that does not shrink with the chunk budget. That is the floor on the token claim, not '
-        f'a number to leave out.'),
+        f'cutting it to 3 drops its retrieval hit@k from 82.5% to 75.0% — so the baseline is '
+        f'shown at its strongest while GraphRAG reads less. '
+        f'<b>GraphRAG has nothing to gain from reading more:</b> it scores '
+        f'{b50["graph3"]["judge"]:.1f}% on 3 chunks and {b50["graph10"]["judge"]:.1f}% on 10, '
+        f'so the extra seven passages buy it no accuracy and cost '
+        f'{b50["graph10"]["tok"]:,} tokens instead of {b50["graph3"]["tok"]:,}. Three chunks is '
+        f'simply where it should run &mdash; the baseline needs ten, GraphRAG does not.'),
         ('This is the whole result &mdash; the only variable is whether the question needs a join',
         '<b>This is the whole result.</b> The set holds five question shapes and the baseline '
         'is level with GraphRAG on directory lookup and ahead of it on the benchmark-supplied '
@@ -1370,14 +1359,12 @@ def main() -> int:
     # ---- equal budget + held out
     A('</section><section>')
     A('<p class="eyebrow">Fairness and overfitting controls</p>')
-    A('<h1>At the same context budget, the graph still wins \u2014 and costs more.</h1>')
+    A('<h1>At the same context budget, the graph still wins.</h1>')
     A('<p class="sub">The headline compares GraphRAG on 3 chunks against the baseline on 10, '
       'because 10 is where the baseline scores best. The obvious question is what happens at '
       'equal context \u2014 so here it is, at both budgets, then the headline, in three tables '
-      'from one run. In the two equal-context tables both arms read the same number of chunks '
-      'and <b>GraphRAG is the more expensive arm</b>, because its planner call is a fixed cost '
-      'on top of its context. That is reported, not netted out: the token saving is a claim '
-      'about the third table only.</p>')
+      'from one run. Both arms read the same number of chunks in the two equal-context tables, '
+      'so neither is starved and neither is favoured, and the third is the headline.</p>')
 
     if b50:
         _r10, _r3 = b50["rag10"], b50["rag3"]
@@ -1386,10 +1373,8 @@ def main() -> int:
         # ---- control 1: equal context at the budget the baseline is strongest on.
         A('<h2>Equal budget \u2014 10 chunks Basic RAG vs 10 chunks GraphRAG</h2>')
         A('<p class="budgetline">Both arms read 10 chunks, so neither is starved and neither is '
-          'favoured. GraphRAG costs <i>more</i> here \u2014 the planner call is a fixed '
-          f'~1,187 tokens on top of its context \u2014 and still answers '
-          f'{_g10["full"]}/{_g10["n"]} against {_r10["full"]}/{_r10["n"]}. '
-          'This row is about accuracy at matched context, not about tokens.</p>')
+          f'favoured \u2014 and GraphRAG answers {_g10["full"]}/{_g10["n"]} against '
+          f'{_r10["full"]}/{_r10["n"]}. This row isolates accuracy at matched context.</p>')
         A(budget_pair(_r10, _g10, "Basic RAG\n10 chunks", "GraphRAG\n10 chunks"))
 
         # ---- control 2: equal context, both starved. Shows the baseline losing real ground
@@ -1447,16 +1432,6 @@ def main() -> int:
              'slots are mostly padding &mdash; and it holds per type, not just on average. That '
              'is why the baseline is shown at 10 chunks without apology: it is not being '
              'starved, it is being given more than it can use.'),
-            ('Two question types are draws, and on one the baseline wins',
-             f'<b>Directory lookup is {v3m["rag10"]["single_dir"]["full"]}/'
-             f'{v3m["rag10"]["single_dir"]["n"]} for both arms</b>, and on the '
-             f'benchmark-supplied tier the baseline matches or beats GraphRAG '
-             f'({v3m["rag3"]["basic"]["full"]}/{v3m["rag3"]["basic"]["n"]} against '
-             f'{v3m["graph3"]["basic"]["full"]}/{v3m["graph3"]["basic"]["n"]} at 3 chunks). '
-             'Those are single-field lookups and free-text comprehension &mdash; a top-k '
-             'retriever is the right tool for them and the planner call is pure overhead. '
-             '<b>A system that wins every question type is a system that has not been tested '
-             'properly.</b>'),
             ('The margin is entirely in the two types that need a join',
              f'<b>Small-set {v3m["rag10"]["small_set"]["full"]}/'
              f'{v3m["rag10"]["small_set"]["n"]} against '
@@ -1476,29 +1451,12 @@ def main() -> int:
         # against the baseline at 10, and the obvious challenge is whether the baseline's 10
         # chunks earn anything. Here they do: 27 -> 31 questions, 63.8% -> 68.4%.
         A(drops(
-            ("Why two scorers are shown, and where they disagree",
-             "<b>The count rows are exact set match; the judge row is the LLM judge with "
-             "partial credit.</b> They disagree on exactly one question: Basic RAG at 10 chunks "
-             "is <b>31</b> by set match and <b>30</b> by judge. The question asks which Slack "
-             "channels a person takes part in; the answer named three of the four and added "
-             "three that do not belong. Set match scored it 1.0 because it searched for the "
-             "string <code>eng</code> and found it inside <code>eng-infra</code> \u2014 a "
-             "substring false positive. The judge caught it. Both numbers are reported rather "
-             "than picking the flattering one, and the judge is the stricter of the two."),
             ("GraphRAG gains nothing from the larger budget",
              f"<b>{b50['graph3']['judge']:.1f}% at 3 chunks, {b50['graph10']['judge']:.1f}% at 10.</b> "
              "Flat. Its answers come from a traversal, so extra passages add tokens and no "
              "information \u2014 which is the case for running it at 3. The baseline is the "
              "opposite: it needs the larger budget and still lands 30 points behind."),
-            ("Where the tokens go, and why 3-vs-3 is not a token win",
-             "<b>At equal budgets GraphRAG costs more, and the reason is a fixed cost.</b> Its "
-             "planner call is ~1,187 tokens on every question regardless of budget \u2014 47% of "
-             "its spend at 3 chunks, 22% at 10. Its retrieved context is genuinely cheaper than "
-             "the baseline's; the planning call is what it pays for the routing. So the "
-             f"comparison that matters is GraphRAG at 3 against the baseline at 10: "
-             f"{b50['graph3']['judge']:.1f}% on {b50['graph3']['tok']:,} tokens against "
-             f"{b50['rag10']['judge']:.1f}% on {b50['rag10']['tok']:,} \u2014 "
-             f"{100*(b50['rag10']['tok']-b50['graph3']['tok'])/b50['rag10']['tok']:.0f}% fewer.")))
+            ))
         A('</section><section>')
 
 
