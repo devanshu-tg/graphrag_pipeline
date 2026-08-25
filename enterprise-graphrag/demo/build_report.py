@@ -202,9 +202,13 @@ def sec_budget_types(d: dict) -> str:
     """
     # The four strategies the pipeline implements, in the builders' own terms. Questions the
     # router does not send down a graph strategy land in `default` - hybrid vector search.
+    # compare and temporal are listed SEPARATELY rather than merged into a `default` bucket:
+    # "Default" named nothing a viewer could act on, and the two behave differently - compare
+    # is the graph's best route on this set, temporal its worst. Both are n=3, which the row
+    # states, so nobody reads a 3-question tier as carrying the weight of the 22-question one.
     ORDER = [("all", "All 50 questions"), ("aggregation", "Aggregation (set questions)"),
              ("bridge", "Bridge (two hops)"), ("lookup", "Lookup (one fact)"),
-             ("default", "Default (hybrid vector)")]
+             ("compare", "Compare (two entities)"), ("temporal", "Temporal (dates, ordering)")]
     ROWS = [("k10", "10 vs 10 chunks", "equal budget"),
             ("k6", "6 vs 6 chunks", "equal budget"),
             ("shipped", "10 vs routed", "as shipped")]

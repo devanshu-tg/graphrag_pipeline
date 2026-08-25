@@ -18,7 +18,8 @@
    "k6": [
     "Basic RAG\n6 chunks",
     "GraphRAG\n6 chunks"
-   ]
+   ],
+   "_tiers": "compare and temporal were a merged `default` bucket; the k10 and k6 rows for those two tiers are a re-measurement of their 6 questions (the original file's generator no longer exists and an average cannot be un-merged), the shipped row is derived from eval_sec_norefusal.jsonl. Basic RAG reproduced the stored default within 0.3%; GraphRAG came in 14% lower, which is this corpus's documented retrieval variance."
   }
  },
  "shipped": {
@@ -61,19 +62,6 @@
     "tok": 5501
    }
   },
-  "default": {
-   "n": 6,
-   "p2": {
-    "full": 4,
-    "judge": 80.0,
-    "tok": 5306
-   },
-   "p3": {
-    "full": 4,
-    "judge": 73.3,
-    "tok": 4976
-   }
-  },
   "aggregation": {
    "n": 22,
    "p2": {
@@ -85,6 +73,32 @@
     "full": 14,
     "judge": 86.9,
     "tok": 1266
+   }
+  },
+  "compare": {
+   "n": 3,
+   "p2": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 5340
+   },
+   "p3": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 4846
+   }
+  },
+  "temporal": {
+   "n": 3,
+   "p2": {
+    "full": 2,
+    "judge": 66.7,
+    "tok": 4734
+   },
+   "p3": {
+    "full": 0,
+    "judge": 30.0,
+    "tok": 4547
    }
   }
  },
@@ -128,19 +142,6 @@
     "tok": 5257
    }
   },
-  "default": {
-   "n": 6,
-   "p2": {
-    "full": 5,
-    "judge": 86.7,
-    "tok": 5298
-   },
-   "p3": {
-    "full": 3,
-    "judge": 63.3,
-    "tok": 5664
-   }
-  },
   "aggregation": {
    "n": 22,
    "p2": {
@@ -152,6 +153,32 @@
     "full": 14,
     "judge": 84.2,
     "tok": 1248
+   }
+  },
+  "compare": {
+   "n": 3,
+   "p2": {
+    "full": 2,
+    "judge": 96.7,
+    "tok": 5624
+   },
+   "p3": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 4914
+   }
+  },
+  "temporal": {
+   "n": 3,
+   "p2": {
+    "full": 2,
+    "judge": 73.3,
+    "tok": 4999
+   },
+   "p3": {
+    "full": 1,
+    "judge": 43.3,
+    "tok": 4828
    }
   }
  },
@@ -195,19 +222,6 @@
     "tok": 3691
    }
   },
-  "default": {
-   "n": 6,
-   "p2": {
-    "full": 5,
-    "judge": 83.3,
-    "tok": 3424
-   },
-   "p3": {
-    "full": 3,
-    "judge": 66.7,
-    "tok": 3654
-   }
-  },
   "aggregation": {
    "n": 22,
    "p2": {
@@ -219,6 +233,32 @@
     "full": 14,
     "judge": 86.9,
     "tok": 1085
+   }
+  },
+  "compare": {
+   "n": 3,
+   "p2": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 3675
+   },
+   "p3": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 3637
+   }
+  },
+  "temporal": {
+   "n": 3,
+   "p2": {
+    "full": 1,
+    "judge": 58.3,
+    "tok": 3171
+   },
+   "p3": {
+    "full": 1,
+    "judge": 56.7,
+    "tok": 3254
    }
   }
  }
