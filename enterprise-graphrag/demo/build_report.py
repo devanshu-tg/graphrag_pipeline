@@ -1149,13 +1149,36 @@ def main() -> int:
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
     ]
+    # Token figures on the subset of questions Basic RAG actually answers (PASS or PART).
+    # Sebastien's basis: "when both systems produce a usable answer, what does each cost?".
+    # Derived, never typed - and reported as its own row rather than silently replacing the
+    # all-50 numbers, because the scorecard's other rows are over all 50 and a reader cannot
+    # see a mixed base.
+    _sec_by: dict = {}
+    for _r in sec:
+        _sec_by.setdefault(_r["question_id"], {})[_r.get("arm_kind") or _r.get("arm")] = _r
+    def _tk(r):
+        return r["prompt_tokens"] + r["completion_tokens"] + r.get("planner_tokens", 0)
+    _keep = [q for q, d in _sec_by.items()
+             if "p2" in d and (d["p2"]["exact"] or d["p2"]["f1"] > 0)]
+    sec_sub = None
+    if _keep:
+        sec_sub = {a: st.mean([_tk(_sec_by[q][a]) for q in _keep if a in _sec_by[q]])
+                   for a in ("p1", "p2", "p3")}
+        sec_sub["n"] = len(_keep)
+        sec_sub["red"] = 100.0 * (sec_sub["p2"] - sec_sub["p3"]) / sec_sub["p2"]
+
     sec_metrics = [
         ("Strict pass (exact)", "strict", frac, "hi"),
         ("LLM judge", "judge", pct, "hi"),
         ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
         ("Wrong (answered, 0%)", "wrongc", lambda v, _: f"{int(v)}", "lo"),
         ("Declined / empty", "emptyc", lambda v, _: f"{int(v)}", "lo"),
-        ("Tokens / question", "tok", tok, "lo"),
+        # Tokens are reported on the questions Basic RAG actually answers, so the comparison is
+        # "when both produce a usable answer, what does each cost?". The row says so, because
+        # every other row above it is over all 50 and a mixed base is invisible otherwise.
+        (("Tokens / question\non comparable answers") if sec_sub
+         else "Tokens / question", "tok_sub" if sec_sub else "tok", tok, "lo"),
     ]
 
     red = 100.0 * (E["p2rr"]["tok"] - E["p3"]["tok"]) / E["p2rr"]["tok"]
@@ -1204,6 +1227,9 @@ def main() -> int:
       '100 S&amp;P-100 companies. Real entities the model has already read &mdash; which is '
       f'why LLM-only scores {S["p1"]["judge"]:.1f}% here with no retrieval at all, against '
       f'{(b50["p1"]["judge"] if b50 else E["p1"]["judge"]):.1f}% on the fictional corpus.</p>')
+    if sec_sub:
+        for _a, _k in (("p1", "p1"), ("p2", "p2"), ("p3", "p3")):
+            S[_a]["tok_sub"] = sec_sub[_k]
     A(scorecard(SEC_ARMS, S, sec_metrics))
 
     # ---- the corpus itself, after the result it produced
@@ -1552,8 +1578,11 @@ def main() -> int:
     # sections cannot disagree.
     stats_js = json.dumps({
         "factual": [
-            (f"-{sec_red:.0f}%", "GraphRAG vs Basic RAG token reduction",
-             f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question", ""),
+            ((f"-{sec_sub['red']:.0f}%" if sec_sub else f"-{sec_red:.0f}%"),
+             "GraphRAG vs Basic RAG token reduction",
+             (f"{sec_sub['p3']:,.0f} vs {sec_sub['p2']:,.0f} per question "
+              f"on comparable answers" if sec_sub
+              else f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question"), ""),
             # The aggregation-tier multiple used to sit here. It is still the most interesting
             # SEC result, so it stays in the callout under the scorecard —
             # only the headline card is gone, to keep this row to two cards.
