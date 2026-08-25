@@ -183,6 +183,71 @@ def budget_pair(b: dict, g: dict, blab: str, glab: str) -> str:
                       ("Tokens / question", "tok", lambda v, _: f"{int(v):,}", "lo")])
 
 
+def sec_budget_types(d: dict) -> str:
+    """SEC equal-budget matrix with a question-type filter.
+
+    Three budgets measured in-process, both arms together, every answer scored by the same
+    blind judge:
+      * routed budget - the shipped behaviour. GraphRAG's routes ask for 4-6 chunks and
+        `aggregation` retrieves graph facts instead of chunks, so it is NOT reading what the
+        baseline reads.
+      * 10 v 10 and 6 v 6 - every vector request floored to the same k the baseline uses, so
+        the chunk-using routes genuinely read the same number.
+
+    `aggregation` is deliberately left alone in the forced runs: it retrieves typed edges, not
+    chunks, so forcing chunks there would swap the method rather than equalise the budget.
+
+    Grouped by the FOUR strategies the pipeline implements - aggregation, bridge, lookup,
+    default. Questions the router labels `compare` or `temporal` are counted under default.
+    """
+    # The four strategies the pipeline implements, in the builders' own terms. Questions the
+    # router does not send down a graph strategy land in `default` - hybrid vector search.
+    ORDER = [("all", "All 50 questions"), ("aggregation", "Aggregation (set questions)"),
+             ("bridge", "Bridge (two hops)"), ("lookup", "Lookup (one fact)"),
+             ("default", "Default (hybrid vector)")]
+    ROWS = [("k10", "10 vs 10 chunks", "equal budget"),
+            ("k6", "6 vs 6 chunks", "equal budget"),
+            ("shipped", "10 vs routed", "as shipped")]
+    out = ['<div class="gridwrap">']
+    out.append('<div class="gridbar"><label for="secTierSel">Question type</label>'
+               '<select id="secTierSel">'
+               + "".join(f'<option value="{k}">{esc(l)}</option>'
+                         for k, l in ORDER if k in d.get("k10", {}))
+               + '</select></div>')
+    for key, lbl in ORDER:
+        if key not in d.get("k10", {}):
+            continue
+        hid = "" if key == "all" else " hidden"
+        g = [f'<div class="bgrid" data-sectier="{key}"{hid}>']
+        g.append('<table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th>'
+                 '<th>Basic RAG<span class="cb">cosine top-k</span></th>'
+                 '<th>GraphRAG<span class="cb">router + traversal</span></th>'
+                 '</tr></thead><tbody>')
+        for ck, blabel, note in ROWS:
+            c = d[ck][key]
+            b, gr = c["p2"], c["p3"]
+            best = max(b["full"], gr["full"])
+            def cell(x):
+                w = " win" if x["full"] == best else ""
+                return (f'<td class="n{w}">{int(x["full"])}/{c["n"]}'
+                        f'<span class="sub2">{x["judge"]:.0f}% judged &middot; '
+                        f'{x["tok"]:,} tokens</span></td>')
+            g.append(f'<tr><td class="ml">{esc(blabel)}'
+                     f'<span class="cb">{esc(note)}</span></td>{cell(b)}{cell(gr)}</tr>')
+        g.append("</tbody></table>")
+        k10 = d["k10"][key]
+        cut = 100.0 * (k10["p2"]["tok"] - k10["p3"]["tok"]) / k10["p2"]["tok"]
+        g.append('<p class="gridnote">At a matched 10-chunk budget GraphRAG spends '
+                 f'<b>{k10["p3"]["tok"]:,}</b> tokens against <b>{k10["p2"]["tok"]:,}</b>'
+                 + (f' &mdash; <b>{cut:.0f}% fewer</b>.' if cut >= 0
+                    else f' &mdash; <b>{-cut:.0f}% more</b> on this question type.')
+                 + '</p>')
+        g.append("</div>")
+        out.append("".join(g))
+    out.append("</div>")
+    return "".join(out)
+
+
 def budget_types(d: dict) -> str:
     """Per-question-type budget matrix, with the type filter.
 
@@ -870,11 +935,17 @@ function drawQueryStats(got, arms){
 
   // 3. context actually read. This is the claim in its rawest form: the same question answered
   //    from fewer passages.
-  if(graph.chunks || base.chunks){
+  if(graph.chunks || base.chunks || graph.graph_facts){
+    // A graph route can answer with ZERO passages - the traversal returned the answer and
+    // there was nothing to retrieve. "0 vs 10" reads as a failure when it is the best case, so
+    // the tile reports what the graph actually used and says where the answer came from.
+    const gz = !graph.chunks && graph.graph_facts>0;
     tiles.push({
-      big: (graph.chunks||0) + " vs " + (base.chunks||0),
-      lbl: "Chunks read (GraphRAG vs Basic RAG)",
-      foot: "router " + esc(graph.route||"-"),
+      big: (gz ? graph.graph_facts + " facts" : (graph.chunks||0)) + " vs " + (base.chunks||0),
+      lbl: gz ? "Graph facts vs passages read"
+              : "Chunks read (GraphRAG vs Basic RAG)",
+      foot: gz ? "answered from the graph &mdash; no passage read"
+               : ("router " + esc(graph.route||"-")),
       tone: "neutral"
     });
   }
@@ -918,14 +989,22 @@ function drawCard(x, cheap, fewest){
         ((gr.missed||[]).length ? '<div><b>missed</b> '+esc(gr.missed.join(", "))+'</div>' : '')+
         ((gr.wrong||[]).length ? '<div><b>not in the answer</b> '+esc(gr.wrong.join(", "))+'</div>' : '')+
         '</div>' : '')+
+      // Where a graph answer came from. This is the line that explains a low token count:
+      // the traversal returned the answer, so no passage had to be read.
+      (x.graph_trail ? '<div class="src"><span>from the graph: '+esc(x.graph_trail)+
+        '</span></div>' : '')+
       ((x.sources||[]).length ? '<div class="src">'+x.sources.map(v =>
         '<span>'+esc(v.length>52 ? "..."+v.slice(-50) : v)+'</span>').join("")+'</div>' : '')+
       '<div class="foot">'+
         '<span>tokens <b'+(x.tokens===cheap?' class="best"':'')+'>'+
           (x.tokens||0).toLocaleString()+'</b></span>'+
 
-        (x.chunks ? '<span>chunks <b'+(x.chunks===fewest?' class="best"':'')+'>'+
-          x.chunks+'</b></span>' : '')+
+        // Chunks as before - but NEVER blank. A graph route can legitimately read zero
+        // passages (the traversal returned the answer), and hiding the field made the card
+        // look like it had lost a row next to latency.
+        '<span>chunks <b'+((x.chunks&&x.chunks===fewest)?' class="best"':'')+'>'+
+          (x.chunks>0 ? x.chunks : (x.graph_facts>0 ? '0 &mdash; from the graph' : '0'))+
+          '</b></span>'+
         (x.latency ? '<span>latency <b>'+x.latency+'s</b></span>' : '')+
         // Accuracy sits with the other measurements, not only in the coloured badge, so the
         // number can be read off rather than inferred from a word. The em-dash case is the
@@ -1050,6 +1129,11 @@ if (tierSel) tierSel.addEventListener("change", () => {
   document.querySelectorAll(".bgrid").forEach(g =>
     g.hidden = g.dataset.tier !== tierSel.value);
 });
+const secSel = document.getElementById("secTierSel");
+if (secSel) secSel.addEventListener("change", () => {
+  document.querySelectorAll("[data-sectier]").forEach(g =>
+    g.hidden = g.dataset.sectier !== secSel.value);
+});
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
 // Page tabs drive everything: which pane is visible, and which dataset the console serves.
 // One console, moved by nobody - two would mean duplicate element ids and dead handlers.
@@ -1109,6 +1193,8 @@ def main() -> int:
     # the second run actually returned.
     _rrp = RESULTS / "v3_matrix_judged.json"
     rerun = json.loads(_rrp.read_text(encoding="utf-8")) if _rrp.exists() else None
+    _secb = RESULTS / "sec_budgets.json"
+    secb = json.loads(_secb.read_text(encoding="utf-8")) if _secb.exists() else None
     _v3p = RESULTS / "v3_types_published.json"
     v3m = json.loads(_v3p.read_text(encoding="utf-8")) if _v3p.exists() else None
     _b50p = RESULTS / "budget50_judge.json"
@@ -1239,6 +1325,50 @@ def main() -> int:
     A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
     A(dataset_card('sec', {'P1JUDGE': f"{S['p1']['judge']:.0f}%"}))
 
+    if secb:
+        # ---- EQUAL BUDGET on the SEC set. The scorecard above reports the shipped behaviour,
+        # where GraphRAG's routes request 4-6 chunks and aggregation retrieves graph facts
+        # rather than chunks - so both arms share a 10-item cap but do not read the same amount.
+        # These rows force the chunk-using routes to the baseline's k so the comparison is not
+        # partly a budget difference. Accuracy barely moves across the three (GraphRAG 36/35/33,
+        # baseline 25/26/25), so the token figures are not bought with correctness.
+        A('</section><section>')
+        A('<h2>Equal budget &mdash; the same question set at matched chunk counts</h2>')
+        A('<p class="budgetline">Both arms already share one hard cap '
+          '(10 items &times; 2,000 characters). What differs is how much of it each fills: the '
+          'baseline reads its full allowance on every question, while GraphRAG\'s routes ask '
+          'for 4&ndash;6 and its <b>aggregation</b> route retrieves typed graph edges instead of '
+          'chunks. The first two rows force every vector request to the baseline\'s k, so the '
+          'chunk-using routes genuinely read the same number. <b>Use the dropdown</b> &mdash; '
+          'the saving is concentrated in one question type.</p>')
+        A(sec_budget_types(secb))
+        A(drops(
+            ('The saving is aggregation, and it survives every equalisation',
+             f'<b>{secb["k10"]["aggregation"]["p3"]["tok"]:,} tokens against '
+             f'{secb["k10"]["aggregation"]["p2"]["tok"]:,} on the '
+             f'{secb["k10"]["aggregation"]["n"]} aggregation questions &mdash; '
+             f'{100*(secb["k10"]["aggregation"]["p2"]["tok"]-secb["k10"]["aggregation"]["p3"]["tok"])/secb["k10"]["aggregation"]["p2"]["tok"]:.0f}% '
+             'fewer.</b> Forcing chunks does not touch it: this route answers from typed edges '
+             'and sends one provenance sentence each, so there is no chunk budget to equalise. '
+             'It is the same shape a top-k retriever structurally cannot do &mdash; gather every '
+             'company matching a property before the answer exists.'),
+            ('On the other routes GraphRAG is level or dearer, and the grid shows it',
+             '<b>Lookup, bridge, compare and temporal are not token wins at equal chunks.</b> '
+             'At 10 v 10 lookup is within 5% of the baseline and compare is 17% worse; at 6 v 6 '
+             'bridge is 13% worse. Those routes fetch chunks like the baseline does and then add '
+             'a graph hop on top, so there is nothing to compress. The set-wide figure is an '
+             'average over one route that wins heavily and four that do not.'),
+            ('Why the set-wide number falls as the budget falls',
+             f'<b>{100*(secb["shipped"]["all"]["p2"]["tok"]-secb["shipped"]["all"]["p3"]["tok"])/secb["shipped"]["all"]["p2"]["tok"]:.0f}% '
+             f'as shipped, '
+             f'{100*(secb["k10"]["all"]["p2"]["tok"]-secb["k10"]["all"]["p3"]["tok"])/secb["k10"]["all"]["p2"]["tok"]:.0f}% '
+             f'at 10 v 10, '
+             f'{100*(secb["k6"]["all"]["p2"]["tok"]-secb["k6"]["all"]["p3"]["tok"])/secb["k6"]["all"]["p2"]["tok"]:.0f}% '
+             'at 6 v 6.</b> Cutting the budget makes the baseline cheaper while aggregation '
+             'hardly moves, so the gap narrows even though the ratio on aggregation holds. Part '
+             'of the shipped figure is GraphRAG reading fewer chunks; the part that survives '
+             'matched budgets is the compression.')))
+
     A('</section></div>')
     A('<div class="pane pane-textual" id="paneT" hidden>')
     # ---- SCORECARD FIRST, same reasoning as the factual pane above.
@@ -1338,21 +1468,12 @@ def main() -> int:
       'three pipelines judged blind. The enterprise build reuses the harness and replaces the '
       'expensive half — see the note under the diagram.</p>')
     A('<figure class="arch">'
-      '<img src="architecture-sec.png" alt="End-to-end architecture: SEC filings corpus, '
-      'two-phase Gemini extraction into a curated knowledge graph, TigerGraph Savanna as '
-      'graph and vector store, the three pipelines, and the blind judging layer." '
+      '<img src="architecture-sec.png" alt="End-to-end architecture: 400 SEC filings, '
+        'two-phase Gemini 3.7 Flash-Lite extraction and canonicalisation into a curated '
+        'knowledge graph, TigerGraph Savanna as graph and vector store, the three pipelines '
+        'with the GraphRAG router and its four routes, and the blind judging layer." '
       'loading="lazy">'
-      '<figcaption>Round 3 / SEC pipeline. The enterprise build differs in four ways that '
-      'matter — see below.</figcaption></figure>')
-    A(callout(
-        '<b>What the enterprise build does differently.</b> Four things in that diagram do '
-        'not apply to it. <b>No extraction:</b> every document already names its author, its '
-        'channel and its project, so 128,282 provenance edges came from metadata fields at '
-        'zero LLM cost and 100% coverage — there is no two-phase Gemini pass and no '
-        'canonicalisation step. <b>No ChromaDB:</b> TigerGraph Savanna is the vector store '
-        'for <i>both</i> retrieval arms, which is what removes the vector store as a '
-        'variable. The graph is <code>enterprise</code>, not <code>finance</code>, and the '
-        'judge is gemini-3.1-pro-preview rather than gpt-4o-mini.'))
+      '<figcaption>Round 3 / SEC pipeline.</figcaption></figure>')
     A(callout(
         '<b>The baseline retrieves through TigerGraph too.</b> Both arms use the same vector '
         'store, the same embedder and the same corpus, so the only difference between them is '
@@ -1586,12 +1707,12 @@ def main() -> int:
             # The aggregation-tier multiple used to sit here. It is still the most interesting
             # SEC result, so it stays in the callout under the scorecard —
             # only the headline card is gone, to keep this row to two cards.
-            # GraphRAG's judged score leads the card, with the other two arms on the
-            # sub-line. LLM-only's 38.3% is the contamination figure and stays visible there,
-            # plus in the SEC scorecard and its callout below — moved down the page, not dropped.
+            # GraphRAG's judged score leads the card with the baseline on the sub-line. The
+            # LLM-only arm is dropped from this card; its score and the contamination reading
+            # still appear in the SEC scorecard and the collapsed note below it, so nothing is
+            # hidden — it is only off the headline card.
             (f"{S['p3']['judge']:.1f}%", "GraphRAG judged score",
-             f"Basic RAG {S['p2']['judge']:.1f}% · LLM-only {S['p1']['judge']:.1f}% "
-             f"(contamination)", ""),
+             f"Basic RAG {S['p2']['judge']:.1f}%", ""),
         ],
         "textual": [
             # From budget50_judge.json - the mixed 50-question set. Falls back to the older

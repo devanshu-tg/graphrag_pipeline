@@ -1,0 +1,225 @@
+{
+ "_meta": {
+  "n": 50,
+  "model": "gemini-3.7-flash",
+  "judge": "gemini-3.1-pro-preview",
+  "rubric": "v2",
+  "routes": "the four strategies the pipeline implements: aggregation, bridge, lookup, default",
+  "note": "one in-process run per budget, both arms measured together; 'routed budget' is the shipped behaviour where GraphRAG's routes request 4-6 chunks and aggregation retrieves typed graph edges instead of chunks",
+  "labels": {
+   "shipped": [
+    "Basic RAG\n10 chunks",
+    "GraphRAG\nrouted budget"
+   ],
+   "k10": [
+    "Basic RAG\n10 chunks",
+    "GraphRAG\n10 chunks"
+   ],
+   "k6": [
+    "Basic RAG\n6 chunks",
+    "GraphRAG\n6 chunks"
+   ]
+  }
+ },
+ "shipped": {
+  "all": {
+   "n": 50,
+   "p2": {
+    "full": 25,
+    "judge": 66.1,
+    "tok": 5121
+   },
+   "p3": {
+    "full": 36,
+    "judge": 84.0,
+    "tok": 2992
+   }
+  },
+  "lookup": {
+   "n": 15,
+   "p2": {
+    "full": 14,
+    "judge": 96.7,
+    "tok": 5705
+   },
+   "p3": {
+    "full": 14,
+    "judge": 93.3,
+    "tok": 3560
+   }
+  },
+  "bridge": {
+   "n": 7,
+   "p2": {
+    "full": 2,
+    "judge": 35.7,
+    "tok": 5098
+   },
+   "p3": {
+    "full": 4,
+    "judge": 64.3,
+    "tok": 5501
+   }
+  },
+  "default": {
+   "n": 6,
+   "p2": {
+    "full": 4,
+    "judge": 80.0,
+    "tok": 5306
+   },
+   "p3": {
+    "full": 4,
+    "judge": 73.3,
+    "tok": 4976
+   }
+  },
+  "aggregation": {
+   "n": 22,
+   "p2": {
+    "full": 5,
+    "judge": 51.1,
+    "tok": 4679
+   },
+   "p3": {
+    "full": 14,
+    "judge": 86.9,
+    "tok": 1266
+   }
+  }
+ },
+ "k10": {
+  "all": {
+   "n": 50,
+   "p2": {
+    "full": 26,
+    "judge": 66.9,
+    "tok": 5120
+   },
+   "p3": {
+    "full": 35,
+    "judge": 82.6,
+    "tok": 3599
+   }
+  },
+  "lookup": {
+   "n": 15,
+   "p2": {
+    "full": 14,
+    "judge": 96.7,
+    "tok": 5704
+   },
+   "p3": {
+    "full": 13,
+    "judge": 90.0,
+    "tok": 5447
+   }
+  },
+  "bridge": {
+   "n": 7,
+   "p2": {
+    "full": 2,
+    "judge": 35.7,
+    "tok": 5098
+   },
+   "p3": {
+    "full": 5,
+    "judge": 78.6,
+    "tok": 5257
+   }
+  },
+  "default": {
+   "n": 6,
+   "p2": {
+    "full": 5,
+    "judge": 86.7,
+    "tok": 5298
+   },
+   "p3": {
+    "full": 3,
+    "judge": 63.3,
+    "tok": 5664
+   }
+  },
+  "aggregation": {
+   "n": 22,
+   "p2": {
+    "full": 5,
+    "judge": 51.2,
+    "tok": 4680
+   },
+   "p3": {
+    "full": 14,
+    "judge": 84.2,
+    "tok": 1248
+   }
+  }
+ },
+ "k6": {
+  "all": {
+   "n": 50,
+   "p2": {
+    "full": 25,
+    "judge": 62.9,
+    "tok": 3327
+   },
+   "p3": {
+    "full": 33,
+    "judge": 81.2,
+    "tok": 2502
+   }
+  },
+  "lookup": {
+   "n": 15,
+   "p2": {
+    "full": 14,
+    "judge": 96.7,
+    "tok": 3691
+   },
+   "p3": {
+    "full": 13,
+    "judge": 90.0,
+    "tok": 3564
+   }
+  },
+  "bridge": {
+   "n": 7,
+   "p2": {
+    "full": 1,
+    "judge": 23.9,
+    "tok": 3268
+   },
+   "p3": {
+    "full": 3,
+    "judge": 57.1,
+    "tok": 3691
+   }
+  },
+  "default": {
+   "n": 6,
+   "p2": {
+    "full": 5,
+    "judge": 83.3,
+    "tok": 3424
+   },
+   "p3": {
+    "full": 3,
+    "judge": 66.7,
+    "tok": 3654
+   }
+  },
+  "aggregation": {
+   "n": 22,
+   "p2": {
+    "full": 5,
+    "judge": 46.8,
+    "tok": 3072
+   },
+   "p3": {
+    "full": 14,
+    "judge": 86.9,
+    "tok": 1085
+   }
+  }
+ }
+}

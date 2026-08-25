@@ -157,6 +157,42 @@ _PLURAL_ASK = _re.compile(
     r"|\bwhich two\b|\blist\b|\ball of (which|them)\b|\bhow many\b", _re.I)
 
 
+_GRAPH_FACTS: dict = {}
+
+
+def _install_facts_capture(p3) -> None:
+    """Record the graph-facts block per question so the console can report what the traversal
+    returned instead of a chunk count.
+
+    An aggregation answer can legitimately read ZERO chunks - the traversal returns the answer
+    and there is nothing to retrieve - and "chunks 0" reads as a failure when it is the best
+    case. graph_facts is a local in run_single and mastergraph-round3/ is frozen, so it is
+    captured by wrapping _build_prompt rather than editing their file.
+    """
+    orig = p3._build_prompt
+
+    def build(question, context, graph_facts=""):
+        _GRAPH_FACTS[question.strip()] = graph_facts or ""
+        return orig(question, context, graph_facts)
+
+    p3._build_prompt = build
+
+
+def _facts_count(question: str) -> tuple[int, str]:
+    """(number of entities the traversal returned, the traversal line) for a question."""
+    gf = _GRAPH_FACTS.get(question.strip(), "")
+    if not gf:
+        return 0, ""
+    # shape: "Companies satisfying [rel->target] (from graph traversal): AMZN, HON"
+    tail = gf.rsplit(":", 1)[-1]
+    names = [x.strip() for x in tail.split(",") if x.strip()]
+    m = _re.search(r"\[([^\]]+)\]", gf)
+    trail = ""
+    if m and names:
+        trail = f"{m.group(1)} \u21d2 {', '.join(names[:8])}"
+    return len(names), trail
+
+
 def _install_router(p3) -> None:
     """Wrap p3.route so bridge is detected on meaning and tested before aggregation."""
     if os.getenv("SEC_ROUTER", "fixed") == "orig":
@@ -228,6 +264,7 @@ def warm() -> None:
             if os.getenv("SEC_PROMPT", "v2") != "v1":
                 _patch_prompt_rules(mg_config)
             _install_router(p3)
+            _install_facts_capture(p3)
             print(f"[factual] model={mg_config.GEMINI_MODEL} max_tokens={mg_config.MAX_TOKENS} "
                   f"no_refusal={NO_REFUSAL} prompt={os.getenv('SEC_PROMPT', 'v2')}")
             _state["config"] = {"model": mg_config.GEMINI_MODEL,
@@ -262,7 +299,9 @@ def run(question: str) -> dict:
                         "prompt_tokens": pt, "completion_tokens": ct, "planner_tokens": 0,
                         "tokens": pt + ct, "route": route,
                         "latency": getattr(m, "latency_seconds", 0),
-                        "chunks": getattr(m, "retrieved_chunks", 0)})
+                        "chunks": getattr(m, "retrieved_chunks", 0),
+                        "graph_facts": (_facts_count(question)[0] if arm == "p3" else 0),
+                        "graph_trail": (_facts_count(question)[1] if arm == "p3" else "")})
         except Exception as e:
             out.append({"arm": arm, "answer": f"ERROR: {e}", "tokens": 0, "route": "error",
                         "prompt_tokens": 0, "completion_tokens": 0, "planner_tokens": 0,

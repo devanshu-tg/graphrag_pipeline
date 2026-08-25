@@ -326,6 +326,7 @@ def warm() -> None:
             spec.loader.exec_module(p3)
             p3._load()
             p3._connect()
+            _install_ent_facts_capture(p3)
             import pipeline1_llm_only as p1
             import pipeline2_basic_rag as p2
             # The published baseline is the RERANKED one. The console sends arm "p2rr" and
@@ -389,6 +390,8 @@ def run_query(question: str, arms: list[str]) -> dict:
                         "tokens": pt + ct + plan, "route": route,
                         "latency": getattr(m, "latency_seconds", 0),
                         "chunks": getattr(m, "retrieved_chunks", 0),
+                        "graph_facts": (_ent_facts_count(question)[0] if arm == "p3" else 0),
+                        "graph_trail": (_ent_facts_count(question)[1] if arm == "p3" else ""),
                         "sources": src[:6]})
         except Exception as e:
             out.append({"arm": arm, "answer": f"ERROR: {e}", "tokens": 0, "route": "error",
@@ -497,6 +500,36 @@ def factual_live(question: str) -> dict | None:
 # Costs one extra call per arm (~1-3s). SEC_JUDGE=0 turns it off and restores the em-dash.
 SEC_JUDGE = os.getenv("SEC_JUDGE", "1") != "0"
 _judge_mod = None
+
+
+_ENT_FACTS: dict = {}
+
+
+def _install_ent_facts_capture(p3mod) -> None:
+    """Record the traversal block per question so the console can report graph facts instead of
+    a chunk count. A graph route can legitimately read ZERO chunks - the traversal returns the
+    answer - and "chunks 0" reads as a failure when it is the best case."""
+    orig = p3mod._build_prompt
+
+    def build(question, context, facts=""):
+        _ENT_FACTS[question.strip()] = facts or ""
+        return orig(question, context, facts)
+
+    p3mod._build_prompt = build
+
+
+def _ent_facts_count(question: str) -> tuple[int, str]:
+    """(entities the traversal returned, a short traversal line) for a question."""
+    import re as _r
+    gf = _ENT_FACTS.get(question.strip(), "")
+    if not gf:
+        return 0, ""
+    # shape: "Graph traversal [legs] (N results): a, b, c"
+    tail = gf.rsplit(":", 1)[-1]
+    names = [x.strip() for x in tail.split(",") if x.strip()]
+    m = _r.search(r"\[([^\]]+)\]", gf)
+    trail = f"{m.group(1)} \u21d2 {', '.join(names[:8])}" if (m and names) else ""
+    return len(names), trail
 
 
 def _sec_judge():
