@@ -117,6 +117,23 @@ SYSTEM_PROMPT = (
     "Output the answer ONLY - no 'Citations:' line. Evidence is recorded automatically."
 )
 
+# ENT_PROMPT=v2 appends a constraint-filtering rule. Measured on FIN46/FIN49: the Graph
+# traversal line listed every member of the channel and the model output all 200+, because the
+# instruction above says "COMPLETE list, do not stop early" and declares the traversal
+# AUTHORITATIVE. Gold was two names. The traversal answers ONE constraint; a two-constraint
+# question needs the second applied afterwards, and only the model can do that from context.
+# Default stays v1 so nothing already measured shifts underneath.
+if os.getenv("ENT_PROMPT", "v1") != "v1":
+    SYSTEM_PROMPT += (
+        "\nIMPORTANT - multi-constraint questions:\n"
+        "- If the question carries MORE THAN ONE constraint (e.g. 'people from the X department "
+        "who take part in Y'), the Graph traversal line answers only ONE of them. Output ONLY "
+        "the items satisfying EVERY constraint, checking each candidate against the context. "
+        "A long traversal list is a list of CANDIDATES, not the answer. Leave out any candidate "
+        "you cannot confirm against the other constraint.\n"
+        "- A list longer than about ten items is almost always an unfiltered traversal. Filter "
+        "it rather than repeating it.\n")
+
 # gemini-2.5-flash draws THINKING and visible output from the same maxOutputTokens budget.
 # Measured on the SEC run: ~489 of a 512 budget went to reasoning, leaving ~11 for the
 # answer — and here it truncated the router's JSON plan at 7 tokens, which silently made

@@ -590,7 +590,7 @@ def run_single(question: str, vectorstore=None, num_hops: int = 2) -> CallMetric
         # non-deterministic even at temperature 0. Re-draw the plan instead of accepting the
         # first dud, and say so when every draw lands nothing.
         for _try in range(GRAPH_PLAN_TRIES):
-            plan = schema_router.plan(question, get_llm_response)
+            plan = schema_router.plan(question, get_llm_response, attempt=_try)
             if not plan["legs"]:
                 break                       # plan() already reported the no-plan case
             landed, trail = _walk(plan)

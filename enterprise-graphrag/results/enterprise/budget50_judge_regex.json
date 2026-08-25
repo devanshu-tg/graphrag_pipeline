@@ -1,0 +1,51 @@
+{
+ "rag3": {
+  "n": 50,
+  "full": 27,
+  "part": 13,
+  "zero": 10,
+  "judge": 63.8,
+  "tok": 1730
+ },
+ "rag10": {
+  "n": 50,
+  "full": 31,
+  "part": 10,
+  "zero": 9,
+  "judge": 68.4,
+  "tok": 5442
+ },
+ "graph3": {
+  "n": 50,
+  "full": 49,
+  "part": 1,
+  "zero": 0,
+  "judge": 99.0,
+  "tok": 1327
+ },
+ "graph10": {
+  "n": 50,
+  "full": 49,
+  "part": 1,
+  "zero": 0,
+  "judge": 99.0,
+  "tok": 4953
+ },
+ "_meta": {
+  "n": 50,
+  "model": "gemini-3.7-flash",
+  "judge": "gemini-3.1-pro-preview",
+  "rubric": "v2",
+  "rr_pool": 500,
+  "note": "count rows are exact set match; the judge row is the blind LLM judge with partial credit",
+  "graph_arm": "GraphRAG re-measured with the pattern router on eval_mixed50 (MX01-MX50), judged gemini-3.1-pro-preview rubric v2. Basic RAG and LLM-only rows are unchanged from the original run, which was measured on eval_final50_v3 - the two columns are therefore from different 50-question sets."
+ },
+ "p1": {
+  "n": 50,
+  "full": 1,
+  "part": 1,
+  "zero": 48,
+  "judge": 8.2,
+  "tok": 270
+ }
+}

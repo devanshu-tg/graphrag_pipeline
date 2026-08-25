@@ -262,6 +262,11 @@ def budget_types(d: dict) -> str:
     TIERS = [("all", "All 50 questions"), ("single_dir", "Directory lookup"),
              ("single_doc", "Single-document"), ("basic", "Benchmark-supplied"),
              ("small_set", "Small-set"), ("multi_hop", "Multi-hop")]
+    # Only render a tier every arm actually has. When the arms come from different question
+    # sets their tier lists differ, and d[arm][tier] would raise KeyError mid-build - a tier
+    # one arm cannot fill is not a comparison, so it is dropped rather than half-drawn.
+    _arms = [a for a in ("rag10", "rag3", "graph10", "graph3") if a in d]
+    TIERS = [(t, l) for t, l in TIERS if all(t in d[a] for a in _arms)]
     out = ['<div class="gridwrap">']
     out.append('<div class="gridbar"><label for="tierSel">Question type</label>'
                '<select id="tierSel">'
@@ -1170,7 +1175,9 @@ def main() -> int:
                     help="X-Demo-Token value; it ends up in the published page")
     args = ap.parse_args()
 
-    ent = load("eval_pub50.jsonl")
+    # GraphRAG re-measured with the pattern router; the *_regex files carry the SAME
+    # Basic RAG and LLM-only rows as the originals, with only the graph arm replaced.
+    ent = load("eval_pub50_regex.jsonl") or load("eval_pub50.jsonl")
     # Re-measured 2026-08-20: gemini-3.7-flash, no-refusal prompt applied to ALL THREE arms
     # (the config the published figures were meant to use and which was silently off), 8,192
     # token budget, judged by gemini-3.1-pro-preview under the v2 rubric. GraphRAG 35/50
@@ -1195,9 +1202,13 @@ def main() -> int:
     rerun = json.loads(_rrp.read_text(encoding="utf-8")) if _rrp.exists() else None
     _secb = RESULTS / "sec_budgets.json"
     secb = json.loads(_secb.read_text(encoding="utf-8")) if _secb.exists() else None
-    _v3p = RESULTS / "v3_types_published.json"
+    _v3p = RESULTS / "v3_types_published_regex.json"
+    if not _v3p.exists():
+        _v3p = RESULTS / "v3_types_published.json"
     v3m = json.loads(_v3p.read_text(encoding="utf-8")) if _v3p.exists() else None
-    _b50p = RESULTS / "budget50_judge.json"
+    _b50p = RESULTS / "budget50_judge_regex.json"
+    if not _b50p.exists():
+        _b50p = RESULTS / "budget50_judge.json"
     b50 = json.loads(_b50p.read_text(encoding="utf-8")) if _b50p.exists() else None   # 2x2 budget grid, one controlled run
     if not ent or not sec:
         print("ABORT: eval_pub50.jsonl or eval_sec_fair_prompt.jsonl missing")
@@ -1287,7 +1298,10 @@ def main() -> int:
 
     A('<div class="wrap">')
     A('<div class="nav"><span class="brand"><i></i>GraphRAG evaluation</span>'
-      '<button class="tab on" id="tabF">Factual \u00b7 SEC</button>'
+      # "Hybrid", not "Factual": the SEC router seeds 26 of 50 questions with similarity
+      # search (lookup 16, bridge 4, compare 3, temporal 3) and only the 24 aggregation
+      # questions are answered from graph edges alone. The arm is graph PLUS vector.
+      '<button class="tab on" id="tabF">Hybrid \u00b7 SEC</button>'
       '<button class="tab" id="tabT">Textual \u00b7 Enterprise</button>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
     # ---- OVERALL PERFORMANCE: headline + the two KPI cards. The interactive console used to
@@ -1606,13 +1620,15 @@ def main() -> int:
              'slots are mostly padding &mdash; and it holds per type, not just on average. That '
              'is why the baseline is shown at 10 chunks without apology: it is not being '
              'starved, it is being given more than it can use.'),
-            ('The margin is entirely in the two types that need a join',
-             f'<b>Small-set {v3m["rag10"]["small_set"]["full"]}/'
-             f'{v3m["rag10"]["small_set"]["n"]} against '
-             f'{v3m["graph10"]["small_set"]["full"]}/{v3m["graph10"]["small_set"]["n"]}; '
-             f'multi-hop {v3m["rag10"]["multi_hop"]["full"]}/'
-             f'{v3m["rag10"]["multi_hop"]["n"]} against '
-             f'{v3m["graph10"]["multi_hop"]["full"]}/{v3m["graph10"]["multi_hop"]["n"]}.</b> '
+            ('The margin is entirely in the types that need a join',
+             # Only name tiers BOTH arms measured. When the arms come from different question
+             # sets one may lack a tier, and quoting it would either crash the build or print a
+             # comparison against nothing.
+             '<b>' + '; '.join(
+                 f'{lbl} {v3m["rag10"][k]["full"]}/{v3m["rag10"][k]["n"]} against '
+                 f'{v3m["graph10"][k]["full"]}/{v3m["graph10"][k]["n"]}'
+                 for k, lbl in (("small_set", "Small-set"), ("multi_hop", "Multi-hop"))
+                 if k in v3m["rag10"] and k in v3m["graph10"]) + '.</b> '
              'Not narrow margins &mdash; the baseline scores near zero on both, at either '
              'budget. These questions need every document about a person gathered before the '
              'answer exists, and no reranker fixes that, because nothing puts hundreds of '
@@ -1699,7 +1715,10 @@ def main() -> int:
     # sections cannot disagree.
     stats_js = json.dumps({
         "factual": [
-            ((f"-{sec_sub['red']:.0f}%" if sec_sub else f"-{sec_red:.0f}%"),
+            # Two decimals on THIS card only: the figure Sebastien measured is 50.81%,
+            # and rounding it to -51% loses the precision he asked for. The textual card
+            # below keeps whole percent.
+            ((f"-{sec_sub['red']:.2f}%" if sec_sub else f"-{sec_red:.2f}%"),
              "GraphRAG vs Basic RAG token reduction",
              (f"{sec_sub['p3']:,.0f} vs {sec_sub['p2']:,.0f} per question "
               f"on comparable answers" if sec_sub

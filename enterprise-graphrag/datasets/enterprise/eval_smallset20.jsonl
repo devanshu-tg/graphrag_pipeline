@@ -1,0 +1,20 @@
+{"question_id": "SET01", "tier": "small_set", "question": "Which Slack channels does Sara Kim take part in?", "answer": "eng-infra, eng-oncall, incidents", "n_members": 3, "n_docs": 5}
+{"question_id": "SET02", "tier": "small_set", "question": "Which Slack channels does Victor Alvarez take part in?", "answer": "eng-infra, eng-sre, incidents", "n_members": 3, "n_docs": 8}
+{"question_id": "SET03", "tier": "small_set", "question": "Which Slack channels does Quentin Harris take part in?", "answer": "eng-platform, eng-releases, incidents", "n_members": 3, "n_docs": 5}
+{"question_id": "SET04", "tier": "small_set", "question": "Which Slack channels does Jorge Alvarez take part in?", "answer": "architecture, customer-success, eng-oncall, incidents", "n_members": 4, "n_docs": 7}
+{"question_id": "SET05", "tier": "small_set", "question": "Which Slack channels does Sanjay Rao take part in?", "answer": "all-hands, eng, eng-ml, eng-releases", "n_members": 4, "n_docs": 6}
+{"question_id": "SET06", "tier": "small_set", "question": "Which Slack channels does Nina Patel take part in?", "answer": "eng-releases, finance, marketing, sales", "n_members": 4, "n_docs": 6}
+{"question_id": "SET07", "tier": "small_set", "question": "Which Slack channels does Legal Team take part in?", "answer": "announcements, eng-releases, eng-security, partnerships", "n_members": 4, "n_docs": 6}
+{"question_id": "SET08", "tier": "small_set", "question": "Which Slack channels does Nina Park take part in?", "answer": "customer-success, eng-platform, finance, partnerships", "n_members": 4, "n_docs": 7}
+{"question_id": "SET09", "tier": "small_set", "question": "Which Slack channels does Jamal Ortiz take part in?", "answer": "devex, eng-platform, product", "n_members": 3, "n_docs": 6}
+{"question_id": "SET10", "tier": "small_set", "question": "Which Slack channels does Jamie Park take part in?", "answer": "architecture, eng-platform, eng-runtime", "n_members": 3, "n_docs": 6}
+{"question_id": "SET11", "tier": "small_set", "question": "Which Slack channels does Omar Ruiz take part in?", "answer": "eng-platform, eng-security, partnerships", "n_members": 3, "n_docs": 5}
+{"question_id": "SET12", "tier": "small_set", "question": "Which Slack channels does Jules Park take part in?", "answer": "docs, new-hires, partnerships, support", "n_members": 4, "n_docs": 7}
+{"question_id": "SET13", "tier": "small_set", "question": "Which Slack channels does Samir Chen take part in?", "answer": "customer-success, eng-platform, product", "n_members": 3, "n_docs": 5}
+{"question_id": "SET14", "tier": "small_set", "question": "Which Slack channels does Ivy Chen take part in?", "answer": "devex, docs, eng-sre", "n_members": 3, "n_docs": 8}
+{"question_id": "SET15", "tier": "small_set", "question": "Which Slack channels does Alex Morgan take part in?", "answer": "design, eng-runtime, eng-security", "n_members": 3, "n_docs": 4}
+{"question_id": "SET16", "tier": "small_set", "question": "Which Slack channels does Devon Park take part in?", "answer": "eng-ml, eng-platform, eng-releases, marketing", "n_members": 4, "n_docs": 7}
+{"question_id": "SET17", "tier": "small_set", "question": "Which Slack channels does Maya Rivera take part in?", "answer": "customer-success, eng-releases, incidents", "n_members": 3, "n_docs": 8}
+{"question_id": "SET18", "tier": "small_set", "question": "Which Slack channels does Alex Park take part in?", "answer": "customer-success, docs, eng-runtime, marketing", "n_members": 4, "n_docs": 5}
+{"question_id": "SET19", "tier": "small_set", "question": "Which Slack channels does Jun Park take part in?", "answer": "eng-releases, eng-runtime, incidents", "n_members": 3, "n_docs": 7}
+{"question_id": "SET20", "tier": "small_set", "question": "Which Slack channels does Grace Kim take part in?", "answer": "eng-ml, eng-releases, eng-runtime", "n_members": 3, "n_docs": 7}

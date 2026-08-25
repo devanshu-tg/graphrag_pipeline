@@ -1,0 +1,452 @@
+[
+ {
+  "qid": "MX01",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX02",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX03",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX04",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX05",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX06",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX07",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX08",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX09",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX10",
+  "shape": "author",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX11",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX12",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX13",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX14",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX15",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX16",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX17",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX18",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX19",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX20",
+  "shape": "channel_of_doc",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX21",
+  "shape": "direct_reports",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX22",
+  "shape": "direct_reports",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX23",
+  "shape": "direct_reports",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 5,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX24",
+  "shape": "direct_reports",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 4,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX25",
+  "shape": "manager_of",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX26",
+  "shape": "manager_of",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX27",
+  "shape": "manager_of",
+  "route": "lookup",
+  "verdict": "exact",
+  "n_landed": 1,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX28",
+  "shape": "dept_members",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX29",
+  "shape": "dept_members",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 4,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX30",
+  "shape": "dept_members",
+  "route": "directory",
+  "verdict": "exact",
+  "n_landed": 4,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX31",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 4,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX32",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX33",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX34",
+  "shape": "dept_in_channel",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX35",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX36",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX37",
+  "shape": "dept_in_channel",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX38",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX39",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 5,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX40",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX41",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX42",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX43",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX44",
+  "shape": "dept_in_channel",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX45",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX46",
+  "shape": "dept_in_channel",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 4,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX47",
+  "shape": "intersection",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX48",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 3,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX49",
+  "shape": "dept_in_channel",
+  "route": "intersect",
+  "verdict": "exact",
+  "n_landed": 2,
+  "missed": [],
+  "extra": []
+ },
+ {
+  "qid": "MX50",
+  "shape": "two_hop_org",
+  "route": "chain",
+  "verdict": "exact",
+  "n_landed": 5,
+  "missed": [],
+  "extra": []
+ }
+]

@@ -1,0 +1,15 @@
+{"question_id": "HOP01", "tier": "set_4to6", "question": "Which Slack channels does Jordan Li take part in?", "answer": "design, devex, eng-infra, eng-ml, finance, new-hires", "n_members": 6, "n_docs": 12}
+{"question_id": "HOP02", "tier": "set_4to6", "question": "Which Slack channels does Wei Chen take part in?", "answer": "devex, docs, eng-oncall, eng-platform, eng-sre", "n_members": 5, "n_docs": 14}
+{"question_id": "HOP03", "tier": "set_4to6", "question": "Which Slack channels does Christine Wong take part in?", "answer": "eng-oncall, eng-sre, incidents, support", "n_members": 4, "n_docs": 15}
+{"question_id": "HOP04", "tier": "set_4to6", "question": "Which Slack channels does Peter Holtz take part in?", "answer": "architecture, eng-infra, eng-sre, incidents, postmortems", "n_members": 5, "n_docs": 16}
+{"question_id": "HOP05", "tier": "set_4to6", "question": "Which Slack channels does Owen Phillips take part in?", "answer": "eng-oncall, eng-platform, incidents, support", "n_members": 4, "n_docs": 14}
+{"question_id": "HOP06", "tier": "set_4to6", "question": "Which Slack channels does Sergio Costa take part in?", "answer": "eng-oncall, eng-platform, eng-releases, eng-sre, postmortems", "n_members": 5, "n_docs": 13}
+{"question_id": "HOP07", "tier": "set_4to6", "question": "Which Slack channels does Paula Mendes take part in?", "answer": "announcements, architecture, eng-sre, product", "n_members": 4, "n_docs": 16}
+{"question_id": "HOP08", "tier": "set_4to6", "question": "Which Slack channels does Sahana Iyer take part in?", "answer": "announcements, devex, eng, eng-infra, eng-releases", "n_members": 5, "n_docs": 15}
+{"question_id": "HOP09", "tier": "set_4to6", "question": "Which Slack channels does Devon Price take part in?", "answer": "eng-oncall, eng-platform, eng-releases, eng-runtime, eng-sre, incidents", "n_members": 6, "n_docs": 13}
+{"question_id": "HOP10", "tier": "set_4to6", "question": "Which Slack channels does Keiko Yamamoto take part in?", "answer": "architecture, eng-infra, eng-sre, postmortems", "n_members": 4, "n_docs": 14}
+{"question_id": "HOP11", "tier": "set_4to6", "question": "Which Slack channels does Caleb Johnson take part in?", "answer": "architecture, eng, eng-platform, eng-security, eng-sre, incidents", "n_members": 6, "n_docs": 16}
+{"question_id": "HOP12", "tier": "set_4to6", "question": "Which Slack channels does Jonah Patel take part in?", "answer": "architecture, docs, eng-runtime, incidents", "n_members": 4, "n_docs": 10}
+{"question_id": "HOP13", "tier": "set_4to6", "question": "Which Slack channels does Jorge Alvarez take part in?", "answer": "architecture, customer-success, eng-oncall, incidents", "n_members": 4, "n_docs": 7}
+{"question_id": "HOP14", "tier": "set_4to6", "question": "Which Slack channels does Sanjay Rao take part in?", "answer": "all-hands, eng, eng-ml, eng-releases", "n_members": 4, "n_docs": 6}
+{"question_id": "HOP15", "tier": "set_4to6", "question": "Which Slack channels does Nina Patel take part in?", "answer": "eng-releases, finance, marketing, sales", "n_members": 4, "n_docs": 6}

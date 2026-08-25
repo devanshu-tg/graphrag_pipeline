@@ -1,0 +1,1802 @@
+{
+ "MX01": {
+  "basic": [
+   "linear/product-management/PM-71258-quarter-plan-cadence-and-cross-functional-rhythm-for-private-deliverables.json#c0",
+   "linear/product-management/PM-981234-tenant-auditpath-milestone-orchestration.json#c0",
+   "linear/engineering/ENG-120305-metering-telemetry-gatekeeper.json#c0",
+   "linear/product-management/PM-223451-reliability-initiative-gatekeeper-automated-sli-reconciliation-runbook.json#c0",
+   "linear/engineering/ENG-834021-release-acceptance-gatekeeper-harness.json#c0",
+   "linear/engineering/ENG-98890-probabilistic-gatekeeper-for-canary-and-shadow-traffic.json#c0",
+   "linear/product-management/PM-24739-compliance-milestone-heatmap-and-dependencies.json#c2",
+   "gmail/dylan_brooks/20270514-milestone-checkpoint-no-show-reschedule-plan-update.json#c4",
+   "gmail/grace_oconnor/20270819-buyflow-align-map-owners-signature-deadline.json#c1",
+   "linear/engineering/ENG-79802-release-gatehouse-smoke-and-telemetry.json#c0"
+  ],
+  "graph": [
+   "linear/product-management/PM-624801-compliance-cutover-control-ownership-and-rollback-matrix.json#c0",
+   "linear/product-management/PM-981234-tenant-auditpath-milestone-orchestration.json#c0",
+   "github/pr-50721-kms-region-scoping-audit-enrichment-rbac-bindings.json#c0"
+  ],
+  "basic_2": [
+   "linear/product-management/PM-71258-quarter-plan-cadence-and-cross-functional-rhythm-for-private-deliverables.json#c0",
+   "linear/product-management/PM-981234-tenant-auditpath-milestone-orchestration.json#c0",
+   "linear/engineering/ENG-120305-metering-telemetry-gatekeeper.json#c0",
+   "linear/product-management/PM-223451-reliability-initiative-gatekeeper-automated-sli-reconciliation-runbook.json#c0",
+   "linear/engineering/ENG-834021-release-acceptance-gatekeeper-harness.json#c0",
+   "linear/engineering/ENG-98890-probabilistic-gatekeeper-for-canary-and-shadow-traffic.json#c0",
+   "linear/product-management/PM-24739-compliance-milestone-heatmap-and-dependencies.json#c2",
+   "gmail/dylan_brooks/20270514-milestone-checkpoint-no-show-reschedule-plan-update.json#c4",
+   "gmail/grace_oconnor/20270819-buyflow-align-map-owners-signature-deadline.json#c1",
+   "linear/engineering/ENG-79802-release-gatehouse-smoke-and-telemetry.json#c0"
+  ],
+  "graph_2": [
+   "linear/product-management/PM-624801-compliance-cutover-control-ownership-and-rollback-matrix.json#c0",
+   "github/pr-50721-kms-region-scoping-audit-enrichment-rbac-bindings.json#c0",
+   "linear/product-management/PM-981234-tenant-auditpath-milestone-orchestration.json#c0"
+  ]
+ },
+ "MX02": {
+  "basic": [
+   "confluence/oncall-and-incident-response/postmortems/2025-02-11-hosted-api-latency-fallback-activated.json#c0",
+   "linear/engineering/ENG-760412-rapid-5xx-triage-and-customer-facing-fallback-shim.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/2025-06-08-dedicated-cluster-degradation-fallback-to-hosted.json#c0",
+   "google_drive/users/atlas-customer-ops-comm-scratchpad.json#c0",
+   "linear/product-management/PM-86420-commitment-matrix-backstop-policies-hostedapi-modelcatalog.json#c0",
+   "linear/engineering/PM-808101-enterprise-gatebook-fallbacks-hosted-chat-streams.json#c0",
+   "linear/product-management/PM-167243-hosted-endpoint-qos-and-quality-prd-with-launch-gatechecklist.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/latency-regression-tokenizer-update-2026-01-27.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/eng-ops-commitments-decision-log-nov-18-2026.json#c1",
+   "confluence/eng-platform/runbooks/hosted-model-rollout-and-fallback.json#c0"
+  ],
+  "graph": [
+   "google_drive/shared_drives/product/hosted-api/hosted-api-control-plane-sync-stall-chronicle.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/2025-02-11-hosted-api-latency-fallback-activated.json#c0",
+   "linear/engineering/ENG-286460-connection-damping-and-retry-fallthrough-runbook.json#c0"
+  ],
+  "basic_2": [
+   "confluence/oncall-and-incident-response/postmortems/2025-02-11-hosted-api-latency-fallback-activated.json#c0",
+   "linear/engineering/ENG-760412-rapid-5xx-triage-and-customer-facing-fallback-shim.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/2025-06-08-dedicated-cluster-degradation-fallback-to-hosted.json#c0",
+   "google_drive/users/atlas-customer-ops-comm-scratchpad.json#c0",
+   "linear/product-management/PM-86420-commitment-matrix-backstop-policies-hostedapi-modelcatalog.json#c0",
+   "linear/engineering/PM-808101-enterprise-gatebook-fallbacks-hosted-chat-streams.json#c0",
+   "linear/product-management/PM-167243-hosted-endpoint-qos-and-quality-prd-with-launch-gatechecklist.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/latency-regression-tokenizer-update-2026-01-27.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/eng-ops-commitments-decision-log-nov-18-2026.json#c1",
+   "confluence/eng-platform/runbooks/hosted-model-rollout-and-fallback.json#c0"
+  ],
+  "graph_2": [
+   "linear/engineering/ENG-286460-connection-damping-and-retry-fallthrough-runbook.json#c0",
+   "google_drive/shared_drives/product/hosted-api/hosted-api-control-plane-sync-stall-chronicle.json#c0",
+   "confluence/oncall-and-incident-response/postmortems/2025-02-11-hosted-api-latency-fallback-activated.json#c0"
+  ]
+ },
+ "MX03": {
+  "basic": [
+   "linear/engineering/ENG-913579-attention-path-prefetcher-and-kernel-winnower.json#c0",
+   "linear/engineering/ENG-80111-token-tide-regulator-and-attention-prefetch-smoother.json#c0",
+   "github/pr-75012-neon-orchestrated-attn-hybrid-flash-lazykv-tiler.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/attention-runtime-hypothesis-sprint-04-observations.json#c0",
+   "github/pr-512345-shadowed-quant-dispatch-kv-prefetch-continuous-batcher.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/stochastic-attn-kernel-sensitivity-notes.json#c0",
+   "linear/engineering/ENG-881237-kernel-stratification-attention-fusion-hardening.json#c0",
+   "linear/engineering/ENG-314159-negotiated-kernel-adapter-attn-buffer-coalescing.json#c0",
+   "linear/engineering/ENG-110601-attention-fusion-optimizer-prefill-pacing-audit.json#c0",
+   "linear/engineering/ENG-372201-flashattn-prefetch-shard-adaptor-degradation-mitigation-investigation.json#c0"
+  ],
+  "graph": [
+   "linear/engineering/ENG-314159-negotiated-kernel-adapter-attn-buffer-coalescing.json#c0",
+   "linear/engineering/ENG-246136-prefill-decode-strata-kernel-inspector.json#c0",
+   "linear/engineering/ENG-913579-attention-path-prefetcher-and-kernel-winnower.json#c0"
+  ],
+  "basic_2": [
+   "linear/engineering/ENG-913579-attention-path-prefetcher-and-kernel-winnower.json#c0",
+   "linear/engineering/ENG-80111-token-tide-regulator-and-attention-prefetch-smoother.json#c0",
+   "github/pr-75012-neon-orchestrated-attn-hybrid-flash-lazykv-tiler.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/attention-runtime-hypothesis-sprint-04-observations.json#c0",
+   "github/pr-512345-shadowed-quant-dispatch-kv-prefetch-continuous-batcher.json#c0",
+   "google_drive/shared_drives/engineering/serving-runtime/stochastic-attn-kernel-sensitivity-notes.json#c0",
+   "linear/engineering/ENG-881237-kernel-stratification-attention-fusion-hardening.json#c0",
+   "linear/engineering/ENG-314159-negotiated-kernel-adapter-attn-buffer-coalescing.json#c0",
+   "linear/engineering/ENG-110601-attention-fusion-optimizer-prefill-pacing-audit.json#c0",
+   "linear/engineering/ENG-372201-flashattn-prefetch-shard-adaptor-degradation-mitigation-investigation.json#c0"
+  ],
+  "graph_2": [
+   "linear/engineering/ENG-314159-negotiated-kernel-adapter-attn-buffer-coalescing.json#c0",
+   "linear/engineering/ENG-246136-prefill-decode-strata-kernel-inspector.json#c0",
+   "linear/engineering/ENG-913579-attention-path-prefetcher-and-kernel-winnower.json#c0"
+  ]
+ },
+ "MX04": {
+  "basic": [
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c0",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c1",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c3",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c2",
+   "gmail/maya_srinivasan/20261211-cobaltbridge-caiq-lane-plan-and-call-minutes.json#c1",
+   "gmail/rohan_mehta/20260907-vendor-compliance-intake-prefill-meditech.json#c2",
+   "gmail/kimberly_park/20260918-helioquest-sig-intake-log-and-attachments.json#c1",
+   "confluence/applied-ml-and-evals/model-onboarding/hosted-api-model-intake.json#c0",
+   "gmail/irene_choi/20260701-vertexx-sig-caiq-qa-and-action-log.json#c2",
+   "gmail/kimberly_park/20260918-helioquest-sig-intake-log-and-attachments.json#c2"
+  ],
+  "graph": [
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c1",
+   "fireflies/sales-calls/2025-11-12-lyra-therapeutics-prompt-retention-policy-call.json#c0",
+   "slack/product/6177777777-ga-closeout-slo-monitoring.json#c0"
+  ],
+  "basic_2": [
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c0",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c1",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c3",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c2",
+   "gmail/maya_srinivasan/20261211-cobaltbridge-caiq-lane-plan-and-call-minutes.json#c1",
+   "gmail/rohan_mehta/20260907-vendor-compliance-intake-prefill-meditech.json#c2",
+   "gmail/kimberly_park/20260918-helioquest-sig-intake-log-and-attachments.json#c1",
+   "confluence/applied-ml-and-evals/model-onboarding/hosted-api-model-intake.json#c0",
+   "gmail/irene_choi/20260701-vertexx-sig-caiq-qa-and-action-log.json#c2",
+   "gmail/kimberly_park/20260918-helioquest-sig-intake-log-and-attachments.json#c2"
+  ],
+  "graph_2": [
+   "fireflies/sales-calls/2025-11-12-lyra-therapeutics-prompt-retention-policy-call.json#c0",
+   "gmail/vivek_kulkarni/20270509-lyra-onboarding-sig-caiq-intake.json#c1",
+   "slack/product/6177777777-ga-closeout-slo-monitoring.json#c0"
+  ]
+ },
+ "MX05": {
+  "basic": [
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c0",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c4",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c3",
+   "gmail/avery_johnson/20280329-subprocessor-disclosure-and-kms-transfer-clarify-paybridge.json#c2",
+   "gmail/jonas_weber/20261220-subproc-encryption-ownership-clarify.json#c3",
+   "gmail/ben_carter/20270720-msa-orderform-dpa-remediation-playbook.json#c3",
+   "gmail/sergio_alvarez/20260909-clearpath-supplychain-handoff-kms-clarify.json#c0",
+   "gmail/markus_klein/20261007-roster-request-edgebeam-onboard-and-kms-clarify.json#c2",
+   "gmail/ben_carter/20270720-msa-orderform-dpa-remediation-playbook.json#c5",
+   "linear/product-management/PM-912364-operator-auditproof-onboarding-and-sso-hsm-conformance-checklist.json#c0"
+  ],
+  "graph": [
+   "gmail/rafael_mendes/20270519-nimblecare-readyset-passoff.json#c3",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c3",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c4"
+  ],
+  "basic_2": [
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c0",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c4",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c3",
+   "gmail/avery_johnson/20280329-subprocessor-disclosure-and-kms-transfer-clarify-paybridge.json#c2",
+   "gmail/jonas_weber/20261220-subproc-encryption-ownership-clarify.json#c3",
+   "gmail/ben_carter/20270720-msa-orderform-dpa-remediation-playbook.json#c3",
+   "gmail/sergio_alvarez/20260909-clearpath-supplychain-handoff-kms-clarify.json#c0",
+   "gmail/markus_klein/20261007-roster-request-edgebeam-onboard-and-kms-clarify.json#c2",
+   "gmail/ben_carter/20270720-msa-orderform-dpa-remediation-playbook.json#c5",
+   "linear/product-management/PM-912364-operator-auditproof-onboarding-and-sso-hsm-conformance-checklist.json#c0"
+  ],
+  "graph_2": [
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c3",
+   "gmail/rafael_mendes/20270519-nimblecare-readyset-passoff.json#c3",
+   "gmail/evelyn_hart/20270610-processor-roster-handoff-kms-sourcing.json#c4"
+  ]
+ },
+ "MX06": {
+  "basic": [
+   "gmail/karthik_iyer/20270521-medbridge-security-subprocessor-checkin.json#c0",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c0",
+   "gmail/avery_johnson/20280329-subprocessor-disclosure-and-kms-transfer-clarify-paybridge.json#c0",
+   "gmail/mina_haddad/20261105-vendor-authorization-dataflow-attestation.json#c0",
+   "gmail/jordan_blake/20250528-subprocessor-decommission-evidence-request.json#c0",
+   "gmail/evelyn_hart/20270415-rfi-supplychain-disclosure-change-log-acme.json#c2",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c2",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c4",
+   "gmail/priyom_das/20270621-cloudchain-subprocessor-certification-sig-request.json#c0",
+   "gmail/marissa_cole/20270418-region-pin-pledge-and-subprocessor-sequencing-plan.json#c0"
+  ],
+  "graph": [
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c2",
+   "linear/product-management/PM-624801-compliance-cutover-control-ownership-and-rollback-matrix.json#c0",
+   "gmail/karthik_iyer/20270521-medbridge-security-subprocessor-checkin.json#c0"
+  ],
+  "basic_2": [
+   "gmail/karthik_iyer/20270521-medbridge-security-subprocessor-checkin.json#c0",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c0",
+   "gmail/avery_johnson/20280329-subprocessor-disclosure-and-kms-transfer-clarify-paybridge.json#c0",
+   "gmail/mina_haddad/20261105-vendor-authorization-dataflow-attestation.json#c0",
+   "gmail/jordan_blake/20250528-subprocessor-decommission-evidence-request.json#c0",
+   "gmail/evelyn_hart/20270415-rfi-supplychain-disclosure-change-log-acme.json#c2",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c2",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c4",
+   "gmail/priyom_das/20270621-cloudchain-subprocessor-certification-sig-request.json#c0",
+   "gmail/marissa_cole/20270418-region-pin-pledge-and-subprocessor-sequencing-plan.json#c0"
+  ],
+  "graph_2": [
+   "gmail/karthik_iyer/20270521-medbridge-security-subprocessor-checkin.json#c0",
+   "gmail/jasmine_liu/20270321-medvenue-security-subprocessors-and-data-boundaries-recap.json#c2",
+   "linear/product-management/PM-624801-compliance-cutover-control-ownership-and-rollback-matrix.json#c0"
+  ]
+ },
+ "MX07": {
+  "basic": [
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c0",
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c0",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c2",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c3",
+   "gmail/marissa_cole/20261210-opslyric-condense-and-reschedule.json#c0",
+   "fireflies/sales-calls/2027-04-07-json-sandbox-tool-execution-and-console-demo-with-arcadia-dataworks.json#c0",
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c1",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c1",
+   "gmail/neha_kapoor/20261130-arcadia-contract-kickoff-redline-route.json#c0",
+   "gmail/rishi_malhotra/20270130-arcadia-security-intake-sprint-cadence-and-sample-map.json#c0"
+  ],
+  "graph": [
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c0",
+   "gmail/dylan_brooks/20270427-demo-wrap-15day-trial-runway-arcadialane.json#c2",
+   "google_drive/shared_drives/kernel-lattice-weekly-capture.json#c3"
+  ],
+  "basic_2": [
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c0",
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c0",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c2",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c3",
+   "gmail/marissa_cole/20261210-opslyric-condense-and-reschedule.json#c0",
+   "fireflies/sales-calls/2027-04-07-json-sandbox-tool-execution-and-console-demo-with-arcadia-dataworks.json#c0",
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c1",
+   "gmail/vivek_kulkarni/20291107-arcadia-evening-walkthrough-reschedule.json#c1",
+   "gmail/neha_kapoor/20261130-arcadia-contract-kickoff-redline-route.json#c0",
+   "gmail/rishi_malhotra/20270130-arcadia-security-intake-sprint-cadence-and-sample-map.json#c0"
+  ],
+  "graph_2": [
+   "gmail/dylan_brooks/20270427-demo-wrap-15day-trial-runway-arcadialane.json#c2",
+   "fireflies/sales-calls/2027-07-22-runtime-inference-forensics-interactive-walkthrough-arcadia-retail.json#c0",
+   "google_drive/shared_drives/kernel-lattice-weekly-capture.json#c3"
+  ]
+ },
+ "MX08": {
+  "basic": [
+   "gmail/priya_natarajan/20261121-slot-swap-proxy-invite-widget-handoff.json#c0",
+   "gmail/karthik_iyer/20270505-widget-intake-slot-swap-request.json#c0",
+   "linear/product-management/PM-78145-dependency-crosswalk-and-release-gating-protocol.json#c2",
+   "github/redwood/pr-863412-slimline-sdk-credential-swap-and-pullstream-unification.json#c0",
+   "confluence/oncall-and-incident-response/runbooks/gpu-warm-pool-cross-account-handoff-runbook-2025.json#c0",
+   "google_drive/users/nocturne-observer-callstrip.json#c0",
+   "slack/partnerships/1768801111-proxy-retirement-partner-plan.json#c0",
+   "github/incident-bot/pr-827661-oncall-credential-rotator-and-safe-shared-secret-proxy.json#c0",
+   "gmail/soojin_lee/20260807-auriga-short-notice-rebook-lockdown.json#c1",
+   "linear/product-management/PM-7024-enterprise-ask-consolidation-and-scope-heuristics.json#c3"
+  ],
+  "graph": [
+   "linear/engineering/ENG-42817-preemptive-slot-scheduler-with-cache-affinity.json#c0",
+   "github/pr-95312-unify-handshake-consumer-ux-and-retry-bump.json#c0",
+   "google_drive/shared_drives/engineering/observability/ops-weave-standup-and-handoff-nov30-2027.json#c0"
+  ],
+  "basic_2": [
+   "gmail/priya_natarajan/20261121-slot-swap-proxy-invite-widget-handoff.json#c0",
+   "gmail/karthik_iyer/20270505-widget-intake-slot-swap-request.json#c0",
+   "linear/product-management/PM-78145-dependency-crosswalk-and-release-gating-protocol.json#c2",
+   "github/redwood/pr-863412-slimline-sdk-credential-swap-and-pullstream-unification.json#c0",
+   "confluence/oncall-and-incident-response/runbooks/gpu-warm-pool-cross-account-handoff-runbook-2025.json#c0",
+   "google_drive/users/nocturne-observer-callstrip.json#c0",
+   "slack/partnerships/1768801111-proxy-retirement-partner-plan.json#c0",
+   "github/incident-bot/pr-827661-oncall-credential-rotator-and-safe-shared-secret-proxy.json#c0",
+   "gmail/soojin_lee/20260807-auriga-short-notice-rebook-lockdown.json#c1",
+   "linear/product-management/PM-7024-enterprise-ask-consolidation-and-scope-heuristics.json#c3"
+  ],
+  "graph_2": [
+   "linear/engineering/ENG-42817-preemptive-slot-scheduler-with-cache-affinity.json#c0",
+   "github/pr-95312-unify-handshake-consumer-ux-and-retry-bump.json#c0",
+   "google_drive/shared_drives/engineering/observability/ops-weave-standup-and-handoff-nov30-2027.json#c0"
+  ]
+ },
+ "MX09": {
+  "basic": [
+   "linear/design/ENG-411007-stratified-hit-ensemble-ttl-runbook.json#c3",
+   "linear/design/ENG-411007-stratified-hit-ensemble-ttl-runbook.json#c0",
+   "confluence/eng-platform/runbooks/runbook-retention-purge-jobs.json#c0",
+   "linear/engineering/ENG-617890-probing-harness-staged-ttl-applier.json#c0",
+   "confluence/eng-platform/team-wiki/runbook-writing-and-telemetry-bootcamp-curriculum-2026.json#c0",
+   "confluence/security-and-compliance/ten-step-restoration-sprint-and-shadow-mentoring-handbook-2025.json#c0",
+   "linear/engineering/ENG-9153-stratified-arrival-benchmarking-harness.json#c0",
+   "confluence/eng-platform/how-tos/oncall-guide-unit-economics-dashboard.json#c0",
+   "confluence/eng-sre/runbooks/burst-pool-overload-mitigation-runbook.json#c0",
+   "linear/product-management/PM-67234-create-release-snapshot-templates-and-rapid-review-sprint.json#c2"
+  ],
+  "graph": [
+   "confluence/eng-platform/runbooks/runbook-retention-purge-jobs.json#c0",
+   "linear/engineering/ENG-673892-admin-runbook-playground-authorsim-export.json#c0",
+   "confluence/eng-platform/team-wiki/runbook-writing-and-telemetry-bootcamp-curriculum-2026.json#c0"
+  ],
+  "basic_2": [
+   "linear/design/ENG-411007-stratified-hit-ensemble-ttl-runbook.json#c3",
+   "linear/design/ENG-411007-stratified-hit-ensemble-ttl-runbook.json#c0",
+   "confluence/eng-platform/runbooks/runbook-retention-purge-jobs.json#c0",
+   "linear/engineering/ENG-617890-probing-harness-staged-ttl-applier.json#c0",
+   "confluence/eng-platform/team-wiki/runbook-writing-and-telemetry-bootcamp-curriculum-2026.json#c0",
+   "confluence/security-and-compliance/ten-step-restoration-sprint-and-shadow-mentoring-handbook-2025.json#c0",
+   "linear/engineering/ENG-9153-stratified-arrival-benchmarking-harness.json#c0",
+   "confluence/eng-platform/how-tos/oncall-guide-unit-economics-dashboard.json#c0",
+   "confluence/eng-sre/runbooks/burst-pool-overload-mitigation-runbook.json#c0",
+   "linear/product-management/PM-67234-create-release-snapshot-templates-and-rapid-review-sprint.json#c2"
+  ],
+  "graph_2": [
+   "linear/engineering/ENG-673892-admin-runbook-playground-authorsim-export.json#c0",
+   "confluence/eng-platform/runbooks/runbook-retention-purge-jobs.json#c0",
+   "confluence/eng-platform/team-wiki/runbook-writing-and-telemetry-bootcamp-curriculum-2026.json#c0"
+  ]
+ },
+ "MX10": {
+  "basic": [
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c0",
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c3",
+   "gmail/aditya_rao/20260902-qbr-account-velocity-readout-okr-checkins.json#c0",
+   "gmail/dylan_brooks/20280807-qbr-infra-sprint-rapid-check-ask.json#c0",
+   "gmail/tessa_morgan/20270309-commander-brief-account-drilldowns.json#c0",
+   "gmail/karthik_iyer/20280521-renewal-briefing-runway-and-qbr-window-request.json#c0",
+   "gmail/nikhil_sharma/20261021-qbr-rapid-fire-account-synopses-and-forecast-consolidation.json#c0",
+   "gmail/aditya_rao/20260902-qbr-account-velocity-readout-okr-checkins.json#c3",
+   "google_drive/shared_drives/engineering/infrastructure/customer-runway-stitching-apr-2027.json#c0",
+   "fireflies/customer-success/2025-09-11-bridgewater-qbr-health-and-runway-sprint.json#c0"
+  ],
+  "graph": [
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c0",
+   "google_drive/shared_drives/go-to-market/one-pager-fintech-lumenmoney-q4-2025.json#c0",
+   "google_drive/shared_drives/go-to-market/one-pager-legal-brieflyai-q4-2025.json#c0"
+  ],
+  "basic_2": [
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c0",
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c3",
+   "gmail/aditya_rao/20260902-qbr-account-velocity-readout-okr-checkins.json#c0",
+   "gmail/dylan_brooks/20280807-qbr-infra-sprint-rapid-check-ask.json#c0",
+   "gmail/tessa_morgan/20270309-commander-brief-account-drilldowns.json#c0",
+   "gmail/karthik_iyer/20280521-renewal-briefing-runway-and-qbr-window-request.json#c0",
+   "gmail/nikhil_sharma/20261021-qbr-rapid-fire-account-synopses-and-forecast-consolidation.json#c0",
+   "gmail/aditya_rao/20260902-qbr-account-velocity-readout-okr-checkins.json#c3",
+   "google_drive/shared_drives/engineering/infrastructure/customer-runway-stitching-apr-2027.json#c0",
+   "fireflies/customer-success/2025-09-11-bridgewater-qbr-health-and-runway-sprint.json#c0"
+  ],
+  "graph_2": [
+   "google_drive/shared_drives/go-to-market/one-pager-fintech-lumenmoney-q4-2025.json#c0",
+   "gmail/vanessa_ortiz/20270420-qbr-runway-stitch-account-onepagers.json#c0",
+   "google_drive/shared_drives/go-to-market/one-pager-legal-brieflyai-q4-2025.json#c0"
+  ]
+ },
+ "MX11": {
+  "basic": [
+   "slack/random/5390001111-tiny-astronaut-toast-emoji-echo.json#c0",
+   "slack/random/7382001110-sea-otter-synchronized-snap.json#c0",
+   "slack/people-ops/2039501111-anya-hybrid-celebration-options.json#c0",
+   "slack/random/1769001111-lunch-and-swag-after-500k.json#c0",
+   "slack/random/1810001111-oracular-semver-yaml-omen.json#c0",
+   "slack/random/2163001234-potted-plant-anthem-and-rooftop-toast.json#c0",
+   "slack/partnerships/3990001111-cs-sku-prime-microrun.json#c1",
+   "slack/random/3789012345-tropical-sink-nap.json#c0",
+   "slack/eng-releases/1745321111-pr-6291-second-approve-request.json#c0",
+   "slack/random/2165432100-bread-bird-loop.json#c0"
+  ],
+  "graph": [
+   "slack/random/1764004321-dinner-editor-model-poll.json#c0",
+   "slack/random/5390001111-tiny-astronaut-toast-emoji-echo.json#c0",
+   "slack/random/2165432100-bread-bird-loop.json#c0"
+  ],
+  "basic_2": [
+   "slack/random/5390001111-tiny-astronaut-toast-emoji-echo.json#c0",
+   "slack/random/7382001110-sea-otter-synchronized-snap.json#c0",
+   "slack/people-ops/2039501111-anya-hybrid-celebration-options.json#c0",
+   "slack/random/1769001111-lunch-and-swag-after-500k.json#c0",
+   "slack/random/1810001111-oracular-semver-yaml-omen.json#c0",
+   "slack/random/2163001234-potted-plant-anthem-and-rooftop-toast.json#c0",
+   "slack/partnerships/3990001111-cs-sku-prime-microrun.json#c1",
+   "slack/random/3789012345-tropical-sink-nap.json#c0",
+   "slack/eng-releases/1745321111-pr-6291-second-approve-request.json#c0",
+   "slack/random/2165432100-bread-bird-loop.json#c0"
+  ],
+  "graph_2": [
+   "slack/random/2165432100-bread-bird-loop.json#c0",
+   "slack/random/1764004321-dinner-editor-model-poll.json#c0",
+   "slack/random/5390001111-tiny-astronaut-toast-emoji-echo.json#c0"
+  ]
+ },
+ "MX12": {
+  "basic": [
+   "slack/product/1898765432-pin-decay-orchestration-and-grace-unification.json#c0",
+   "slack/product/4309876543-customer-adaptive-cutover-and-legal-gracepath.json#c0",
+   "slack/architecture/1799999999-compact-pin-schema-proposal.json#c0",
+   "slack/architecture/5298765432-tenant-preemptive-priority-edgecases.json#c0",
+   "slack/architecture/1722229876-compatibility-affinity-eviction-metric-guidelines.json#c0",
+   "slack/eng-releases/2318765432-client-saturn-private-rollout-lock-and-metrics-check.json#c0",
+   "slack/eng-releases/1757654321-teraquell-dedicated-preflight-service-account-pin.json#c0",
+   "slack/eng-releases/2147123456-deploybot-new-tag-snapshot-rollback-reminder.json#c1",
+   "slack/eng-infra/1923456789-spot-probe-grace-synchronization.json#c0",
+   "slack/eng-runtime/1748809999-eviction-grace-interop-checkin.json#c0"
+  ],
+  "graph": [
+   "slack/eng-runtime/1748809999-eviction-grace-interop-checkin.json#c0",
+   "slack/architecture/2064001234-model-lease-compat-gates.json#c0",
+   "slack/eng-releases/1717779999-split-traffic-gradual-cutover-and-pinlist.json#c0"
+  ],
+  "basic_2": [
+   "slack/product/1898765432-pin-decay-orchestration-and-grace-unification.json#c0",
+   "slack/product/4309876543-customer-adaptive-cutover-and-legal-gracepath.json#c0",
+   "slack/architecture/1799999999-compact-pin-schema-proposal.json#c0",
+   "slack/architecture/5298765432-tenant-preemptive-priority-edgecases.json#c0",
+   "slack/architecture/1722229876-compatibility-affinity-eviction-metric-guidelines.json#c0",
+   "slack/eng-releases/2318765432-client-saturn-private-rollout-lock-and-metrics-check.json#c0",
+   "slack/eng-releases/1757654321-teraquell-dedicated-preflight-service-account-pin.json#c0",
+   "slack/eng-releases/2147123456-deploybot-new-tag-snapshot-rollback-reminder.json#c1",
+   "slack/eng-infra/1923456789-spot-probe-grace-synchronization.json#c0",
+   "slack/eng-runtime/1748809999-eviction-grace-interop-checkin.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-releases/1717779999-split-traffic-gradual-cutover-and-pinlist.json#c0",
+   "slack/architecture/2064001234-model-lease-compat-gates.json#c0",
+   "slack/eng-runtime/1748809999-eviction-grace-interop-checkin.json#c0"
+  ]
+ },
+ "MX13": {
+  "basic": [
+   "slack/eng-ml/2176543210-emoji-specialtoken-splitter-hubauth-timeout.json#c0",
+   "slack/eng-oncall/1718654321-model-catalog-tokenizer-mismatch.json#c0",
+   "slack/support/6987654321-juno-hosted-599s-auth-cache-throttle-repro.json#c0",
+   "slack/support/2987654321-embed-sdk-backpressure-auth-401-batch-smearing.json#c0",
+   "slack/eng-ml/1955554321-embedding-pool-truncation-qa-hiccup.json#c0",
+   "slack/eng-platform/1807654321-prefetch-throttle-batch-accounting-edge-wobble.json#c0",
+   "slack/incidents/2897654321-authz-remediation-sprint-handoff.json#c0",
+   "slack/incidents/6129876543-large-context-hotexit-503s-cs-escalation.json#c0",
+   "slack/support/1767512345.json#c0",
+   "slack/eng-ml/3123869999-formatting-nit-onboard-ping.json#c0"
+  ],
+  "graph": [
+   "slack/eng-ml/1952109876-token-id-mismatch-onboard.json#c0",
+   "jira/internal-support/INT-933333-orchestrated-ephemeral-research-sandboxes.json#c0",
+   "slack/eng-security/1781200000-per-route-embeddings-allowlist-bypass.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-ml/2176543210-emoji-specialtoken-splitter-hubauth-timeout.json#c0",
+   "slack/eng-oncall/1718654321-model-catalog-tokenizer-mismatch.json#c0",
+   "slack/support/6987654321-juno-hosted-599s-auth-cache-throttle-repro.json#c0",
+   "slack/support/2987654321-embed-sdk-backpressure-auth-401-batch-smearing.json#c0",
+   "slack/eng-ml/1955554321-embedding-pool-truncation-qa-hiccup.json#c0",
+   "slack/eng-platform/1807654321-prefetch-throttle-batch-accounting-edge-wobble.json#c0",
+   "slack/incidents/2897654321-authz-remediation-sprint-handoff.json#c0",
+   "slack/incidents/6129876543-large-context-hotexit-503s-cs-escalation.json#c0",
+   "slack/support/1767512345.json#c0",
+   "slack/eng-ml/3123869999-formatting-nit-onboard-ping.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-security/1781200000-per-route-embeddings-allowlist-bypass.json#c0",
+   "jira/internal-support/INT-933333-orchestrated-ephemeral-research-sandboxes.json#c0",
+   "slack/eng-ml/1952109876-token-id-mismatch-onboard.json#c0"
+  ]
+ },
+ "MX14": {
+  "basic": [
+   "slack/eng-security/2176543210-kms-rewrap-edge-cases-and-rbac-clarify.json#c0",
+   "slack/eng-security/2188881234-pt-prep-rbac-kms-readroom-checkin.json#c0",
+   "slack/eng-releases/4659876543-tls-rbac-kms-rollout-canary-triage.json#c0",
+   "slack/eng-security/1765432100-kek-rollforward-gating-and-canary-play.json#c0",
+   "slack/eng-security/2087654321-kms-event-schema-gatekeeper-failure.json#c0",
+   "slack/eng-security/1987654321-private-hardening-rbac-audit-kms-discuss.json#c0",
+   "slack/eng-platform/3987654321-audit-shipper-iam-ejects-gpu-pool.json#c0",
+   "slack/eng-security/3654321999-priv-deploy-kms-403-triage.json#c0",
+   "slack/eng-security/6765432100-finserv-evidence-packet-prep.json#c0",
+   "slack/eng-security/1934567890-identity-gatekeeper-decrypt-handoff-thread.json#c0"
+  ],
+  "graph": [
+   "slack/eng-security/3249876543-ops-bridge-pen-test-sprint-staging-proofs.json#c0",
+   "slack/eng-security/4901234567-fieldwork-kms-access-mapping-and-breach-sim-ask.json#c0",
+   "slack/eng-security/1841239999-private-deploy-rbac-sanity-kms-audit.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-security/2176543210-kms-rewrap-edge-cases-and-rbac-clarify.json#c0",
+   "slack/eng-security/2188881234-pt-prep-rbac-kms-readroom-checkin.json#c0",
+   "slack/eng-releases/4659876543-tls-rbac-kms-rollout-canary-triage.json#c0",
+   "slack/eng-security/1765432100-kek-rollforward-gating-and-canary-play.json#c0",
+   "slack/eng-security/2087654321-kms-event-schema-gatekeeper-failure.json#c0",
+   "slack/eng-security/1987654321-private-hardening-rbac-audit-kms-discuss.json#c0",
+   "slack/eng-platform/3987654321-audit-shipper-iam-ejects-gpu-pool.json#c0",
+   "slack/eng-security/3654321999-priv-deploy-kms-403-triage.json#c0",
+   "slack/eng-security/6765432100-finserv-evidence-packet-prep.json#c0",
+   "slack/eng-security/1934567890-identity-gatekeeper-decrypt-handoff-thread.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-security/3249876543-ops-bridge-pen-test-sprint-staging-proofs.json#c0",
+   "slack/eng-security/4901234567-fieldwork-kms-access-mapping-and-breach-sim-ask.json#c0",
+   "slack/eng-security/1841239999-private-deploy-rbac-sanity-kms-audit.json#c0"
+  ]
+ },
+ "MX15": {
+  "basic": [
+   "slack/eng-security/2755550000-legal-hold-stale-snapshot-service-account-check.json#c0",
+   "slack/eng-security/2755556789-legacy-backup-s3-creds-kms-interop-triage.json#c0",
+   "slack/eng-security/1759012345-dsar-keystore-ephemeral-role-audit-thread.json#c0",
+   "slack/eng-security/1771000000-dsar-hold-redact-rewrap-rbac-discussion.json#c0",
+   "slack/finance/2155551234-ferris-2pay-ACH-holiday-window.json#c0",
+   "slack/docs/1755554321-export-retention-request-paths.json#c0",
+   "slack/eng-security/1712507890-priv-request-keystore-proof-rbac-auditlog-kms-clarify.json#c0",
+   "slack/product/1759012345-enterprise-retention-legalhold-fallbacks.json#c0",
+   "slack/eng-security/3305550000-kms-rbac-sast-noise-smokecheck.json#c0",
+   "slack/eng-infra/1782543210-gpu-holdlist-retention-billing-inquiry.json#c0"
+  ],
+  "graph": [
+   "slack/eng-security/2766991234-privacy-orphaned-key-retention-eval-discussion.json#c0",
+   "slack/eng-security/2755550000-legal-hold-stale-snapshot-service-account-check.json#c0",
+   "slack/eng-security/1771000000-dsar-hold-redact-rewrap-rbac-discussion.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-security/2755550000-legal-hold-stale-snapshot-service-account-check.json#c0",
+   "slack/eng-security/2755556789-legacy-backup-s3-creds-kms-interop-triage.json#c0",
+   "slack/eng-security/1759012345-dsar-keystore-ephemeral-role-audit-thread.json#c0",
+   "slack/eng-security/1771000000-dsar-hold-redact-rewrap-rbac-discussion.json#c0",
+   "slack/finance/2155551234-ferris-2pay-ACH-holiday-window.json#c0",
+   "slack/docs/1755554321-export-retention-request-paths.json#c0",
+   "slack/eng-security/1712507890-priv-request-keystore-proof-rbac-auditlog-kms-clarify.json#c0",
+   "slack/product/1759012345-enterprise-retention-legalhold-fallbacks.json#c0",
+   "slack/eng-security/3305550000-kms-rbac-sast-noise-smokecheck.json#c0",
+   "slack/eng-infra/1782543210-gpu-holdlist-retention-billing-inquiry.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-security/2766991234-privacy-orphaned-key-retention-eval-discussion.json#c0",
+   "slack/eng-security/2755550000-legal-hold-stale-snapshot-service-account-check.json#c0",
+   "slack/eng-security/1771000000-dsar-hold-redact-rewrap-rbac-discussion.json#c0"
+  ]
+ },
+ "MX16": {
+  "basic": [
+   "slack/eng-releases/1928654321-surge-mitigation-rollback-scenario-ops.json#c0",
+   "slack/eng-platform/1837654321-rollout-signal-slicing-dashboard-feedback.json#c0",
+   "slack/general/1917629145-probe-failure-tiered-escalation.json#c0",
+   "slack/eng-infra/1772507890-ebpf-ipv6-prober-timeout.json#c0",
+   "slack/eng-releases/1789999998-afterburn-probe-sanity-and-degradation-triage.json#c0",
+   "slack/eng-platform/1801234567-client-probe-per-route-canary-signals.json#c0",
+   "slack/eng-releases/1763512345-canary-hold-preflight-pin.json#c0",
+   "slack/incidents/1782256677-hotfix-pin-rollback-customer-drafts.json#c0",
+   "slack/eng-runtime/3319994321-kernel-selector-kv-warm-bisect.json#c0",
+   "slack/eng-releases/4219876543-phased-pinbackoff-rollback-playbook.json#c0"
+  ],
+  "graph": [
+   "slack/all-hands/1956012345-daybreak-quick-checkin.json#c0",
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/incidents/1767070707-release-canary-paging-mismatch-handoff.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-releases/1928654321-surge-mitigation-rollback-scenario-ops.json#c0",
+   "slack/eng-platform/1837654321-rollout-signal-slicing-dashboard-feedback.json#c0",
+   "slack/general/1917629145-probe-failure-tiered-escalation.json#c0",
+   "slack/eng-infra/1772507890-ebpf-ipv6-prober-timeout.json#c0",
+   "slack/eng-releases/1789999998-afterburn-probe-sanity-and-degradation-triage.json#c0",
+   "slack/eng-platform/1801234567-client-probe-per-route-canary-signals.json#c0",
+   "slack/eng-releases/1763512345-canary-hold-preflight-pin.json#c0",
+   "slack/incidents/1782256677-hotfix-pin-rollback-customer-drafts.json#c0",
+   "slack/eng-runtime/3319994321-kernel-selector-kv-warm-bisect.json#c0",
+   "slack/eng-releases/4219876543-phased-pinbackoff-rollback-playbook.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/incidents/1767070707-release-canary-paging-mismatch-handoff.json#c0",
+   "slack/all-hands/1956012345-daybreak-quick-checkin.json#c0"
+  ]
+ },
+ "MX17": {
+  "basic": [
+   "slack/eng-platform/1950012345-shim-routing-decisionflow.json#c0",
+   "slack/eng-platform/3412345678-slo-driven-backfill-gating-and-console-estimator.json#c0",
+   "slack/eng-platform/3623456789-edge-router-shim-canary-heuristics-chat.json#c0",
+   "slack/eng-platform/1950012345-routing-telemetry-fallbacks.json#c0",
+   "slack/support/1790012345-misrouted-coldpool-scale-down-throttle.json#c0",
+   "slack/product/4512345678-pilot-ssolight-accelerate-cutlist.json#c0",
+   "slack/sales/1951234567-enterprise-x-commit-sizing-and-autoscale-play.json#c0",
+   "slack/product/1961234567-routing-manifest-pilot-gates-sync.json#c0",
+   "slack/eng-ml/2212345678-hoplink-regional-latency-sidebar.json#c0",
+   "slack/eng-releases/6543210123-v2-schema-check-shim-pin-and-backfill.json#c0"
+  ],
+  "graph": [
+   "slack/eng-platform/1794527890-per-tenant-routing-bypass-request.json#c0",
+   "slack/eng-platform/1765501234-client-contract-migration.json#c0",
+   "slack/all-hands/1829998888-client-shim-implicit-header-fallback.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-platform/1950012345-shim-routing-decisionflow.json#c0",
+   "slack/eng-platform/3412345678-slo-driven-backfill-gating-and-console-estimator.json#c0",
+   "slack/eng-platform/3623456789-edge-router-shim-canary-heuristics-chat.json#c0",
+   "slack/eng-platform/1950012345-routing-telemetry-fallbacks.json#c0",
+   "slack/support/1790012345-misrouted-coldpool-scale-down-throttle.json#c0",
+   "slack/product/4512345678-pilot-ssolight-accelerate-cutlist.json#c0",
+   "slack/sales/1951234567-enterprise-x-commit-sizing-and-autoscale-play.json#c0",
+   "slack/product/1961234567-routing-manifest-pilot-gates-sync.json#c0",
+   "slack/eng-ml/2212345678-hoplink-regional-latency-sidebar.json#c0",
+   "slack/eng-releases/6543210123-v2-schema-check-shim-pin-and-backfill.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-platform/1794527890-per-tenant-routing-bypass-request.json#c0",
+   "slack/eng-platform/1765501234-client-contract-migration.json#c0",
+   "slack/all-hands/1829998888-client-shim-implicit-header-fallback.json#c0"
+  ]
+ },
+ "MX18": {
+  "basic": [
+   "slack/sales/1789123456-sdr-emea-first-week-access.json#c0",
+   "slack/people-ops/2105001234-manager-briefing-onepager.json#c0",
+   "slack/new-hires/1718203456-first-day-channel-map-and-bot-controls.json#c0",
+   "slack/partnerships/1759991234-partner-budget-slab-reweighting-sprint.json#c0",
+   "slack/partnerships/4001234567-partner-sev-paths-email-phone-fallbacks.json#c0",
+   "slack/sales/1745123456-sideload-bundle-activation-kms-integration-blocker.json#c0",
+   "slack/product/2323456789-regional-sla-windowed-optin-and-rollback-choreography.json#c0",
+   "slack/customer-success/3468123456-onboarding-groundwork-orion-kickoff.json#c0",
+   "slack/announcements/1798901234-plugin-bounty-sprint-launch.json#c0",
+   "slack/incidents/2801234567-embed-proxy-softlimits-summary.json#c0"
+  ],
+  "graph": [
+   "slack/customer-success/1719801234-cornerstone-launch-kickstart-transfer.json#c0",
+   "slack/customer-success/1759994321-enablement-microbootcamp-slot-triage.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "basic_2": [
+   "slack/sales/1789123456-sdr-emea-first-week-access.json#c0",
+   "slack/people-ops/2105001234-manager-briefing-onepager.json#c0",
+   "slack/new-hires/1718203456-first-day-channel-map-and-bot-controls.json#c0",
+   "slack/partnerships/1759991234-partner-budget-slab-reweighting-sprint.json#c0",
+   "slack/partnerships/4001234567-partner-sev-paths-email-phone-fallbacks.json#c0",
+   "slack/sales/1745123456-sideload-bundle-activation-kms-integration-blocker.json#c0",
+   "slack/product/2323456789-regional-sla-windowed-optin-and-rollback-choreography.json#c0",
+   "slack/customer-success/3468123456-onboarding-groundwork-orion-kickoff.json#c0",
+   "slack/announcements/1798901234-plugin-bounty-sprint-launch.json#c0",
+   "slack/incidents/2801234567-embed-proxy-softlimits-summary.json#c0"
+  ],
+  "graph_2": [
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/customer-success/1759994321-enablement-microbootcamp-slot-triage.json#c0",
+   "slack/customer-success/1719801234-cornerstone-launch-kickstart-transfer.json#c0"
+  ]
+ },
+ "MX19": {
+  "basic": [
+   "slack/partnerships/5698765432-marketplace-edgebox-gTM-readiness.json#c0",
+   "slack/eng-platform/3987654321-audit-shipper-iam-ejects-gpu-pool.json#c0",
+   "slack/partnerships/1755559999-edgebridge-langchain-orchflow-marketplace-onramp.json#c0",
+   "slack/sales/5098765432-enterprise-commit-traffic-profile-qna-and-preheat-coordination.json#c0",
+   "slack/partnerships/2534567890-marketplace-bundle-gateway-orch-interop.json#c0",
+   "slack/partnerships/2512346789-listing-and-launch-playbook-sync.json#c0",
+   "slack/support/2198765432-acme-demo-prefetch-throttle-fix.json#c0",
+   "slack/support/2134567890-edge-proxy-auth-headers-investigation.json#c0",
+   "slack/customer-success/4376543210-atria-renewal-triage-mllead-exit-keycheck.json#c0",
+   "slack/partnerships/1749978888-hw-embargo-canary-marketplace-slotting.json#c0"
+  ],
+  "graph": [
+   "slack/partnerships/1746601234-edgebox-x1-preview-logistics.json#c0",
+   "slack/partnerships/1795012345-vaultgrid-hsm-kms-sso-scim-readiness-check.json#c0",
+   "slack/partnerships/1755559999-edgebridge-langchain-orchflow-marketplace-onramp.json#c0"
+  ],
+  "basic_2": [
+   "slack/partnerships/5698765432-marketplace-edgebox-gTM-readiness.json#c0",
+   "slack/eng-platform/3987654321-audit-shipper-iam-ejects-gpu-pool.json#c0",
+   "slack/partnerships/1755559999-edgebridge-langchain-orchflow-marketplace-onramp.json#c0",
+   "slack/sales/5098765432-enterprise-commit-traffic-profile-qna-and-preheat-coordination.json#c0",
+   "slack/partnerships/2534567890-marketplace-bundle-gateway-orch-interop.json#c0",
+   "slack/partnerships/2512346789-listing-and-launch-playbook-sync.json#c0",
+   "slack/support/2198765432-acme-demo-prefetch-throttle-fix.json#c0",
+   "slack/support/2134567890-edge-proxy-auth-headers-investigation.json#c0",
+   "slack/customer-success/4376543210-atria-renewal-triage-mllead-exit-keycheck.json#c0",
+   "slack/partnerships/1749978888-hw-embargo-canary-marketplace-slotting.json#c0"
+  ],
+  "graph_2": [
+   "slack/partnerships/1746601234-edgebox-x1-preview-logistics.json#c0",
+   "slack/partnerships/1795012345-vaultgrid-hsm-kms-sso-scim-readiness-check.json#c0",
+   "slack/partnerships/1755559999-edgebridge-langchain-orchflow-marketplace-onramp.json#c0"
+  ]
+ },
+ "MX20": {
+  "basic": [
+   "slack/devex/5372109999-opal9b-emergency-softcap-and-fallback.json#c2",
+   "slack/partnerships/1777777777-sequenced-joint-sev-handoff-and-roles-demo.json#c0",
+   "slack/product/4445007890-onprem-packaging-lanes-and-handshake-sync.json#c0",
+   "slack/incidents/2798765432-nova-vpc-gw-sse-fallback-mitigation.json#c0",
+   "slack/eng-oncall/1783456789-defining-oncall-incident-thresholds.json#c0",
+   "slack/design/2181009999-mini-live-render-token-handoff-promptlib-toggle.json#c2",
+   "slack/incidents/3945678901-overnight-handoff-delegation-sync.json#c0",
+   "slack/eng-infra/7912340000-pt-staging-evidence-handshake.json#c1",
+   "slack/docs/1769876543-handoff-epoch-invalidate-playbook.json#c0",
+   "slack/incidents/1724046789-tls-handshake-failures-prod-gateway.json#c0"
+  ],
+  "graph": [
+   "slack/eng/2412345678-maint-extension-ops-comm-templates.json#c0",
+   "slack/eng-infra/1792504321-walled-garden-cluster-ops-runthrough.json#c0",
+   "slack/devex/5372109999-opal9b-emergency-softcap-and-fallback.json#c2"
+  ],
+  "basic_2": [
+   "slack/devex/5372109999-opal9b-emergency-softcap-and-fallback.json#c2",
+   "slack/partnerships/1777777777-sequenced-joint-sev-handoff-and-roles-demo.json#c0",
+   "slack/product/4445007890-onprem-packaging-lanes-and-handshake-sync.json#c0",
+   "slack/incidents/2798765432-nova-vpc-gw-sse-fallback-mitigation.json#c0",
+   "slack/eng-oncall/1783456789-defining-oncall-incident-thresholds.json#c0",
+   "slack/design/2181009999-mini-live-render-token-handoff-promptlib-toggle.json#c2",
+   "slack/incidents/3945678901-overnight-handoff-delegation-sync.json#c0",
+   "slack/eng-infra/7912340000-pt-staging-evidence-handshake.json#c1",
+   "slack/docs/1769876543-handoff-epoch-invalidate-playbook.json#c0",
+   "slack/incidents/1724046789-tls-handshake-failures-prod-gateway.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng/2412345678-maint-extension-ops-comm-templates.json#c0",
+   "slack/devex/5372109999-opal9b-emergency-softcap-and-fallback.json#c2",
+   "slack/eng-infra/1792504321-walled-garden-cluster-ops-runthrough.json#c0"
+  ]
+ },
+ "MX21": {
+  "basic": [
+   "directory/people/vikram-singh.md#c0",
+   "directory/people/emily-zhao.md#c0",
+   "directory/people/robert-king.md#c0",
+   "directory/people/priya-natarajan.md#c0",
+   "directory/people/arjun-desai.md#c0",
+   "directory/people/nikhil-sharma.md#c0",
+   "directory/people/dev-patel.md#c0",
+   "directory/people/dr.-maya-srinivasan.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/monica-patel.md#c0"
+  ],
+  "graph": [
+   "directory/people/priya-natarajan.md#c0",
+   "directory/people/rishi-malhotra.md#c0",
+   "slack/finance/1774507890-in-tds-grossup-trc-10f-request.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/vikram-singh.md#c0",
+   "directory/people/emily-zhao.md#c0",
+   "directory/people/robert-king.md#c0",
+   "directory/people/priya-natarajan.md#c0",
+   "directory/people/arjun-desai.md#c0",
+   "directory/people/nikhil-sharma.md#c0",
+   "directory/people/dev-patel.md#c0",
+   "directory/people/dr.-maya-srinivasan.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/monica-patel.md#c0"
+  ],
+  "graph_2": [
+   "slack/finance/1774507890-in-tds-grossup-trc-10f-request.json#c0",
+   "directory/people/priya-natarajan.md#c0",
+   "directory/people/rishi-malhotra.md#c0"
+  ]
+ },
+ "MX22": {
+  "basic": [
+   "directory/people/kimberly-park.md#c0",
+   "directory/people/aly-nguyen.md#c0",
+   "directory/people/sergio-alvarez.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "gmail/kimberly_park/20251114-encrypted-share-proposal-hosted-api-pt.json#c0",
+   "gmail/kimberly_park/20261020-continuity-commitment-bridge-letter-concurrency-ask.json#c0",
+   "gmail/kimberly_park/20281117-benchmark-download-autoschedule-decline-and-rescue.json#c0",
+   "gmail/kimberly_park/20260815-pinecrest-bridgenote-evidence-support-request.json#c0",
+   "directory/people/ethan-park.md#c0",
+   "gmail/kimberly_park/20260905-guest-access-lifecycle-and-evidence-bundle-request.json#c0"
+  ],
+  "graph": [
+   "gmail/kimberly_park/20280418-kv-occupancy-slam-exec-ops-briefing.json#c0",
+   "directory/people/rachel-kim.md#c0",
+   "directory/people/kimberly-park.md#c0"
+  ],
+  "basic_2": [
+   "directory/people/kimberly-park.md#c0",
+   "directory/people/aly-nguyen.md#c0",
+   "directory/people/sergio-alvarez.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "gmail/kimberly_park/20251114-encrypted-share-proposal-hosted-api-pt.json#c0",
+   "gmail/kimberly_park/20261020-continuity-commitment-bridge-letter-concurrency-ask.json#c0",
+   "gmail/kimberly_park/20281117-benchmark-download-autoschedule-decline-and-rescue.json#c0",
+   "gmail/kimberly_park/20260815-pinecrest-bridgenote-evidence-support-request.json#c0",
+   "directory/people/ethan-park.md#c0",
+   "gmail/kimberly_park/20260905-guest-access-lifecycle-and-evidence-bundle-request.json#c0"
+  ],
+  "graph_2": [
+   "directory/people/rachel-kim.md#c0",
+   "gmail/kimberly_park/20280418-kv-occupancy-slam-exec-ops-briefing.json#c0",
+   "directory/people/kimberly-park.md#c0"
+  ]
+ },
+ "MX23": {
+  "basic": [
+   "directory/people/alex-martinez.md#c0",
+   "directory/people/monica-patel.md#c0",
+   "directory/people/elliot-price.md#c0",
+   "directory/people/jean-paul-laurent.md#c0",
+   "directory/people/sonia-bhandari.md#c0",
+   "directory/people/renee-sullivan.md#c0",
+   "directory/people/evelyn-hart.md#c0",
+   "gmail/alex_martinez/20270412-mutual-action-plan-poc-risk-heatmap.json#c0",
+   "gmail/alex_martinez/20270509-overnight-vip-escort-and-shift-bridge.json#c0",
+   "gmail/soojin_lee/20250203-guided-onboarding-kickoff-and-owners.json#c0"
+  ],
+  "graph": [
+   "gmail/alex_martinez/20260607-timefinder-25m-phone-windows-sofia-marin.json#c0",
+   "gmail/alex_martinez/20260920-gridiron-credit-allocation-authorization.json#c0",
+   "directory/people/alex-martinez.md#c0"
+  ],
+  "basic_2": [
+   "directory/people/alex-martinez.md#c0",
+   "directory/people/monica-patel.md#c0",
+   "directory/people/elliot-price.md#c0",
+   "directory/people/jean-paul-laurent.md#c0",
+   "directory/people/sonia-bhandari.md#c0",
+   "directory/people/renee-sullivan.md#c0",
+   "directory/people/evelyn-hart.md#c0",
+   "gmail/alex_martinez/20270412-mutual-action-plan-poc-risk-heatmap.json#c0",
+   "gmail/alex_martinez/20270509-overnight-vip-escort-and-shift-bridge.json#c0",
+   "gmail/soojin_lee/20250203-guided-onboarding-kickoff-and-owners.json#c0"
+  ],
+  "graph_2": [
+   "gmail/alex_martinez/20260920-gridiron-credit-allocation-authorization.json#c0",
+   "gmail/alex_martinez/20260607-timefinder-25m-phone-windows-sofia-marin.json#c0",
+   "directory/people/alex-martinez.md#c0"
+  ]
+ },
+ "MX24": {
+  "basic": [
+   "directory/people/rafael-mendes.md#c0",
+   "directory/people/aisha-bello.md#c0",
+   "directory/people/jacob-stein.md#c0",
+   "directory/people/tom\u00e1\u0161-nov\u00e1k.md#c0",
+   "directory/people/christine-wong.md#c0",
+   "directory/people/sean-gallagher.md#c0",
+   "directory/people/sofia-mendes.md#c0",
+   "directory/people/michael-grant.md#c0",
+   "gmail/hannah_schmitt/20270722-exec-convening-slot-assignments-and-read-pack-routing.json#c4",
+   "gmail/rafael_mendes/20261203-type2-report-evidence-quickkit-and-docsign-consent.json#c0"
+  ],
+  "graph": [
+   "gmail/hannah_schmitt/20270722-exec-convening-slot-assignments-and-read-pack-routing.json#c4",
+   "gmail/rafael_mendes/20261215-last-ask-priority-shift-or-unsubscribe.json#c0",
+   "directory/people/sofia-mendes.md#c0"
+  ],
+  "basic_2": [
+   "directory/people/rafael-mendes.md#c0",
+   "directory/people/aisha-bello.md#c0",
+   "directory/people/jacob-stein.md#c0",
+   "directory/people/tom\u00e1\u0161-nov\u00e1k.md#c0",
+   "directory/people/christine-wong.md#c0",
+   "directory/people/sean-gallagher.md#c0",
+   "directory/people/sofia-mendes.md#c0",
+   "directory/people/michael-grant.md#c0",
+   "gmail/hannah_schmitt/20270722-exec-convening-slot-assignments-and-read-pack-routing.json#c4",
+   "gmail/rafael_mendes/20261203-type2-report-evidence-quickkit-and-docsign-consent.json#c0"
+  ],
+  "graph_2": [
+   "directory/people/sofia-mendes.md#c0",
+   "gmail/hannah_schmitt/20270722-exec-convening-slot-assignments-and-read-pack-routing.json#c4",
+   "gmail/rafael_mendes/20261215-last-ask-priority-shift-or-unsubscribe.json#c0"
+  ]
+ },
+ "MX25": {
+  "basic": [
+   "directory/people/devon-price.md#c0",
+   "directory/people/dylan-brooks.md#c0",
+   "directory/people/elliot-price.md#c0",
+   "directory/people/wei-chen.md#c0",
+   "directory/people/kira-thompson.md#c0",
+   "directory/people/alex-martinez.md#c0",
+   "directory/people/tyler-benson.md#c0",
+   "directory/people/isabelle-laurent.md#c0",
+   "directory/people/chloe-martin.md#c0",
+   "directory/people/thomas-baird.md#c0"
+  ],
+  "graph": [
+   "directory/people/kira-thompson.md#c0",
+   "directory/people/liam-o'rourke.md#c0",
+   "directory/people/owen-phillips.md#c0"
+  ],
+  "basic_2": [
+   "directory/people/devon-price.md#c0",
+   "directory/people/dylan-brooks.md#c0",
+   "directory/people/elliot-price.md#c0",
+   "directory/people/wei-chen.md#c0",
+   "directory/people/kira-thompson.md#c0",
+   "directory/people/alex-martinez.md#c0",
+   "directory/people/tyler-benson.md#c0",
+   "directory/people/isabelle-laurent.md#c0",
+   "directory/people/chloe-martin.md#c0",
+   "directory/people/thomas-baird.md#c0"
+  ],
+  "graph_2": [
+   "directory/people/owen-phillips.md#c0",
+   "directory/people/liam-o'rourke.md#c0",
+   "directory/people/kira-thompson.md#c0"
+  ]
+ },
+ "MX26": {
+  "basic": [
+   "directory/people/olivia-grant.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/sofia-mendes.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "directory/people/sergio-costa.md#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c0",
+   "gmail/priya_natarajan/20280903-session-tether-and-eval-liaison.json#c0",
+   "directory/people/sean-gallagher.md#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c3",
+   "directory/people/chloe-martin.md#c0"
+  ],
+  "graph": [
+   "directory/people/marissa-cole.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/rachel-kim.md#c0"
+  ],
+  "basic_2": [
+   "directory/people/olivia-grant.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/sofia-mendes.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "directory/people/sergio-costa.md#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c0",
+   "gmail/priya_natarajan/20280903-session-tether-and-eval-liaison.json#c0",
+   "directory/people/sean-gallagher.md#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c3",
+   "directory/people/chloe-martin.md#c0"
+  ],
+  "graph_2": [
+   "directory/people/marissa-cole.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/rachel-kim.md#c0"
+  ]
+ },
+ "MX27": {
+  "basic": [
+   "directory/people/hassan-mirza.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/ibrahim-khan.md#c0",
+   "directory/people/rohan-mehta.md#c0",
+   "directory/people/amina-yusuf.md#c0",
+   "directory/people/priya-shah.md#c0",
+   "directory/people/samir-qureshi.md#c0",
+   "directory/people/priyanka-bose.md#c0",
+   "directory/people/jasmine-liu.md#c0",
+   "directory/people/jamal-pierce.md#c0"
+  ],
+  "graph": [
+   "directory/people/harish-reddy.md#c0",
+   "gmail/stephanie_nguyen/20270714-acceptance-risk-assessment-manageric-vs-ic-offer.json#c4",
+   "hubspot/company-silkroad-realtime-economics.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/hassan-mirza.md#c0",
+   "directory/people/karthik-iyer.md#c0",
+   "directory/people/ibrahim-khan.md#c0",
+   "directory/people/rohan-mehta.md#c0",
+   "directory/people/amina-yusuf.md#c0",
+   "directory/people/priya-shah.md#c0",
+   "directory/people/samir-qureshi.md#c0",
+   "directory/people/priyanka-bose.md#c0",
+   "directory/people/jasmine-liu.md#c0",
+   "directory/people/jamal-pierce.md#c0"
+  ],
+  "graph_2": [
+   "directory/people/harish-reddy.md#c0",
+   "hubspot/company-silkroad-realtime-economics.json#c0",
+   "gmail/stephanie_nguyen/20270714-acceptance-risk-assessment-manageric-vs-ic-offer.json#c4"
+  ]
+ },
+ "MX28": {
+  "basic": [
+   "directory/departments/operations---it.md#c0",
+   "directory/people/natalie-chen.md#c0",
+   "directory/people/david-kim.md#c0",
+   "directory/departments/people.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/chris-osei.md#c0",
+   "directory/people/kimberly-park.md#c0",
+   "directory/people/tyler-benson.md#c0",
+   "directory/departments/infrastructure-&-sre.md#c0",
+   "directory/people/fiona-mccarthy.md#c0"
+  ],
+  "graph": [
+   "directory/people/natalie-chen.md#c0",
+   "directory/people/david-kim.md#c0",
+   "directory/people/fiona-mccarthy.md#c0"
+  ],
+  "basic_2": [
+   "directory/departments/operations---it.md#c0",
+   "directory/people/natalie-chen.md#c0",
+   "directory/people/david-kim.md#c0",
+   "directory/departments/people.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/chris-osei.md#c0",
+   "directory/people/kimberly-park.md#c0",
+   "directory/people/tyler-benson.md#c0",
+   "directory/departments/infrastructure-&-sre.md#c0",
+   "directory/people/fiona-mccarthy.md#c0"
+  ],
+  "graph_2": [
+   "directory/people/natalie-chen.md#c0",
+   "directory/people/david-kim.md#c0",
+   "directory/people/fiona-mccarthy.md#c0"
+  ]
+ },
+ "MX29": {
+  "basic": [
+   "directory/departments/finance.md#c0",
+   "directory/people/laura-bennett.md#c0",
+   "directory/departments/people.md#c0",
+   "directory/people/emily-stone.md#c0",
+   "directory/people/rishi-malhotra.md#c0",
+   "gmail/chloe_martin/20280328-portal-cutover-renewal-authorization.json#c1",
+   "slack/people-ops/2951234567-urgent-senior-hire-pay-elevate-routing.json#c1",
+   "confluence/policies-and-process/ops-orchestra-procedures-2026.json#c0",
+   "slack/people-ops/1803001234-workstyle-hub-access-travel-clarifications.json#c1",
+   "gmail/karthik_iyer/20260902-capacity-requisition-triage.json#c1"
+  ],
+  "graph": [
+   "gmail/evelyn_hart/20260212-reengage-q-followup-greenfield.json#c4",
+   "directory/departments/legal.md#c0",
+   "gmail/neha_kapoor/20260910-close-slip-containment-playbook-procurement-analysis.json#c0"
+  ],
+  "basic_2": [
+   "directory/departments/finance.md#c0",
+   "directory/people/laura-bennett.md#c0",
+   "directory/departments/people.md#c0",
+   "directory/people/emily-stone.md#c0",
+   "directory/people/rishi-malhotra.md#c0",
+   "gmail/chloe_martin/20280328-portal-cutover-renewal-authorization.json#c1",
+   "slack/people-ops/2951234567-urgent-senior-hire-pay-elevate-routing.json#c1",
+   "confluence/policies-and-process/ops-orchestra-procedures-2026.json#c0",
+   "slack/people-ops/1803001234-workstyle-hub-access-travel-clarifications.json#c1",
+   "gmail/karthik_iyer/20260902-capacity-requisition-triage.json#c1"
+  ],
+  "graph_2": [
+   "gmail/evelyn_hart/20260212-reengage-q-followup-greenfield.json#c4",
+   "directory/departments/legal.md#c0",
+   "gmail/neha_kapoor/20260910-close-slip-containment-playbook-procurement-analysis.json#c0"
+  ]
+ },
+ "MX30": {
+  "basic": [
+   "directory/departments/people.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/kimberly-park.md#c0",
+   "slack/people-ops/2442004567-pivot-review-window-edgecase-questions.json#c2",
+   "slack/people-ops/1779001234-international-guest-customs-and-badge.json#c0",
+   "slack/people-ops/1801204321-handbook-review-ack-and-course-rollout.json#c2",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "slack/people-ops/2287654321-contractor-compliance-spring-rollout.json#c0",
+   "slack/people-ops/2234567890-scentfree-interview-accom-remote-paneling.json#c0",
+   "slack/people-ops/2714510111-allhands-followup-leveling-roadmap.json#c0"
+  ],
+  "graph": [
+   "slack/people-ops/2287654321-contractor-compliance-spring-rollout.json#c0",
+   "slack/people-ops/2061234000-care-policy-rollout-onboarding-hiring-sync.json#c0",
+   "slack/people-ops/1801204321-handbook-review-ack-and-course-rollout.json#c2"
+  ],
+  "basic_2": [
+   "directory/departments/people.md#c0",
+   "directory/people/daniela-costa.md#c0",
+   "directory/people/kimberly-park.md#c0",
+   "slack/people-ops/2442004567-pivot-review-window-edgecase-questions.json#c2",
+   "slack/people-ops/1779001234-international-guest-customs-and-badge.json#c0",
+   "slack/people-ops/1801204321-handbook-review-ack-and-course-rollout.json#c2",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "slack/people-ops/2287654321-contractor-compliance-spring-rollout.json#c0",
+   "slack/people-ops/2234567890-scentfree-interview-accom-remote-paneling.json#c0",
+   "slack/people-ops/2714510111-allhands-followup-leveling-roadmap.json#c0"
+  ],
+  "graph_2": [
+   "slack/people-ops/2287654321-contractor-compliance-spring-rollout.json#c0",
+   "slack/people-ops/1801204321-handbook-review-ack-and-course-rollout.json#c2",
+   "slack/people-ops/2061234000-care-policy-rollout-onboarding-hiring-sync.json#c0"
+  ]
+ },
+ "MX31": {
+  "basic": [
+   "directory/people/sergio-costa.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "confluence/architecture-and-standards/decision-records/adr-perf-canary-baseline-and-thresholds.json#c0"
+  ],
+  "graph": [
+   "directory/people/allison-grant.md#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/sergio-costa.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "confluence/architecture-and-standards/decision-records/adr-perf-canary-baseline-and-thresholds.json#c0"
+  ],
+  "graph_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "directory/people/allison-grant.md#c0",
+   "gmail/monica_patel/20250728-option-grant-timing-and-board-slate.json#c0"
+  ]
+ },
+ "MX32": {
+  "basic": [
+   "slack/eng-platform/1739173199-openai-compat-tool-call-differences.json#c0",
+   "confluence/eng-developer-experience/api-examples/streaming-event-model-conventions.json#c0",
+   "confluence/architecture-and-standards/api-standards/adr-streaming-tool-call-payload-shape.json#c0",
+   "slack/eng-oncall/3498765432-primary-secondary-auth-handoff-sync.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/people-ops/1803456789-ccing-candidates-and-scorecard-training-gap.json#c0",
+   "slack/marketing/1745556789-practical-inference-runofshow-sync.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0",
+   "directory/people/wei-chen.md#c0",
+   "directory/people/ibrahim-khan.md#c0"
+  ],
+  "graph": [
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/general/1719302468-emoji-sprint-and-unofficial-uno.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0"
+  ],
+  "basic_2": [
+   "slack/eng-platform/1739173199-openai-compat-tool-call-differences.json#c0",
+   "confluence/eng-developer-experience/api-examples/streaming-event-model-conventions.json#c0",
+   "confluence/architecture-and-standards/api-standards/adr-streaming-tool-call-payload-shape.json#c0",
+   "slack/eng-oncall/3498765432-primary-secondary-auth-handoff-sync.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/people-ops/1803456789-ccing-candidates-and-scorecard-training-gap.json#c0",
+   "slack/marketing/1745556789-practical-inference-runofshow-sync.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0",
+   "directory/people/wei-chen.md#c0",
+   "directory/people/ibrahim-khan.md#c0"
+  ],
+  "graph_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/general/1719302468-emoji-sprint-and-unofficial-uno.json#c0"
+  ]
+ },
+ "MX33": {
+  "basic": [
+   "directory/people/marcus-lin.md#c0",
+   "slack/eng-security/1739389006.json#c0",
+   "slack/eng-security/1761021122-audit-event-schema-review.json#c0",
+   "slack/new-hires/1819991234-hannah-lee-hello-kettlebells.json#c0",
+   "gmail/marcus_lin/20260530-zeta-offsite-scheduling-visit-access-windows.json#c0",
+   "slack/support/2991239876-sdk-percent-encoded-region-header-misroute.json#c0",
+   "slack/incidents/1747779033-near-miss-kms-retry-storm.json#c0",
+   "slack/partnerships/1777777777-sequenced-joint-sev-handoff-and-roles-demo.json#c0",
+   "gmail/tessa_morgan/20270208-rohan-advocacy-dossier-scheduling.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "graph": [
+   "slack/eng-oncall/1760464200.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/marcus-lin.md#c0",
+   "slack/eng-security/1739389006.json#c0",
+   "slack/eng-security/1761021122-audit-event-schema-review.json#c0",
+   "slack/new-hires/1819991234-hannah-lee-hello-kettlebells.json#c0",
+   "gmail/marcus_lin/20260530-zeta-offsite-scheduling-visit-access-windows.json#c0",
+   "slack/support/2991239876-sdk-percent-encoded-region-header-misroute.json#c0",
+   "slack/incidents/1747779033-near-miss-kms-retry-storm.json#c0",
+   "slack/partnerships/1777777777-sequenced-joint-sev-handoff-and-roles-demo.json#c0",
+   "gmail/tessa_morgan/20270208-rohan-advocacy-dossier-scheduling.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "graph_2": [
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0"
+  ]
+ },
+ "MX34": {
+  "basic": [
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c2",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1845000001-uswest2-sts-obs-deps-fallback.json#c3",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/incidents/3333333001-pagerbot-deadline-misfire-channel-ghosts.json#c0",
+   "slack/eng-sre/4356789012-controller-manager-cgroup-jitter-gpu-attach.json#c2",
+   "slack/eng-platform/2365478901-emergency-toggle-keyholders-and-audit-tooling.json#c0",
+   "slack/customer-success/1725552468-policy-hysteresis-p95-thrash.json#c3",
+   "slack/incidents/2798765432-nova-vpc-gw-sse-fallback-mitigation.json#c0",
+   "slack/incidents/2923470001-postir-facilitator-scheduling-sync.json#c0"
+  ],
+  "graph": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c2",
+   "slack/incidents/1797654321-post-incident-review-facilitator-roster-and-handoffs.json#c0"
+  ],
+  "basic_2": [
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c2",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1845000001-uswest2-sts-obs-deps-fallback.json#c3",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/incidents/3333333001-pagerbot-deadline-misfire-channel-ghosts.json#c0",
+   "slack/eng-sre/4356789012-controller-manager-cgroup-jitter-gpu-attach.json#c2",
+   "slack/eng-platform/2365478901-emergency-toggle-keyholders-and-audit-tooling.json#c0",
+   "slack/customer-success/1725552468-policy-hysteresis-p95-thrash.json#c3",
+   "slack/incidents/2798765432-nova-vpc-gw-sse-fallback-mitigation.json#c0",
+   "slack/incidents/2923470001-postir-facilitator-scheduling-sync.json#c0"
+  ],
+  "graph_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1797654321-post-incident-review-facilitator-roster-and-handoffs.json#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c2"
+  ]
+ },
+ "MX35": {
+  "basic": [
+   "slack/eng-infra/1768469814-dns-ttl-change-risk-assessment.json#c0",
+   "confluence/eng-sre/reliability-initiatives/incident-ownership-mapping-and-remediation-sla-matrix.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c6",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "directory/people/victor-alvarez.md#c0"
+  ],
+  "graph": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "gmail/rafael_mendes/20280503-region-fallback-priority-ops-inventory.json#c6",
+   "directory/people/mateo-alvarez.md#c0"
+  ],
+  "basic_2": [
+   "slack/eng-infra/1768469814-dns-ttl-change-risk-assessment.json#c0",
+   "confluence/eng-sre/reliability-initiatives/incident-ownership-mapping-and-remediation-sla-matrix.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c6",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "directory/people/victor-alvarez.md#c0"
+  ],
+  "graph_2": [
+   "directory/people/mateo-alvarez.md#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "gmail/rafael_mendes/20280503-region-fallback-priority-ops-inventory.json#c6"
+  ]
+ },
+ "MX36": {
+  "basic": [
+   "gmail/naomi_feldman/20260715-candidate-handshake-interviewer-rotations.json#c3",
+   "gmail/naomi_feldman/20270503-tier-swap-prepay-structure-question.json#c0",
+   "gmail/naomi_feldman/20260818-briefing-cadence-speaker-rotation-and-pre-read-assembly.json#c2",
+   "gmail/naomi_feldman/20270427-candidate-capstone-deliverable-coordination.json#c0",
+   "gmail/naomi_feldman/20270907-candidate-accelerator-intro-passdown.json#c0",
+   "gmail/jordan_blake/20270429-partner-led-discovery-calendar-stitching.json#c0",
+   "gmail/grace_oconnor/20260712-reference-request-backlog-pacing-guidelines.json#c2",
+   "gmail/hannah_schmitt/20260112-confidential-allegation-triage.json#c0",
+   "directory/people/naomi-feldman.md#c0",
+   "directory/people/daniel-carter.md#c0"
+  ],
+  "graph": [
+   "slack/customer-success/1919932105-crescent-onboarding-sec-qna.json#c0",
+   "gmail/tessa_morgan/20270803-map-orbit-launch-stakeholder-sync-and-eval-ramp.json#c2",
+   "slack/eng-security/2176543210-sso-jit-degraded-role-assignments-on-alternate-email.json#c3"
+  ],
+  "basic_2": [
+   "gmail/naomi_feldman/20260715-candidate-handshake-interviewer-rotations.json#c3",
+   "gmail/naomi_feldman/20270503-tier-swap-prepay-structure-question.json#c0",
+   "gmail/naomi_feldman/20260818-briefing-cadence-speaker-rotation-and-pre-read-assembly.json#c2",
+   "gmail/naomi_feldman/20270427-candidate-capstone-deliverable-coordination.json#c0",
+   "gmail/naomi_feldman/20270907-candidate-accelerator-intro-passdown.json#c0",
+   "gmail/jordan_blake/20270429-partner-led-discovery-calendar-stitching.json#c0",
+   "gmail/grace_oconnor/20260712-reference-request-backlog-pacing-guidelines.json#c2",
+   "gmail/hannah_schmitt/20260112-confidential-allegation-triage.json#c0",
+   "directory/people/naomi-feldman.md#c0",
+   "directory/people/daniel-carter.md#c0"
+  ],
+  "graph_2": [
+   "gmail/tessa_morgan/20270803-map-orbit-launch-stakeholder-sync-and-eval-ramp.json#c2",
+   "slack/customer-success/1919932105-crescent-onboarding-sec-qna.json#c0",
+   "slack/eng-security/2176543210-sso-jit-degraded-role-assignments-on-alternate-email.json#c3"
+  ]
+ },
+ "MX37": {
+  "basic": [
+   "directory/departments/product.md#c0",
+   "slack/all-hands/1769954321-enterprise-soc2-vs-revenue-feature-sequencing.json#c2",
+   "directory/people/evelyn-hart.md#c0",
+   "slack/product/2143658700-segmented-success-criteria-dp-thread.json#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/partnerships/1718882345-partner-announcement-runbook-and-sdk-sunset-helpline.json#c0",
+   "slack/people-ops/1753214321-manager-onboard-night-ops-asks.json#c0",
+   "directory/people/tessa-morgan.md#c0",
+   "slack/sales/1719309876-poc-keystone-retail-warmup-pricing-sq-escalation.json#c2",
+   "directory/people/marissa-cole.md#c0"
+  ],
+  "graph": [
+   "gmail/tessa_morgan/20261219-kerry-patel-fullloop-slotfolds-debrief-owners.json#c0",
+   "slack/marketing/2112003456-press-list-live-update-and-quote-handoff.json#c0",
+   "slack/marketing/2312349876-integration-onramp-playbook-final-edits.json#c0"
+  ],
+  "basic_2": [
+   "directory/departments/product.md#c0",
+   "slack/all-hands/1769954321-enterprise-soc2-vs-revenue-feature-sequencing.json#c2",
+   "directory/people/evelyn-hart.md#c0",
+   "slack/product/2143658700-segmented-success-criteria-dp-thread.json#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/partnerships/1718882345-partner-announcement-runbook-and-sdk-sunset-helpline.json#c0",
+   "slack/people-ops/1753214321-manager-onboard-night-ops-asks.json#c0",
+   "directory/people/tessa-morgan.md#c0",
+   "slack/sales/1719309876-poc-keystone-retail-warmup-pricing-sq-escalation.json#c2",
+   "directory/people/marissa-cole.md#c0"
+  ],
+  "graph_2": [
+   "gmail/tessa_morgan/20261219-kerry-patel-fullloop-slotfolds-debrief-owners.json#c0",
+   "slack/marketing/2112003456-press-list-live-update-and-quote-handoff.json#c0",
+   "slack/marketing/2312349876-integration-onramp-playbook-final-edits.json#c0"
+  ]
+ },
+ "MX38": {
+  "basic": [
+   "gmail/vivek_kulkarni/20270328-service-surge-attribution-sdk-timeout-loop.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "gmail/naomi_feldman/20260715-candidate-handshake-interviewer-rotations.json#c3",
+   "gmail/vivek_kulkarni/20270527-headroom-drain-cto-authorization-and-customer-commitment-plan.json#c3",
+   "gmail/vivek_kulkarni/20261001-conversation-slowpath-hotfix-briefing.json#c0",
+   "gmail/vivek_kulkarni/20251102-dpa-pen-test-demo-reschedule.json#c0",
+   "gmail/vivek_kulkarni/20261115-poc-preflight-networking-and-credential-plan.json#c0",
+   "gmail/vivek_kulkarni/20270425-apexcloud-gsi-scheduling-and-roles.json#c0",
+   "gmail/vivek_kulkarni/20260605-service-onboard-tech-briefing-auth-toolchain-prompts.json#c0",
+   "gmail/vivek_kulkarni/20261130-security-exhibit-sequencing-evidence-handoff.json#c0"
+  ],
+  "graph": [
+   "gmail/jonas_weber/20261212-staggered-deep-dive-daymap-and-debrief-rota.json#c0",
+   "gmail/vivek_kulkarni/20270302-vaulted-deploy-operational-qna.json#c0",
+   "gmail/vivek_kulkarni/20270425-apexcloud-gsi-scheduling-and-roles.json#c0"
+  ],
+  "basic_2": [
+   "gmail/vivek_kulkarni/20270328-service-surge-attribution-sdk-timeout-loop.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "gmail/naomi_feldman/20260715-candidate-handshake-interviewer-rotations.json#c3",
+   "gmail/vivek_kulkarni/20270527-headroom-drain-cto-authorization-and-customer-commitment-plan.json#c3",
+   "gmail/vivek_kulkarni/20261001-conversation-slowpath-hotfix-briefing.json#c0",
+   "gmail/vivek_kulkarni/20251102-dpa-pen-test-demo-reschedule.json#c0",
+   "gmail/vivek_kulkarni/20261115-poc-preflight-networking-and-credential-plan.json#c0",
+   "gmail/vivek_kulkarni/20270425-apexcloud-gsi-scheduling-and-roles.json#c0",
+   "gmail/vivek_kulkarni/20260605-service-onboard-tech-briefing-auth-toolchain-prompts.json#c0",
+   "gmail/vivek_kulkarni/20261130-security-exhibit-sequencing-evidence-handoff.json#c0"
+  ],
+  "graph_2": [
+   "gmail/jonas_weber/20261212-staggered-deep-dive-daymap-and-debrief-rota.json#c0",
+   "gmail/vivek_kulkarni/20270302-vaulted-deploy-operational-qna.json#c0",
+   "gmail/vivek_kulkarni/20270425-apexcloud-gsi-scheduling-and-roles.json#c0"
+  ]
+ },
+ "MX39": {
+  "basic": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/incidents/1772008012.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "gmail/rafael_mendes/20270607-invite-misfire-timezone-align-and-runbook.json#c0",
+   "gmail/rafael_mendes/20270614-inference-qualification-debrief-benchmarks-and-asks.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/dedicated-throughput-slo-escalation.json#c0",
+   "confluence/eng-sre/reliability-initiatives/incident-ownership-mapping-and-remediation-sla-matrix.json#c0"
+  ],
+  "graph": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "directory/people/sofia-mendes.md#c0",
+   "slack/incidents/1760211109.json#c0"
+  ],
+  "basic_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "confluence/oncall-and-incident-response/status-page-and-comms/customer-incident-comms-alignment.json#c0",
+   "slack/incidents/1772008012.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "slack/eng-releases/1747248288-private-observability-pack-release-branch-and-backports.json#c0",
+   "gmail/rafael_mendes/20270607-invite-misfire-timezone-align-and-runbook.json#c0",
+   "gmail/rafael_mendes/20270614-inference-qualification-debrief-benchmarks-and-asks.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/dedicated-throughput-slo-escalation.json#c0",
+   "confluence/eng-sre/reliability-initiatives/incident-ownership-mapping-and-remediation-sla-matrix.json#c0"
+  ],
+  "graph_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "directory/people/sofia-mendes.md#c0"
+  ]
+ },
+ "MX40": {
+  "basic": [
+   "directory/people/sofia-ivanova.md#c0",
+   "slack/support/1739566805.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-runtime/1768501140-fast-tier-p99-regression-investigation.json#c0",
+   "directory/people/julian-moore.md#c0",
+   "gmail/ben_carter/20260705-onboarding-blackout-mitigation-credit-request.json#c0",
+   "slack/incidents/1762959044.json#c0",
+   "gmail/sofia_ivanova/20250521-invite-owner-shadow-and-passkey-rotation.json#c0",
+   "gmail/sofia_ivanova/20270509-newsletter-partner-trial-fulfillment-coordination.json#c0",
+   "gmail/sofia_ivanova/20261128-early-output-sla-risk-and-demo-asks.json#c0"
+  ],
+  "graph": [
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/sofia-ivanova.md#c0",
+   "slack/support/1739566805.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-runtime/1768501140-fast-tier-p99-regression-investigation.json#c0",
+   "directory/people/julian-moore.md#c0",
+   "gmail/ben_carter/20260705-onboarding-blackout-mitigation-credit-request.json#c0",
+   "slack/incidents/1762959044.json#c0",
+   "gmail/sofia_ivanova/20250521-invite-owner-shadow-and-passkey-rotation.json#c0",
+   "gmail/sofia_ivanova/20270509-newsletter-partner-trial-fulfillment-coordination.json#c0",
+   "gmail/sofia_ivanova/20261128-early-output-sla-risk-and-demo-asks.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng/1770130402-canary-false-positive-alert-storm.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0"
+  ]
+ },
+ "MX41": {
+  "basic": [
+   "confluence/architecture-and-standards/api-standards/sdk-retry-timeout-standard.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "directory/people/ibrahim-khan.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "slack/eng-security/2176543210-sso-jit-degraded-role-assignments-on-alternate-email.json#c3",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/eng-infra/7912340000-pt-staging-evidence-handshake.json#c0",
+   "slack/sales/1778812345-airgap-transfer-station-poc-checklist.json#c0"
+  ],
+  "graph": [
+   "slack/people-ops/1897654321-adoption-docs-timing-and-payroll-qna.json#c2",
+   "gmail/karthik_iyer/20250512-qurex-msadpa-sow-redlines.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0"
+  ],
+  "basic_2": [
+   "confluence/architecture-and-standards/api-standards/sdk-retry-timeout-standard.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/eng-releases/1776468110-runtime-1-22-0-rc-perf-signoff.json#c0",
+   "slack/eng-oncall/1760464200.json#c0",
+   "directory/people/ibrahim-khan.md#c0",
+   "directory/people/allison-grant.md#c0",
+   "slack/eng-security/2176543210-sso-jit-degraded-role-assignments-on-alternate-email.json#c3",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/eng-infra/7912340000-pt-staging-evidence-handshake.json#c0",
+   "slack/sales/1778812345-airgap-transfer-station-poc-checklist.json#c0"
+  ],
+  "graph_2": [
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "slack/people-ops/1897654321-adoption-docs-timing-and-payroll-qna.json#c2",
+   "gmail/karthik_iyer/20250512-qurex-msadpa-sow-redlines.json#c0"
+  ]
+ },
+ "MX42": {
+  "basic": [
+   "slack/incidents/1762395502.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "gmail/mina_haddad/20260729-go-to-prod-playbook-finalization-and-cutover-owners.json#c0",
+   "gmail/lauren_bishop/20260514-adjudication-compact-vote-aisha-khan.json#c0",
+   "gmail/mina_haddad/20260824-gpu-portfolio-fitment-and-staggered-commitment-proposal.json#c0",
+   "gmail/mina_haddad/20270428-okr-signalboard-launch-owners-rapid-sync.json#c0",
+   "gmail/mina_haddad/20261109-cleartek-map-toolkit-gdoc-initial-share.json#c0",
+   "gmail/mina_haddad/20270407-microbin-context-leakage-streaming-billing.json#c0",
+   "gmail/mina_haddad/20260519-deploy-packaging-ops-sow-negotiation.json#c0",
+   "gmail/mina_haddad/20260715-cost-sensitivity-validation-and-plan.json#c0"
+  ],
+  "graph": [
+   "gmail/mina_haddad/20261205-ops-safeguard-vs-discount-pilot-options.json#c0",
+   "gmail/mina_haddad/20261109-cleartek-map-toolkit-gdoc-initial-share.json#c0",
+   "gmail/mina_haddad/20270815-provisional-lead-cover-plan-and-hr-clearance.json#c0"
+  ],
+  "basic_2": [
+   "slack/incidents/1762395502.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "gmail/mina_haddad/20260729-go-to-prod-playbook-finalization-and-cutover-owners.json#c0",
+   "gmail/lauren_bishop/20260514-adjudication-compact-vote-aisha-khan.json#c0",
+   "gmail/mina_haddad/20260824-gpu-portfolio-fitment-and-staggered-commitment-proposal.json#c0",
+   "gmail/mina_haddad/20270428-okr-signalboard-launch-owners-rapid-sync.json#c0",
+   "gmail/mina_haddad/20261109-cleartek-map-toolkit-gdoc-initial-share.json#c0",
+   "gmail/mina_haddad/20270407-microbin-context-leakage-streaming-billing.json#c0",
+   "gmail/mina_haddad/20260519-deploy-packaging-ops-sow-negotiation.json#c0",
+   "gmail/mina_haddad/20260715-cost-sensitivity-validation-and-plan.json#c0"
+  ],
+  "graph_2": [
+   "gmail/mina_haddad/20261205-ops-safeguard-vs-discount-pilot-options.json#c0",
+   "gmail/mina_haddad/20261109-cleartek-map-toolkit-gdoc-initial-share.json#c0",
+   "gmail/mina_haddad/20270815-provisional-lead-cover-plan-and-hr-clearance.json#c0"
+  ]
+ },
+ "MX43": {
+  "basic": [
+   "directory/people/vikram-singh.md#c0",
+   "slack/people-ops/2751234000-interim-custrel-lead-and-hiring-pilot.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0",
+   "slack/people-ops/1853001234-talent-shelf-swap-and-lead-intro.json#c0",
+   "slack/people-ops/1865432109-priya-rao-onsite-arrival-and-accomms.json#c0",
+   "slack/postmortems/1739736404.json#c0",
+   "slack/people-ops/1987654321-head-data-analytics-intro-and-hiring-plan.json#c0",
+   "slack/new-hires/1715554321-arjun-ferret-pickle-intro.json#c0",
+   "slack/people-ops/1815567890-pre-onboard-itinerary-for-candidate.json#c0",
+   "slack/people-ops/1803456789-ccing-candidates-and-scorecard-training-gap.json#c0"
+  ],
+  "graph": [
+   "slack/eng-oncall/2269998888-handoff-postmortem-actionitems.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0",
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/vikram-singh.md#c0",
+   "slack/people-ops/2751234000-interim-custrel-lead-and-hiring-pilot.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0",
+   "slack/people-ops/1853001234-talent-shelf-swap-and-lead-intro.json#c0",
+   "slack/people-ops/1865432109-priya-rao-onsite-arrival-and-accomms.json#c0",
+   "slack/postmortems/1739736404.json#c0",
+   "slack/people-ops/1987654321-head-data-analytics-intro-and-hiring-plan.json#c0",
+   "slack/new-hires/1715554321-arjun-ferret-pickle-intro.json#c0",
+   "slack/people-ops/1815567890-pre-onboard-itinerary-for-candidate.json#c0",
+   "slack/people-ops/1803456789-ccing-candidates-and-scorecard-training-gap.json#c0"
+  ],
+  "graph_2": [
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0",
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0",
+   "slack/eng-oncall/2269998888-handoff-postmortem-actionitems.json#c0"
+  ]
+ },
+ "MX44": {
+  "basic": [
+   "directory/departments/product.md#c0",
+   "slack/sales/1719309876-poc-keystone-retail-warmup-pricing-sq-escalation.json#c2",
+   "directory/departments/sales.md#c0",
+   "slack/product/1748412345-airgap-procurement-workflow-and-offline-delivery.json#c1",
+   "slack/eng-platform/1763501234-net90-staggered-invoice-poc-coord.json#c3",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/sales/1763349876-gainsight-gong-cs-onboard-issues.json#c0",
+   "slack/all-hands/1769954321-enterprise-soc2-vs-revenue-feature-sequencing.json#c2",
+   "slack/marketing/1908888888-social-webinar-routing.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "graph": [
+   "slack/marketing/2812345678-enterprise-launch-crashcart-webinar-routing.json#c0",
+   "gmail/marissa_cole/20270314-stage-sku-clarity-roundup-for-forecasting.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0"
+  ],
+  "basic_2": [
+   "directory/departments/product.md#c0",
+   "slack/sales/1719309876-poc-keystone-retail-warmup-pricing-sq-escalation.json#c2",
+   "directory/departments/sales.md#c0",
+   "slack/product/1748412345-airgap-procurement-workflow-and-offline-delivery.json#c1",
+   "slack/eng-platform/1763501234-net90-staggered-invoice-poc-coord.json#c3",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/sales/1763349876-gainsight-gong-cs-onboard-issues.json#c0",
+   "slack/all-hands/1769954321-enterprise-soc2-vs-revenue-feature-sequencing.json#c2",
+   "slack/marketing/1908888888-social-webinar-routing.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "graph_2": [
+   "slack/marketing/2812345678-enterprise-launch-crashcart-webinar-routing.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "gmail/marissa_cole/20270314-stage-sku-clarity-roundup-for-forecasting.json#c0"
+  ]
+ },
+ "MX45": {
+  "basic": [
+   "directory/people/dr.-maya-srinivasan.md#c0",
+   "gmail/maya_srinivasan/20260907-manager-review-briefing-sensitive-roles.json#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/people-ops/1750329876-offboarding-lila-coordination.json#c0",
+   "slack/help/1778502468-shared-desk-heat-intolerance-and-coaching-plan.json#c0",
+   "slack/people-ops/1777770001-manager-onboard-essentials.json#c0",
+   "slack/eng-oncall/3661234567.json#c0",
+   "slack/all-hands/1851234567-allhands-weekly-ask-and-key-highlights.json#c0"
+  ],
+  "graph": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/all-hands/4312345678-tue-innovation-snapshot-rollout-qa.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1"
+  ],
+  "basic_2": [
+   "directory/people/dr.-maya-srinivasan.md#c0",
+   "gmail/maya_srinivasan/20260907-manager-review-briefing-sensitive-roles.json#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/people-ops/1750329876-offboarding-lila-coordination.json#c0",
+   "slack/help/1778502468-shared-desk-heat-intolerance-and-coaching-plan.json#c0",
+   "slack/people-ops/1777770001-manager-onboard-essentials.json#c0",
+   "slack/eng-oncall/3661234567.json#c0",
+   "slack/all-hands/1851234567-allhands-weekly-ask-and-key-highlights.json#c0"
+  ],
+  "graph_2": [
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "fireflies/misc/2026-08-11-internal-it-finops-oncall-runbook-transfer.json#c1",
+   "slack/all-hands/4312345678-tue-innovation-snapshot-rollout-qa.json#c0"
+  ]
+ },
+ "MX46": {
+  "basic": [
+   "directory/departments/infrastructure-&-sre.md#c1",
+   "directory/departments/infrastructure-&-sre.md#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/partnerships/1834567000-partner-sev-tribe-handoff-ladder.json#c0",
+   "slack/new-hires/1760000420-frank-onboard-synths.json#c0",
+   "directory/people/samantha-roy.md#c0",
+   "slack/eng-sre/3127778888-probe-cascade-warmchain-starvation.json#c0",
+   "slack/incidents/3170012345-kv-cache-hostfs-firmware-intermittent-p99.json#c0",
+   "directory/people/jamal-pierce.md#c0",
+   "slack/partnerships/1764567890-partner-fastpath-escalation-ladder.json#c0"
+  ],
+  "graph": [
+   "slack/people-ops/1853001234-talent-shelf-swap-and-lead-intro.json#c0",
+   "slack/customer-success/3766123456-hightide-slo-evidence-prep.json#c0",
+   "slack/eng-sre/1767000000-onboard-fanout-snat-ephemeral-exhaustion.json#c0"
+  ],
+  "basic_2": [
+   "directory/departments/infrastructure-&-sre.md#c1",
+   "directory/departments/infrastructure-&-sre.md#c0",
+   "slack/all-hands/2045678901-team-mapping-playbook-questions.json#c0",
+   "slack/partnerships/1834567000-partner-sev-tribe-handoff-ladder.json#c0",
+   "slack/new-hires/1760000420-frank-onboard-synths.json#c0",
+   "directory/people/samantha-roy.md#c0",
+   "slack/eng-sre/3127778888-probe-cascade-warmchain-starvation.json#c0",
+   "slack/incidents/3170012345-kv-cache-hostfs-firmware-intermittent-p99.json#c0",
+   "directory/people/jamal-pierce.md#c0",
+   "slack/partnerships/1764567890-partner-fastpath-escalation-ladder.json#c0"
+  ],
+  "graph_2": [
+   "slack/customer-success/3766123456-hightide-slo-evidence-prep.json#c0",
+   "slack/people-ops/1853001234-talent-shelf-swap-and-lead-intro.json#c0",
+   "slack/eng-sre/1767000000-onboard-fanout-snat-ephemeral-exhaustion.json#c0"
+  ]
+ },
+ "MX47": {
+  "basic": [
+   "slack/product/1739553314.json#c0",
+   "slack/marketing/1760351349.json#c0",
+   "slack/eng-sre/1768461205-controlled-failover-plan-review.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "slack/docs/1769599011-docs-site-security-page-pr-review.json#c0",
+   "gmail/markus_klein/20280530-brightline-telemetry-retention-evidence-request.json#c0",
+   "gmail/markus_klein/20260124-medisol-pseudonymization-routing-escrow-sccs.json#c0",
+   "slack/partnerships/1729000000-minprice-anchor-commit-ladder.json#c0",
+   "gmail/markus_klein/20260120-referral-appreciation-fulfillment-plan.json#c0",
+   "slack/eng-platform/1801234567-export-consent-and-copy-flow.json#c0"
+  ],
+  "graph": [
+   "slack/partnerships/2481234567-marketplace-syndication-hw-bundle-announce-flow.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0",
+   "google_drive/users/vertex-workplace-assistant-call-scrapbook.json#c0"
+  ],
+  "basic_2": [
+   "slack/product/1739553314.json#c0",
+   "slack/marketing/1760351349.json#c0",
+   "slack/eng-sre/1768461205-controlled-failover-plan-review.json#c0",
+   "slack/incidents/1760211109.json#c0",
+   "slack/docs/1769599011-docs-site-security-page-pr-review.json#c0",
+   "gmail/markus_klein/20280530-brightline-telemetry-retention-evidence-request.json#c0",
+   "gmail/markus_klein/20260124-medisol-pseudonymization-routing-escrow-sccs.json#c0",
+   "slack/partnerships/1729000000-minprice-anchor-commit-ladder.json#c0",
+   "gmail/markus_klein/20260120-referral-appreciation-fulfillment-plan.json#c0",
+   "slack/eng-platform/1801234567-export-consent-and-copy-flow.json#c0"
+  ],
+  "graph_2": [
+   "google_drive/users/vertex-workplace-assistant-call-scrapbook.json#c0",
+   "slack/partnerships/2481234567-marketplace-syndication-hw-bundle-announce-flow.json#c0",
+   "slack/architecture/1740113320-adr-review-cache-hit-rate-definition.json#c0"
+  ]
+ },
+ "MX48": {
+  "basic": [
+   "directory/people/laura-bennett.md#c0",
+   "gmail/laura_bennett/20250214-people-priorities-action-plan.json#c0",
+   "slack/sales/1770219944-discount-exception-request-for-enterprise.json#c0",
+   "gmail/vivek_kulkarni/20261001-conversation-slowpath-hotfix-briefing.json#c3",
+   "gmail/laura_bennett/20270720-on-demand-qual-and-slot-sync.json#c0",
+   "gmail/laura_bennett/20261018-embedsync-staging-cutover-csm-ops-questions.json#c0",
+   "gmail/laura_bennett/20270711-network-switchover-acceptance-and-health-sampling.json#c0",
+   "gmail/michael_grant/20280328-polaris-advocate-pairing-telemed-us-east.json#c2",
+   "gmail/ben_carter/20270525-leadership-snapshot-okrs-actionable-deck-and-support-gaplist.json#c0",
+   "slack/incidents/4201234567-warroom-seed-and-customer-comm-plan.json#c2"
+  ],
+  "graph": [
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0",
+   "slack/support/1739566805.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/laura-bennett.md#c0",
+   "gmail/laura_bennett/20250214-people-priorities-action-plan.json#c0",
+   "slack/sales/1770219944-discount-exception-request-for-enterprise.json#c0",
+   "gmail/vivek_kulkarni/20261001-conversation-slowpath-hotfix-briefing.json#c3",
+   "gmail/laura_bennett/20270720-on-demand-qual-and-slot-sync.json#c0",
+   "gmail/laura_bennett/20261018-embedsync-staging-cutover-csm-ops-questions.json#c0",
+   "gmail/laura_bennett/20270711-network-switchover-acceptance-and-health-sampling.json#c0",
+   "gmail/michael_grant/20280328-polaris-advocate-pairing-telemed-us-east.json#c2",
+   "gmail/ben_carter/20270525-leadership-snapshot-okrs-actionable-deck-and-support-gaplist.json#c0",
+   "slack/incidents/4201234567-warroom-seed-and-customer-comm-plan.json#c2"
+  ],
+  "graph_2": [
+   "slack/announcements/1741139017-announce-runtime-lts-pilot.json#c0",
+   "slack/incidents/1740726110-rollout-split-mismatch-us-east.json#c0",
+   "slack/support/1739566805.json#c0"
+  ]
+ },
+ "MX49": {
+  "basic": [
+   "slack/announcements/3312334455-maint-preflight-customer-copy-and-handoff-checklist.json#c2",
+   "slack/partnerships/1718882345-partner-announcement-runbook-and-sdk-sunset-helpline.json#c0",
+   "directory/departments/product.md#c0",
+   "slack/eng/2412345678-maint-extension-ops-comm-templates.json#c3",
+   "slack/new-hires/1955554321-first-week-noise-hacks-and-bot-filters.json#c0",
+   "slack/design/1860034567-search-pill-and-chip-overflow.json#c2",
+   "slack/people-ops/2105001234-manager-briefing-onepager.json#c0",
+   "google_drive/users/ops-micro-announce-template-and-qa-scratch-saffron.json#c0",
+   "slack/announcements/1785129876-ceo-weekly-ops-priorities-launch-and-policy.json#c0",
+   "slack/eng-ml/2143658700-sprint-townhall-launch-callouts.json#c0"
+  ],
+  "graph": [
+   "slack/marketing/2112003456-press-list-live-update-and-quote-handoff.json#c0",
+   "slack/all-hands/1712001234-reorg-headcount-qna.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0"
+  ],
+  "basic_2": [
+   "slack/announcements/3312334455-maint-preflight-customer-copy-and-handoff-checklist.json#c2",
+   "slack/partnerships/1718882345-partner-announcement-runbook-and-sdk-sunset-helpline.json#c0",
+   "directory/departments/product.md#c0",
+   "slack/eng/2412345678-maint-extension-ops-comm-templates.json#c3",
+   "slack/new-hires/1955554321-first-week-noise-hacks-and-bot-filters.json#c0",
+   "slack/design/1860034567-search-pill-and-chip-overflow.json#c2",
+   "slack/people-ops/2105001234-manager-briefing-onepager.json#c0",
+   "google_drive/users/ops-micro-announce-template-and-qa-scratch-saffron.json#c0",
+   "slack/announcements/1785129876-ceo-weekly-ops-priorities-launch-and-policy.json#c0",
+   "slack/eng-ml/2143658700-sprint-townhall-launch-callouts.json#c0"
+  ],
+  "graph_2": [
+   "slack/all-hands/1712001234-reorg-headcount-qna.json#c0",
+   "confluence/customer-success-and-support/escalation-playbook/slack-bridge-and-incident-channel-conventions.json#c0",
+   "slack/marketing/2112003456-press-list-live-update-and-quote-handoff.json#c0"
+  ]
+ },
+ "MX50": {
+  "basic": [
+   "directory/people/monica-patel.md#c0",
+   "slack/people-ops/1999999000-nora-elbaz-model-onboarding-manager-intro.json#c0",
+   "slack/support/1740857812-template-users-seeing-429s-default-qps-too-high.json#c0",
+   "slack/new-hires/1715554321-arjun-ferret-pickle-intro.json#c0",
+   "gmail/hannah_schmitt/20260112-confidential-allegation-triage.json#c4",
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0",
+   "slack/people-ops/4743219876-interviewer-lite-ops-check-and-transcript-consent.json#c0",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "slack/eng-oncall/2087654321-continuous-batch-perf-cliff-mitigation.json#c0",
+   "slack/people-ops/1987654321-head-data-analytics-intro-and-hiring-plan.json#c0"
+  ],
+  "graph": [
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0",
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0",
+   "slack/general/1719302468-emoji-sprint-and-unofficial-uno.json#c0"
+  ],
+  "basic_2": [
+   "directory/people/monica-patel.md#c0",
+   "slack/people-ops/1999999000-nora-elbaz-model-onboarding-manager-intro.json#c0",
+   "slack/support/1740857812-template-users-seeing-429s-default-qps-too-high.json#c0",
+   "slack/new-hires/1715554321-arjun-ferret-pickle-intro.json#c0",
+   "gmail/hannah_schmitt/20260112-confidential-allegation-triage.json#c4",
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0",
+   "slack/people-ops/4743219876-interviewer-lite-ops-check-and-transcript-consent.json#c0",
+   "slack/people-ops/1716543210-review-cycle-checkpoint-alignment.json#c0",
+   "slack/eng-oncall/2087654321-continuous-batch-perf-cliff-mitigation.json#c0",
+   "slack/people-ops/1987654321-head-data-analytics-intro-and-hiring-plan.json#c0"
+  ],
+  "graph_2": [
+   "slack/all-hands/2319876543-quarterly-sprint-summit-logistics-and-asks.json#c0",
+   "slack/general/1719302468-emoji-sprint-and-unofficial-uno.json#c0",
+   "slack/eng-oncall/1758001112-overnight-priv-check-handoff-snapshot.json#c0"
+  ]
+ }
+}

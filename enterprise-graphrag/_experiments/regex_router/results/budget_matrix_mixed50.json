@@ -1,0 +1,52 @@
+{
+  "rag3": {
+    "n": 50,
+    "exact": 23,
+    "full": 23,
+    "part": 10,
+    "zero": 17,
+    "judge": 53.0,
+    "tok": 1754,
+    "multi_hop_exact": "0/20"
+  },
+  "rag10": {
+    "n": 50,
+    "exact": 24,
+    "full": 24,
+    "part": 8,
+    "zero": 18,
+    "judge": 53.5,
+    "tok": 5409,
+    "multi_hop_exact": "0/20"
+  },
+  "graph3": {
+    "n": 50,
+    "exact": 49,
+    "full": 49,
+    "part": 1,
+    "zero": 0,
+    "judge": 99.0,
+    "tok": 1327,
+    "multi_hop_exact": "19/20"
+  },
+  "graph10": {
+    "n": 50,
+    "exact": 49,
+    "full": 49,
+    "part": 1,
+    "zero": 0,
+    "judge": 99.0,
+    "tok": 4953,
+    "multi_hop_exact": "19/20"
+  },
+  "_meta": {
+    "questions": "datasets/enterprise/eval_mixed50.jsonl (MX01-MX50)",
+    "n": 50,
+    "model": "gemini-3.7-flash",
+    "judge": "gemini-3.1-pro-preview",
+    "rubric": "v2",
+    "rr_pool": 50,
+    "graph_router": "regex/pattern router \u2014 0 LLM planner calls, 0 planner tokens",
+    "note": "ALL FOUR arms measured on the SAME 50 questions with the SAME judge. This is the fix for budget50_judge_regex.json, whose rag3/rag10 rows were carried over from eval_final50_v3 and so were not comparable to its graph rows."
+  }
+}

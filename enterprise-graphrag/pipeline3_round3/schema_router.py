@@ -125,13 +125,108 @@ PLAN_PROMPT = (
 )
 
 
+# ---------------------------------------------------------------------------------------------
+# EXPERIMENTAL, default OFF (P3_PLAN_SLIM=1). The planner prompt is ~1,187 tokens on EVERY
+# question and the question itself is under 3% of it - 774 tokens of instructions and worked
+# examples plus 382 of relation listing. That fixed cost is 35% of GraphRAG's spend at a
+# 3-chunk budget. This is a condensed prompt: one worked example instead of three, the rules
+# compressed, and the relation listing without example edges (which carry long document paths).
+# It is only worth adopting if accuracy holds - routing is what earns 48/50, so a cheaper prompt
+# that routes worse is a bad trade.
+PLAN_SLIM = os.getenv("P3_PLAN_SLIM", "0") != "0"
+
+PLAN_PROMPT_SLIM = (
+    "Translate the question into a PLAN over a knowledge graph.\n\n"
+    "Relations (with the share of documents each covers):\n{relations}\n\n"
+    "Return STRICT JSON:\n"
+    '  {{"legs":[{{"seed":"<entity named in the question>",'
+    '"path":[{{"relation":"<from the list>","direction":"out"|"in"}}]}}],\n'
+    '   "combine":"intersect"|"union","tail":[...],"intent":"set"|"lookup"}}\n\n'
+    "Model: each leg starts at its OWN seed and follows its OWN path; the legs' results are "
+    "combined ('intersect' = reached by every leg, 'union' = by any); the tail is walked from "
+    "the combined set. Put a hop in the TAIL if it happens AFTER combining, in a LEG if BEFORE. "
+    "'out' follows source->target, 'in' follows it backwards.\n\n"
+    'Example (different graph): "which cities are home to people working for both ACME and '
+    'Globex?" -> legs [{{"ACME",[works_at:in]}},{{"Globex",[works_at:in]}}], combine intersect, '
+    "tail [lives_in:out]. The shared PEOPLE are found first, then their cities.\n\n"
+    "Rules:\n"
+    "- Use ONLY relation names from the list. Never invent one.\n"
+    "- Seeds are entities NAMED IN THE QUESTION, spelled as the question spells them.\n"
+    "- Every leg must end on the SAME kind of thing.\n"
+    "- Match the question's verb: 'involving'/'mentions'/'takes part in' are BROAD "
+    "participation; 'wrote'/'authored' is narrow authorship. Prefer HIGHER coverage unless the "
+    "question asks for the narrow one - a narrow relation intersected across two people is "
+    "usually EMPTY.\n"
+    "- 'intersect' when the question says both/and/shared; 'union' for a single seed.\n"
+    "- 1 to 3 hops per leg. If nothing can answer it, return an empty legs list.\n\n"
+    "Question: {question}\n\nJSON:"
+)
+
+
 def _short(v: str, n: int = 46) -> str:
     """Document ids are full paths; showing one whole makes the relation list unreadable."""
     v = str(v)
     return v if len(v) <= n else v[: n - 3] + "..."
 
 
-def plan(question: str, get_llm_response) -> dict:
+# ---------------------------------------------------------------- pattern fast path
+# A pattern that recognises the question answers the routing question for FREE: the plan is a
+# function of the PHRASING, not of the entity named in it, so ~1,373 tokens of planner prompt
+# buy nothing on a phrasing already known. Measured on the 50 enterprise questions: 2,700 ->
+# 1,327 tokens at a 3-chunk budget, 49/50 and 99.0% judged either way, latency 9.5s -> 4.3s.
+#
+# This is NOT MasterGraph's lexicon router. That one hardcodes 51 entity strings ("tsmc",
+# "deloitte") because its questions ask "which companies use TSMC" - there the entity IS the
+# filter. Here every person, channel and department is a CAPTURE GROUP, so the patterns encode
+# phrasing and relation names only, and the LLM planner still handles everything unmatched.
+#
+# P3_REGEX_ROUTER=0 restores planner-only behaviour, which is what the pre-2026-08-25 published
+# numbers were measured under.
+REGEX_ROUTER = os.getenv("P3_REGEX_ROUTER", "1") != "0"
+_rr_mod = None
+_rr_ok: bool | None = None
+
+
+def _regex_router():
+    """Load the sibling module by PATH, not by name: this file is imported both as
+    `schema_router` (pipeline.py, with pipeline3_round3 on sys.path) and as
+    `pipeline3_round3.schema_router`, and a bare `import regex_router` resolves in only one of
+    those. Returns None if the module is missing."""
+    global _rr_mod
+    if _rr_mod is None:
+        try:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(
+                "p3_regex_router", Path(__file__).with_name("regex_router.py"))
+            m = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(m)
+            _rr_mod = m
+        except Exception as e:
+            print(f"[router] pattern fast path unavailable: {e}")
+            _rr_mod = False
+    return _rr_mod or None
+
+
+def _regex_applies() -> bool:
+    """Only use the fast path if THIS graph publishes every relation the patterns name.
+    Point the demo at a different schema and the patterns silently stop firing rather than
+    routing to relations that do not exist - which is the property the schema router exists
+    to protect."""
+    global _rr_ok
+    if _rr_ok is None:
+        rr = _regex_router()
+        if rr is None:
+            _rr_ok = False
+        else:
+            known = {r["relation"] for r in graph_relations()}
+            missing = rr.RELATIONS - known
+            _rr_ok = not missing
+            if missing:
+                print(f"[router] pattern fast path OFF - schema lacks {sorted(missing)}")
+    return _rr_ok
+
+
+def plan(question: str, get_llm_response, attempt: int = 0) -> dict:
     """Map a question onto legs + combine + tail over the graph's relations.
 
     Returns {"legs": [{"seed": str, "path": [(rel, dir), ...]}, ...],
@@ -149,18 +244,38 @@ def plan(question: str, get_llm_response) -> dict:
     valid plan twice and an empty one once — and a dropped plan costs the whole question,
     since P3 then falls back to plain vector search.
     """
+    # `attempt` is the caller's re-plan counter. attempt>0 means the walk landed nothing on the
+    # plan just returned, so re-serving the same pattern plan would fail identically - hand that
+    # draw to the LLM planner instead.
+    #
+    # This used to infer the retry from a module-level "last question seen", which was WRONG:
+    # asking the same question twice in a row is indistinguishable from a re-plan that way, so
+    # the second ask silently paid the planner. Observed live - 1,650 tokens on the first call
+    # and 3,023 on an identical second call. The caller knows which attempt it is on; guessing
+    # from global state cannot.
+    if REGEX_ROUTER and attempt == 0 and _regex_applies():
+        hit = _regex_router().route(question)
+        if hit:
+            return hit[2]
+
     rels = graph_relations()
     # Coverage is shown because the planner cannot otherwise tell a broad relation from a
     # narrow one, and picking the narrow one under 'intersect' returns an empty set: measured on
     # five questions of the form "channels containing documents involving both X and Y", where
     # `authored` (33% coverage) intersected to nothing every time while `participated_in` (89%)
     # returned the gold answer exactly. Same failure shape, one wrong relation.
-    listing = "\n".join(
-        f"  {r['relation']}  [covers {100 * r.get('coverage', 0):.0f}% of documents]"
-        + (f"   e.g. ({_short(r['example_sources'][0])}) -> ({_short(r['example_targets'][0])})"
-           if r["example_sources"] and r["example_targets"] else "")
-        for r in rels)
-    prompt = PLAN_PROMPT.format(relations=listing, question=question)
+    if PLAN_SLIM:
+        # no example edges: they are mostly long document paths and cost ~200 tokens
+        listing = "\n".join(
+            f"  {r['relation']} ({100 * r.get('coverage', 0):.0f}%)" for r in rels)
+        prompt = PLAN_PROMPT_SLIM.format(relations=listing, question=question)
+    else:
+        listing = "\n".join(
+            f"  {r['relation']}  [covers {100 * r.get('coverage', 0):.0f}% of documents]"
+            + (f"   e.g. ({_short(r['example_sources'][0])}) -> ({_short(r['example_targets'][0])})"
+               if r["example_sources"] and r["example_targets"] else "")
+            for r in rels)
+        prompt = PLAN_PROMPT.format(relations=listing, question=question)
     empty = {"legs": [], "combine": "union", "tail": [], "intent": "lookup"}
     known = {r["relation"] for r in rels}
 
