@@ -1036,7 +1036,7 @@ function drawCard(x, cheap, fewest){
     // the arm silently degraded to the baseline, which must be legible at a glance.
     //
     // Only P3 says "router": it is the only arm that HAS one. Its value comes from
-    // pipeline.py's route_name, i.e. what the LLM planner chose and whether the walk landed.
+    // pipeline.py's route_name, i.e. which strategy the router chose and whether the walk landed.
     // P1 and P2 have their route hardcoded by the server ("no retrieval", "vector top-k") —
     // those are retrieval methods, not decisions, and calling them a router would imply a
     // component that does not exist in those arms.
@@ -1612,7 +1612,6 @@ def main() -> int:
     _t_judge = f'{b50["rag10"]["judge"]:.1f}' if b50 else f'{E["p2rr"]["judge"]:.1f}'
     _t_strict = (f'{b50["rag10"]["full"]}/{b50["rag10"]["n"]}' if b50
                  else f'{E["p2rr"]["strict"]}/{E["p2rr"]["n"]}')
-    _t_plan = 1187 if b50 else E["p3"]["plan"]
     _t_tok = b50["graph3"]["tok"] if b50 else E["p3"]["tok"]
     A(drops(
         ('What strict pass and the LLM judge each measure',

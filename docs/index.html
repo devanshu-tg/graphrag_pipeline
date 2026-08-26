@@ -553,7 +553,7 @@ function drawCard(x, cheap, fewest){
     // the arm silently degraded to the baseline, which must be legible at a glance.
     //
     // Only P3 says "router": it is the only arm that HAS one. Its value comes from
-    // pipeline.py's route_name, i.e. what the LLM planner chose and whether the walk landed.
+    // pipeline.py's route_name, i.e. which strategy the router chose and whether the walk landed.
     // P1 and P2 have their route hardcoded by the server ("no retrieval", "vector top-k") —
     // those are retrieval methods, not decisions, and calling them a router would imply a
     // component that does not exist in those arms.
