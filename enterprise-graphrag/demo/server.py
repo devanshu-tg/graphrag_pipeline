@@ -339,6 +339,17 @@ def warm() -> None:
             # without this key the dispatch below fell through to else: and ran GraphRAG, so
             # the "Basic RAG" row was a second GraphRAG run wearing the baseline's label.
             import pipeline2rr_rerank as p2rr
+            # Build the cross-encoder HERE, during startup, not on the first user query. It
+            # takes ~18s on a 2-vCPU box, and paying that inside a request meant the browser
+            # aborted at 90s and the console silently replayed the recorded run - a card
+            # reading "recorded" when nothing was wrong with the pipeline.
+            try:
+                import retrieval_common
+                retrieval_common.reranker()
+                print("[warm] cross-encoder ready")
+            except Exception as _e:
+                print(f"[warm] cross-encoder preload failed ({_e}); "
+                      f"it will load on first use instead")
             _mods.update({"p1": p1, "p2": p2, "p2rr": p2rr, "p3": p3})
             _warm["state"] = "ready"
         except Exception as e:
@@ -819,13 +830,21 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Vary", "Origin")
 
     def _send(self, code, body, ctype="application/json"):
+        # EVERY write here can fail once the client has gone: the console aborts at 90s and
+        # end_headers() flushes as eagerly as wfile.write(). Left unguarded, do_POST's handler
+        # tried to report the real error with _send(500, ...), that threw BrokenPipeError too,
+        # and the ORIGINAL exception was never logged - a failed request showed up as nothing
+        # but a broken pipe. Swallowing a dead socket keeps the real traceback visible.
         data = body if isinstance(body, bytes) else str(body).encode("utf-8")
-        self.send_response(code)
-        self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(len(data)))
-        self._cors()
-        self.end_headers()
-        self.wfile.write(data)
+        try:
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(data)))
+            self._cors()
+            self.end_headers()
+            self.wfile.write(data)
+        except (BrokenPipeError, ConnectionResetError):
+            print(f"[send] client gone before the {code} response was written")
 
     def do_OPTIONS(self):
         # The browser sends this BEFORE the POST because /api/query carries a custom header

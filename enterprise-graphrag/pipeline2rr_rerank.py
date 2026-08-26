@@ -44,7 +44,7 @@ RR_KEEP = int(os.getenv("RR_KEEP", str(config.CONTEXT_NUM_CHUNKS)))
 RR_MODEL = os.getenv("RR_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 _p3 = None
-_ce = None
+# no _ce here on purpose: the single cross-encoder lives in retrieval_common
 # Both loaders are called from the demo server's request threads, so two concurrent queries can
 # enter them at once. Without the lock the previous code published the module to the global
 # BEFORE exec_module() populated it, so the second thread got a half-built module and failed
@@ -73,15 +73,16 @@ def _pipeline():
 
 
 def _reranker():
-    global _ce
-    if _ce is not None:
-        return _ce
-    with _load_lock:                          # same race: a cross-encoder takes seconds to load
-        if _ce is None:
-            from sentence_transformers import CrossEncoder
-            print(f"[rerank] loading {RR_MODEL}")
-            _ce = CrossEncoder(RR_MODEL)
-    return _ce
+    """Delegate to retrieval_common so the process holds ONE cross-encoder, not two.
+
+    This module used to build its own. pipeline3_round3 reranks through
+    retrieval_common.reranker(), so a server serving both arms loaded the same model twice -
+    ~18s each on a 2-vCPU box, ~36s before the first Basic RAG answer could return. Long enough
+    for the browser to abort at 90s, which made the console fall back to the recorded run and
+    print "recorded" on a card that was not actually broken.
+    """
+    import retrieval_common
+    return retrieval_common.reranker()
 
 
 def run_single(question: str, vectorstore=None) -> CallMetrics:

@@ -28,14 +28,22 @@ RR_KEEP = int(os.getenv("RR_KEEP", "10"))
 RR_MODEL = os.getenv("RR_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 _ce = None
+# The demo server calls this from request threads, and a CrossEncoder takes ~18s to build on a
+# 2-vCPU box. Without the lock two concurrent first-queries each build their own copy: double
+# the wait and double the memory. THIS is the single instance for the whole process -
+# pipeline2rr_rerank delegates here rather than keeping a second one.
+_ce_lock = __import__("threading").Lock()
 
 
 def reranker():
     global _ce
-    if _ce is None:
-        from sentence_transformers import CrossEncoder
-        print(f"[rerank] loading {RR_MODEL}")
-        _ce = CrossEncoder(RR_MODEL)
+    if _ce is not None:
+        return _ce
+    with _ce_lock:
+        if _ce is None:                       # re-check: another thread may have finished
+            from sentence_transformers import CrossEncoder
+            print(f"[rerank] loading {RR_MODEL}")
+            _ce = CrossEncoder(RR_MODEL)
     return _ce
 
 
