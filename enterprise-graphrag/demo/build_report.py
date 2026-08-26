@@ -1331,7 +1331,7 @@ def main() -> int:
                 ("p3", "GraphRAG" + _B + "3 chunks")]
     SEC_ARMS = [("p1", "LLM only" + _B + "no retrieval"),
                 ("p2", "Basic RAG" + _B + "10 chunks"),
-                ("p3", "GraphRAG" + _B + "10 chunks")]
+                ("p3", "GraphRAG" + _B + "routed")]
 
     ent_metrics = [
         ("Strict pass (exact set)", "strict", frac, "hi"),
