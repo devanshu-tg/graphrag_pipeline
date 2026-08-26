@@ -1340,6 +1340,24 @@ def main() -> int:
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
     ]
+    # Token figures on the questions Basic RAG actually answers (PASS or PART) - Sebastien's
+    # basis, "when both systems produce a usable answer, what does each cost?". Used ONLY by the
+    # KPI card. The scorecard row and the equal-budget section stay on all 50, so the card is
+    # the single place reporting this subset and it carries a label saying so.
+    _sec_by: dict = {}
+    for _r in sec:
+        _sec_by.setdefault(_r["question_id"], {})[_r.get("arm_kind") or _r.get("arm")] = _r
+    def _tk(r):
+        return r["prompt_tokens"] + r["completion_tokens"] + r.get("planner_tokens", 0)
+    _keep = [q for q, d in _sec_by.items()
+             if "p2" in d and (d["p2"]["exact"] or d["p2"]["f1"] > 0)]
+    sec_sub = None
+    if _keep:
+        sec_sub = {a: st.mean([_tk(_sec_by[q][a]) for q in _keep if a in _sec_by[q]])
+                   for a in ("p1", "p2", "p3")}
+        sec_sub["n"] = len(_keep)
+        sec_sub["red"] = 100.0 * (sec_sub["p2"] - sec_sub["p3"]) / sec_sub["p2"]
+
     sec_metrics = [
         ("Strict pass (exact)", "strict", frac, "hi"),
         ("LLM judge", "judge", pct, "hi"),
@@ -1796,8 +1814,11 @@ def main() -> int:
             # Whole percent on the SEC card by request (2026-08-26). The measured figure is
             # 50.81%; the card rounds it to -51%. The unrounded value still appears in the SEC
             # scorecard's token row, so the precision is on the page, just not on the card.
-            (f"-{sec_red:.0f}%", "GraphRAG vs Basic RAG token reduction",
-             f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question", ""),
+            ((f"-{sec_sub['red']:.0f}%" if sec_sub else f"-{sec_red:.0f}%"),
+             "GraphRAG vs Basic RAG token reduction",
+             (f"{sec_sub['p3']:,.0f} vs {sec_sub['p2']:,.0f} per question "
+              f"on comparable answers" if sec_sub
+              else f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question"), ""),
             # The aggregation-tier multiple used to sit here. It is still the most interesting
             # SEC result, so it stays in the callout under the scorecard —
             # only the headline card is gone, to keep this row to two cards.
