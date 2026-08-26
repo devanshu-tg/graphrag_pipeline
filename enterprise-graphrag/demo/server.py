@@ -60,7 +60,13 @@ PORT = int(os.getenv("DEMO_PORT", "8000"))
 # and the 40-set still carries a malformed question ("...the message '1778881234'..."). Two
 # readers, one constant: they cannot drift again without someone editing this line.
 # Built by build/make_pub50.py, which gates on all three arms covering the same 50 ids.
-PUB = "eval_pub50.jsonl"
+# The *_regex file is the published set measured with the pattern router, and it is what
+# demo/build_report.py renders the page tables from. The server must read the SAME file or
+# the console replays answers to questions the tables no longer contain — which is exactly
+# what happened after the 2026-08-25 question swap: the tables moved to MX51-MX54 and the
+# replay still served the four questions they replaced.
+PUB = ("eval_pub50_regex.jsonl"
+       if (RESULTS / "eval_pub50_regex.jsonl").exists() else "eval_pub50.jsonl")
 
 _lock = threading.Lock()
 _mods: dict = {}
@@ -615,7 +621,9 @@ def factual_query(question: str) -> dict:
         out.append({"arm": short, "answer": (r.get("answer") or "").strip() or "(no answer)",
                     "prompt_tokens": pt, "completion_tokens": ct, "planner_tokens": 0,
                     "tokens": pt + ct, "route": r.get("route", "") or "recorded",
-                    "latency": r.get("latency_s", 0), "chunks": 0})
+                    "latency": r.get("latency_s", 0),
+                    # not recorded in the frozen SEC run; the page shows an em dash
+                    "chunks": r.get("retrieved_chunks") or 0, "recorded": True})
     res = {"results": out, "recorded": True, "qid": hit}
     _judge_factual(res, question, qs[hit].get("answer", ""))
     return res

@@ -73,7 +73,9 @@ def build_answers(S, filename: str, grade: bool = True) -> dict:
                        + r.get("planner_tokens", 0)),
             "route": r.get("route", "") or "recorded",
             "latency": round(r.get("latency_s", 0) or 0, 1),
-            "chunks": 0,
+            # retrieved_chunks was never recorded in the published eval files, so this is
+            # unknown rather than zero; the page renders an em dash for it.
+            "chunks": r.get("retrieved_chunks") or 0,
             "sources": [],
         }
         # Grade through the server's own function, so a replayed card and a live card can never

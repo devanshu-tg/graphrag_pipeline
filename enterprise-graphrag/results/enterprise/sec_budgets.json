@@ -4,75 +4,62 @@
   "model": "gemini-3.7-flash",
   "judge": "gemini-3.1-pro-preview",
   "rubric": "v2",
-  "routes": "the four strategies the pipeline implements: aggregation, bridge, lookup, default",
-  "note": "one in-process run per budget, both arms measured together; 'routed budget' is the shipped behaviour where GraphRAG's routes request 4-6 chunks and aggregation retrieves typed graph edges instead of chunks",
-  "labels": {
-   "shipped": [
-    "Basic RAG\n10 chunks",
-    "GraphRAG\nrouted budget"
-   ],
-   "k10": [
-    "Basic RAG\n10 chunks",
-    "GraphRAG\n10 chunks"
-   ],
-   "k6": [
-    "Basic RAG\n6 chunks",
-    "GraphRAG\n6 chunks"
-   ],
-   "_tiers": "compare and temporal were a merged `default` bucket; the k10 and k6 rows for those two tiers are a re-measurement of their 6 questions (the original file's generator no longer exists and an average cannot be un-merged), the shipped row is derived from eval_sec_norefusal.jsonl. Basic RAG reproduced the stored default within 0.3%; GraphRAG came in 14% lower, which is this corpus's documented retrieval variance."
-  }
+  "routes": "grouped by route; compare and temporal kept separate, both n=3",
+  "shipped_source": "results/enterprise/eval_sec_norefusal.jsonl (the published run)",
+  "forced_source": "in-process runs with every vector request floored to the baseline's k",
+  "note": "'routed budget' is the shipped behaviour: GraphRAG's routes request 4-6 chunks and aggregation retrieves typed graph edges instead of chunks"
  },
  "shipped": {
   "all": {
    "n": 50,
    "p2": {
-    "full": 25,
-    "judge": 66.1,
-    "tok": 5121
+    "full": 26,
+    "judge": 65.5,
+    "tok": 4838
    },
    "p3": {
-    "full": 36,
-    "judge": 84.0,
-    "tok": 2992
+    "full": 35,
+    "judge": 83.0,
+    "tok": 2497
    }
   },
   "lookup": {
-   "n": 15,
+   "n": 16,
    "p2": {
     "full": 14,
-    "judge": 96.7,
-    "tok": 5705
+    "judge": 90.6,
+    "tok": 5363
    },
    "p3": {
-    "full": 14,
-    "judge": 93.3,
-    "tok": 3560
+    "full": 13,
+    "judge": 84.4,
+    "tok": 3238
    }
   },
   "bridge": {
-   "n": 7,
+   "n": 4,
    "p2": {
     "full": 2,
-    "judge": 35.7,
-    "tok": 5098
+    "judge": 50.0,
+    "tok": 4918
    },
    "p3": {
-    "full": 4,
-    "judge": 64.3,
-    "tok": 5501
+    "full": 3,
+    "judge": 87.5,
+    "tok": 5269
    }
   },
   "aggregation": {
-   "n": 22,
+   "n": 24,
    "p2": {
     "full": 5,
-    "judge": 51.1,
-    "tok": 4679
+    "judge": 47.0,
+    "tok": 4424
    },
    "p3": {
-    "full": 14,
-    "judge": 86.9,
-    "tok": 1266
+    "full": 16,
+    "judge": 85.9,
+    "tok": 992
    }
   },
   "compare": {
@@ -142,6 +129,19 @@
     "tok": 5257
    }
   },
+  "compare": {
+   "n": 3,
+   "p2": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 5590
+   },
+   "p3": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 6524
+   }
+  },
   "aggregation": {
    "n": 22,
    "p2": {
@@ -155,30 +155,17 @@
     "tok": 1248
    }
   },
-  "compare": {
-   "n": 3,
-   "p2": {
-    "full": 2,
-    "judge": 96.7,
-    "tok": 5624
-   },
-   "p3": {
-    "full": 3,
-    "judge": 100.0,
-    "tok": 4914
-   }
-  },
   "temporal": {
    "n": 3,
    "p2": {
     "full": 2,
     "judge": 73.3,
-    "tok": 4999
+    "tok": 5005
    },
    "p3": {
-    "full": 1,
-    "judge": 43.3,
-    "tok": 4828
+    "full": 0,
+    "judge": 26.7,
+    "tok": 4803
    }
   }
  },
@@ -222,6 +209,19 @@
     "tok": 3691
    }
   },
+  "compare": {
+   "n": 3,
+   "p2": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 3673
+   },
+   "p3": {
+    "full": 3,
+    "judge": 100.0,
+    "tok": 4034
+   }
+  },
   "aggregation": {
    "n": 22,
    "p2": {
@@ -235,30 +235,17 @@
     "tok": 1085
    }
   },
-  "compare": {
-   "n": 3,
-   "p2": {
-    "full": 3,
-    "judge": 100.0,
-    "tok": 3675
-   },
-   "p3": {
-    "full": 3,
-    "judge": 100.0,
-    "tok": 3637
-   }
-  },
   "temporal": {
    "n": 3,
    "p2": {
-    "full": 1,
-    "judge": 58.3,
-    "tok": 3171
+    "full": 2,
+    "judge": 66.7,
+    "tok": 3174
    },
    "p3": {
-    "full": 1,
-    "judge": 56.7,
-    "tok": 3254
+    "full": 0,
+    "judge": 33.3,
+    "tok": 3273
    }
   }
  }

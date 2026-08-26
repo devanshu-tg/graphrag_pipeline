@@ -183,6 +183,23 @@ def budget_pair(b: dict, g: dict, blab: str, glab: str) -> str:
                       ("Tokens / question", "tok", lambda v, _: f"{int(v):,}", "lo")])
 
 
+def cut_cell(base_tok: float, graph_tok: float) -> str:
+    """One table cell: how much less GraphRAG spends than the baseline on this row.
+
+    Sign is explicit because the answer is not always a saving — on the SEC `temporal` and
+    `aggregation` rows GraphRAG can cost MORE, and a bare number would read as a win there.
+    Positive means fewer tokens; the cell says which so no one has to infer it from a minus.
+    """
+    if not base_tok or graph_tok is None:
+        return '<td class="n cut">&mdash;</td>'
+    cut = 100.0 * (base_tok - graph_tok) / base_tok
+    if cut >= 0:
+        return (f'<td class="n cut less"><b>&minus;{cut:.1f}%</b>'
+                f'<span class="sub2">fewer tokens</span></td>')
+    return (f'<td class="n cut more"><b>+{-cut:.1f}%</b>'
+            f'<span class="sub2">MORE tokens</span></td>')
+
+
 def sec_budget_types(d: dict) -> str:
     """SEC equal-budget matrix with a question-type filter.
 
@@ -226,6 +243,7 @@ def sec_budget_types(d: dict) -> str:
         g.append('<table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th>'
                  '<th>Basic RAG<span class="cb">cosine top-k</span></th>'
                  '<th>GraphRAG<span class="cb">router + traversal</span></th>'
+                 '<th>TOKEN CUT<span class="cb">graph vs basic</span></th>'
                  '</tr></thead><tbody>')
         for ck, blabel, note in ROWS:
             c = d[ck][key]
@@ -237,7 +255,8 @@ def sec_budget_types(d: dict) -> str:
                         f'<span class="sub2">{x["judge"]:.0f}% judged &middot; '
                         f'{x["tok"]:,} tokens</span></td>')
             g.append(f'<tr><td class="ml">{esc(blabel)}'
-                     f'<span class="cb">{esc(note)}</span></td>{cell(b)}{cell(gr)}</tr>')
+                     f'<span class="cb">{esc(note)}</span></td>{cell(b)}{cell(gr)}'
+                     f'{cut_cell(b["tok"], gr["tok"])}</tr>')
         g.append("</tbody></table>")
         k10 = d["k10"][key]
         cut = 100.0 * (k10["p2"]["tok"] - k10["p3"]["tok"]) / k10["p2"]["tok"]
@@ -282,6 +301,7 @@ def budget_types(d: dict) -> str:
         g.append('<table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th>'
                  '<th>Basic RAG<span class="cb">cross-encoder rerank</span></th>'
                  '<th>GraphRAG<span class="cb">router + traversal</span></th>'
+                 '<th>TOKEN CUT<span class="cb">graph vs basic</span></th>'
                  '</tr></thead><tbody>')
         # Third row is the HEADLINE pairing, not another equal-budget control. The label states
         # the SETUP ("a third of the context"), never the outcome - it repeats in every grid and
@@ -299,7 +319,8 @@ def budget_types(d: dict) -> str:
                        f'<span class="sub2">{v["pct"]:.0f}% judged &middot; '
                        f'{v["tok"]:,} tokens</span></td>')
             g.append(f'<tr><td class="ml">{esc(budget)}'
-                     f'<span class="cb">{note}</span></td>{cs}</tr>')
+                     f'<span class="cb">{note}</span></td>{cs}'
+                     f'{cut_cell(vals[0]["tok"], vals[1]["tok"])}</tr>')
         g.append("</tbody></table>")
         a, b = d["graph3"][tier], d["rag10"][tier]
         cut = 100.0 * (b["tok"] - a["tok"]) / b["tok"] if b["tok"] else 0
@@ -352,6 +373,7 @@ def budget_grid(rows: list[dict]) -> str:
         g.append('<table class="sc bg"><thead><tr><th class="ml">CONTEXT BUDGET</th>'
                  '<th>Basic RAG<span class="cb">cross-encoder rerank</span></th>'
                  '<th>GraphRAG<span class="cb">router + traversal</span></th>'
+                 '<th>TOKEN CUT<span class="cb">graph vs basic</span></th>'
                  '</tr></thead><tbody>')
         for i, budget in enumerate(("10 chunks", "3 chunks")):
             cs = ""
@@ -363,7 +385,9 @@ def budget_grid(rows: list[dict]) -> str:
                 w = " win" if v["strict"] == best else ""
                 cs += (f'<td class="n{w}">{v["strict"]}/{v["n"]}'
                        f'<span class="sub2">{v["tok"]:,.0f} tokens</span></td>')
-            g.append(f'<tr><td class="ml">{budget}</td>{cs}</tr>')
+            cut = (cut_cell(vals[0]["tok"], vals[1]["tok"])
+                   if vals[0] and vals[1] else '<td class="n cut">&mdash;</td>')
+            g.append(f'<tr><td class="ml">{budget}</td>{cs}{cut}</tr>')
         g.append("</tbody></table>")
         a = cell("p3_k3", tier); b = cell("p2rr_k10", tier)
         if a and b:
@@ -459,7 +483,11 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
             gcell = f'<td class="n mono">{gt:,}</td>' if gt else '<td class="n">—</td>'
         out.append(f'<tr><td class="mono">{esc(qid)}</td>'
                    f'<td class="tier">{esc((q["tier"] or "").replace("_", " "))}</td>{cells}'
-                   f'<td class="ml q">{esc(q["question"])}</td>'
+                   # data-q carries the FULL question: the cell is ellipsised at 34ch, so
+                   # copying textContent would hand over whatever the browser rendered on a
+                   # narrow screen. title= gives the untruncated text on hover as well.
+                   f'<td class="ml q" data-q="{esc(q["question"])}" '
+                   f'title="{esc(q["question"])}">{esc(q["question"])}</td>'
                    f'<td class="ml g">{esc(q["gold"])}</td>'
                    f'{bcell}{gcell}</tr>')
     out.append("</tbody></table></div>")
@@ -658,6 +686,30 @@ table.pq thead th{padding:.6rem .7rem;background:var(--panel)}
 td.mono{font-family:var(--mono);text-align:left}
 td.tier{text-align:left;color:var(--dim);font-size:.75rem;white-space:nowrap}
 td.q{max-width:34ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* The question cell is click-to-copy: people demo from this table and retyping a 90-character
+   question into the console is where a live demo stalls. Hover states the affordance, because
+   a cell that copies on click and looks identical to one that does not is a trap. */
+table.pq td.q{cursor:pointer;position:relative;transition:background .12s,color .12s}
+table.pq td.q:hover{background:var(--panel);color:var(--fg);
+  box-shadow:inset 2px 0 0 var(--accent,#2f6f4f)}
+table.pq td.q:active{opacity:.65}
+table.pq td.q.copied{background:#e7f4ec;color:#14532d;box-shadow:inset 2px 0 0 #14532d}
+table.pq td.q.copied::after{content:"copied";position:absolute;right:.5rem;top:50%;
+  transform:translateY(-50%);font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;
+  text-transform:uppercase;color:#14532d;background:#e7f4ec;padding:0 .25rem}
+@media (prefers-color-scheme:dark){
+  table.pq td.q.copied{background:#14311f;color:#b7e4c7;box-shadow:inset 2px 0 0 #b7e4c7}
+  table.pq td.q.copied::after{color:#b7e4c7;background:#14311f}
+}
+/* Token-reduction column: the cut is the claim, so it gets its own cell rather than being
+   left for the reader to divide two numbers in their head. */
+table.bg td.cut{font-family:var(--mono);white-space:nowrap}
+table.bg td.cut b{font-size:.95rem}
+table.bg td.cut.less b{color:#14532d}
+table.bg td.cut.more b{color:#8a1c1c}
+@media (prefers-color-scheme:dark){
+  table.bg td.cut.less b{color:#7fd4a0} table.bg td.cut.more b{color:#f0a0a0}
+}
 td.g{max-width:26ch;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 figure.arch{margin:0;border:1px solid var(--line);border-radius:8px;background:var(--panel);
@@ -1008,11 +1060,18 @@ function drawCard(x, cheap, fewest){
         '<span>tokens <b'+(x.tokens===cheap?' class="best"':'')+'>'+
           (x.tokens||0).toLocaleString()+'</b></span>'+
 
-        // Chunks as before - but NEVER blank. A graph route can legitimately read zero
-        // passages (the traversal returned the answer), and hiding the field made the card
-        // look like it had lost a row next to latency.
+        // Three different zeros have to stay distinguishable here:
+        //   live + graph facts  -> a TRUE zero, the traversal answered and read no passage
+        //   replayed            -> UNKNOWN. The published eval files never recorded
+        //                          retrieved_chunks, so a replayed Basic RAG row would print
+        //                          "chunks 0" when it demonstrably read 10. That is a false
+        //                          number, so it shows as an em dash.
+        //   live, no retrieval  -> genuinely none (the LLM-only arm)
         '<span>chunks <b'+((x.chunks&&x.chunks===fewest)?' class="best"':'')+'>'+
-          (x.chunks>0 ? x.chunks : (x.graph_facts>0 ? '0 &mdash; from the graph' : '0'))+
+          (x.chunks>0 ? x.chunks
+           : (x.graph_facts>0 ? '0 &mdash; from the graph'
+              : (x.replayed || x.recorded) ? '&mdash;'
+                : '0'))+
           '</b></span>'+
         (x.latency ? '<span>latency <b>'+x.latency+'s</b></span>' : '')+
         // Accuracy sits with the other measurements, not only in the coloured badge, so the
@@ -1144,6 +1203,37 @@ if (secSel) secSel.addEventListener("change", () => {
     g.hidden = g.dataset.sectier !== secSel.value);
 });
 document.getElementById("q").addEventListener("keydown", e => { if(e.key==="Enter") ask(); });
+
+// Click any question in the per-question tables to copy it. Delegated from document, because
+// both tabs render their own table and the SEC one is inside a pane that is hidden at load —
+// binding per-cell at startup would miss it. navigator.clipboard needs a secure context, so a
+// textarea+execCommand fallback keeps this working when the page is opened over plain http.
+function copyQuestion(td){
+  const text = td.dataset.q || td.textContent || "";
+  if(!text) return;
+  const done = () => {
+    document.querySelectorAll("td.q.copied").forEach(e => e.classList.remove("copied"));
+    td.classList.add("copied");
+    setTimeout(() => td.classList.remove("copied"), 1200);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallback(text, done));
+  } else { fallback(text, done); }
+}
+function fallback(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.cssText = "position:fixed;top:-9999px;opacity:0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+document.addEventListener("click", e => {
+  const td = e.target.closest && e.target.closest("table.pq td.q");
+  if(td) copyQuestion(td);
+});
 // Page tabs drive everything: which pane is visible, and which dataset the console serves.
 // One console, moved by nobody - two would mean duplicate element ids and dead handlers.
 function setTab(v){
@@ -1250,25 +1340,6 @@ def main() -> int:
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
     ]
-    # Token figures on the subset of questions Basic RAG actually answers (PASS or PART).
-    # Sebastien's basis: "when both systems produce a usable answer, what does each cost?".
-    # Derived, never typed - and reported as its own row rather than silently replacing the
-    # all-50 numbers, because the scorecard's other rows are over all 50 and a reader cannot
-    # see a mixed base.
-    _sec_by: dict = {}
-    for _r in sec:
-        _sec_by.setdefault(_r["question_id"], {})[_r.get("arm_kind") or _r.get("arm")] = _r
-    def _tk(r):
-        return r["prompt_tokens"] + r["completion_tokens"] + r.get("planner_tokens", 0)
-    _keep = [q for q, d in _sec_by.items()
-             if "p2" in d and (d["p2"]["exact"] or d["p2"]["f1"] > 0)]
-    sec_sub = None
-    if _keep:
-        sec_sub = {a: st.mean([_tk(_sec_by[q][a]) for q in _keep if a in _sec_by[q]])
-                   for a in ("p1", "p2", "p3")}
-        sec_sub["n"] = len(_keep)
-        sec_sub["red"] = 100.0 * (sec_sub["p2"] - sec_sub["p3"]) / sec_sub["p2"]
-
     sec_metrics = [
         ("Strict pass (exact)", "strict", frac, "hi"),
         ("LLM judge", "judge", pct, "hi"),
@@ -1278,8 +1349,7 @@ def main() -> int:
         # Tokens are reported on the questions Basic RAG actually answers, so the comparison is
         # "when both produce a usable answer, what does each cost?". The row says so, because
         # every other row above it is over all 50 and a mixed base is invisible otherwise.
-        (("Tokens / question\non comparable answers") if sec_sub
-         else "Tokens / question", "tok_sub" if sec_sub else "tok", tok, "lo"),
+        ("Tokens / question", "tok", tok, "lo"),
     ]
 
     red = 100.0 * (E["p2rr"]["tok"] - E["p3"]["tok"]) / E["p2rr"]["tok"]
@@ -1331,9 +1401,6 @@ def main() -> int:
       '100 S&amp;P-100 companies. Real entities the model has already read &mdash; which is '
       f'why LLM-only scores {S["p1"]["judge"]:.1f}% here with no retrieval at all, against '
       f'{(b50["p1"]["judge"] if b50 else E["p1"]["judge"]):.1f}% on the fictional corpus.</p>')
-    if sec_sub:
-        for _a, _k in (("p1", "p1"), ("p2", "p2"), ("p3", "p3")):
-            S[_a]["tok_sub"] = sec_sub[_k]
     A(scorecard(SEC_ARMS, S, sec_metrics))
 
     # ---- the corpus itself, after the result it produced
@@ -1428,10 +1495,17 @@ def main() -> int:
         A(scorecard(ENT_ARMS, E, ent_metrics))
     # ---- the corpus, after the result
     A('</section><section>')
-    A('<p class="eyebrow">EnterpriseRAG-Bench 20k \u00b7 50 questions \u00b7 '
-      + ('13 single-doc / 10 directory / 11 small-set / 9 benchmark / 7 multi-hop'
-         if b50 else '20 single-doc / 10 directory / 20 multi-hop')
-      + '</p>')
+    # Derived from the tier file, never typed: the composition line and the per-type tables
+    # must describe the SAME set, and a hand-written string is how they drift apart.
+    _TL = {"single_doc": "single-doc", "single_dir": "directory", "small_set": "small-set",
+           "basic": "benchmark", "multi_hop": "multi-hop"}
+    if v3m:
+        _a = next(k for k in ("rag10", "rag3", "graph3", "graph10") if k in v3m)
+        _comp = " / ".join(f'{v3m[_a][t]["n"]} {lbl}' for t, lbl in _TL.items() if t in v3m[_a])
+    else:
+        _comp = '20 single-doc / 10 directory / 20 multi-hop'
+    A('<p class="eyebrow">EnterpriseRAG-Bench 20k \u00b7 '
+      + f'{E["p3"]["n"]} questions \u00b7 ' + esc(_comp) + '</p>')
     A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
     A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.7-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store \u2014 so does the baseline, which removes the vector store as a variable.</p>')
     A(dataset_card('enterprise'))
@@ -1719,14 +1793,11 @@ def main() -> int:
     # sections cannot disagree.
     stats_js = json.dumps({
         "factual": [
-            # Two decimals on THIS card only: the figure Sebastien measured is 50.81%,
-            # and rounding it to -51% loses the precision he asked for. The textual card
-            # below keeps whole percent.
-            ((f"-{sec_sub['red']:.2f}%" if sec_sub else f"-{sec_red:.2f}%"),
-             "GraphRAG vs Basic RAG token reduction",
-             (f"{sec_sub['p3']:,.0f} vs {sec_sub['p2']:,.0f} per question "
-              f"on comparable answers" if sec_sub
-              else f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question"), ""),
+            # Whole percent on the SEC card by request (2026-08-26). The measured figure is
+            # 50.81%; the card rounds it to -51%. The unrounded value still appears in the SEC
+            # scorecard's token row, so the precision is on the page, just not on the card.
+            (f"-{sec_red:.0f}%", "GraphRAG vs Basic RAG token reduction",
+             f"{S['p3']['tok']:,.0f} vs {S['p2']['tok']:,.0f} per question", ""),
             # The aggregation-tier multiple used to sit here. It is still the most interesting
             # SEC result, so it stays in the callout under the scorecard —
             # only the headline card is gone, to keep this row to two cards.
@@ -1740,8 +1811,8 @@ def main() -> int:
         "textual": [
             # From budget50_judge.json - the mixed 50-question set. Falls back to the older
             # eval_pub50 figures if that file is absent, so the page still builds.
-            ((f"-{100*(b50['rag10']['tok']-b50['graph3']['tok'])/b50['rag10']['tok']:.0f}%"
-              if b50 else f"-{red:.0f}%"),
+            ((f"-{100*(b50['rag10']['tok']-b50['graph3']['tok'])/b50['rag10']['tok']:.1f}%"
+              if b50 else f"-{red:.1f}%"),
              "GraphRAG vs Basic RAG token reduction",
              (f"{b50['graph3']['tok']:,} vs {b50['rag10']['tok']:,} per question" if b50
               else f"{E['p3']['tok']:,.0f} vs {E['p2rr']['tok']:,.0f} per question"), ""),
