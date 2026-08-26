@@ -1394,7 +1394,7 @@ def main() -> int:
       # search (lookup 16, bridge 4, compare 3, temporal 3) and only the 24 aggregation
       # questions are answered from graph edges alone. The arm is graph PLUS vector.
       '<button class="tab on" id="tabF">Hybrid \u00b7 SEC</button>'
-      '<button class="tab" id="tabT">Textual \u00b7 Enterprise</button>'
+      '<button class="tab" id="tabT">Hybrid \u00b7 Enterprise</button>'
       '<a href="https://github.com/devanshu-tg/graphrag_pipeline">Source</a></div>')
     # ---- OVERALL PERFORMANCE: headline + the two KPI cards. The interactive console used to
     # sit here, which meant the page opened with an empty input box before the reader had seen
