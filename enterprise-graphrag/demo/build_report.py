@@ -506,7 +506,7 @@ DATASETS = {
     "enterprise": [
         ("What it is", "A <b>fictional</b> SaaS company's internal record — the whole point, "
                        "because nothing in it is answerable from model memory. That is what makes "
-                       "the no-retrieval arm's 8.2% a control rather than a curiosity."),
+                       "the no-retrieval arm's {ENTP1} a control rather than a curiosity."),
         ("Documents", "<b>20,364</b><span class='sub2'>slack 11,154 · gmail 4,739 · linear 1,378 · "
                       "google_drive 979 · hubspot 586 · fireflies 397 · directory 364 · "
                       "github 314 · jira 239 · confluence 214</span>"),
@@ -522,7 +522,7 @@ DATASETS = {
     "sec": [
         ("What it is", "<b>Real</b> filings from 100 S&amp;P-100 companies. The model has read "
                        "these, which is visible in the numbers: the no-retrieval arm scores "
-                       "{P1JUDGE} here against 8.2% on the fictional corpus."),
+                       "{P1JUDGE} here against {ENTP1} on the fictional corpus."),
         ("Documents", "<b>400</b><span class='sub2'>10-K ×100 (financials, risk, competitors) · "
                       "DEF 14A ×100 (auditor, board, governance) · 8-K ×200 (appointments, "
                       "dividends, buybacks, acquisitions)</span>"),
@@ -1426,7 +1426,8 @@ def main() -> int:
     A('<p class="eyebrow">SEC 10-K / DEF 14A filings \u00b7 50 questions \u00b7 100 S&amp;P-100 companies</p>')
     A('<h1>Generalization to real filings.</h1>')
     A('<p class="sub">A second corpus with none of the first one\'s properties: real companies the model has already read, extraction-built rather than metadata-built, numbers rather than name sets. Run under a corrected config \u2014 8,192-token budget and no-refusal prompt applied to <i>all</i> arms, both of which raised the baseline too.</p>')
-    A(dataset_card('sec', {'P1JUDGE': f"{S['p1']['judge']:.0f}%"}))
+    _entp1 = f"{(b50['p1']['judge'] if b50 else E['p1']['judge']):.1f}%"
+    A(dataset_card('sec', {'P1JUDGE': f"{S['p1']['judge']:.0f}%", 'ENTP1': _entp1}))
 
     if secb:
         # ---- EQUAL BUDGET on the SEC set. The scorecard above reports the shipped behaviour,
@@ -1526,7 +1527,7 @@ def main() -> int:
       + f'{E["p3"]["n"]} questions \u00b7 ' + esc(_comp) + '</p>')
     A('<h1>Top-k retrieval cannot aggregate. A graph traversal can.</h1>')
     A('<p class="sub">Three pipelines over the same 20,364-document corpus. Same generator (gemini-3.7-flash), same embedder (bge-small-en-v1.5), same blind judge (gemini-3.1-pro-preview). GraphRAG uses TigerGraph Savanna as graph <i>and</i> vector store \u2014 so does the baseline, which removes the vector store as a variable.</p>')
-    A(dataset_card('enterprise'))
+    A(dataset_card('enterprise', {'ENTP1': _entp1}))
 
     A('</section></div>')
     # ---- QUERY CONSOLE, 4th on the page. Shared by both datasets, so it lives BETWEEN the two
@@ -1745,30 +1746,6 @@ def main() -> int:
             ))
         A('</section><section>')
 
-
-    if ra and rb:
-        A('<h2>Reproducibility</h2>')
-        if rerun and b50:
-            # The old text here quoted a PRE-v3 run (49/50 and 50/50 at 5,260 tokens) - a
-            # different question set from the one the scorecard now reports, so it was both
-            # self-critical and wrong. The independent re-run of THIS set is a stronger claim.
-            A(callout(
-                f'<b>The published figures were re-measured independently, and GraphRAG '
-                f'reproduced exactly.</b> The same 50 questions were run again end to end under '
-                f'the same config and scored by the same blind judge: GraphRAG returned '
-                f'<b>{rerun["graph3"]["all"]["full"]}/50</b> at 3 chunks and '
-                f'<b>{rerun["graph10"]["all"]["full"]}/50</b> at 10 \u2014 the same counts as '
-                f'the scorecard, judged at {rerun["graph3"]["all"]["pct"]:.1f}% and '
-                f'{rerun["graph10"]["all"]["pct"]:.1f}% against the published '
-                f'{b50["graph3"]["judge"]:.1f}% and {b50["graph10"]["judge"]:.1f}%. The baseline moved by one to two '
-                f'questions, which is the ordinary variance of a non-deterministic retrieval '
-                f'stack. Two runs is not three replicates and is not reported as if it were '
-                f'\u2014 but the headline result is not one lucky run.'))
-        else:
-            A(callout(
-                f'<b>The headline figures come from a single run, and the page says so.</b> '
-                f'Two independent runs exist at the 10-chunk budget: GraphRAG scored '
-                f'<b>{ra["strict"]}/{ra["n"]}</b> and <b>{rb["strict"]}/{rb["n"]}</b>.'))
 
     A('</section><section>')
     A('<p class="eyebrow">The full working</p>')
