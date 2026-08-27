@@ -1365,11 +1365,11 @@ def main() -> int:
     # Judge first: it is the headline metric the page leads with, so it should be the row a
     # reader hits before the stricter exact-set count that qualifies it.
     ent_metrics = [
+        ("Tokens / question", "tok", tok, "lo"),
         ("Accuracy / LLM judge", "judge", pct, "hi"),
         ("Strict pass (exact set)", "strict", frac, "hi"),
         ("BERTScore F1", "bert", dec, "hi"),
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
-        ("Tokens / question", "tok", tok, "lo"),
     ]
     # Token figures on the questions Basic RAG actually answers (PASS or PART) - Sebastien's
     # basis, "when both systems produce a usable answer, what does each cost?". Used ONLY by the
@@ -1389,7 +1389,11 @@ def main() -> int:
         sec_sub["n"] = len(_keep)
         sec_sub["red"] = 100.0 * (sec_sub["p2"] - sec_sub["p3"]) / sec_sub["p2"]
 
+    # Tokens lead: the efficiency claim is what this page is for, and it was arriving last,
+    # after five rows of scoring. Accuracy follows immediately so the cost is never read
+    # without the quality it bought.
     sec_metrics = [
+        ("Tokens / question", "tok", tok, "lo"),
         ("Accuracy / LLM judge", "judge", pct, "hi"),
         ("Strict pass (exact)", "strict", frac, "hi"),
         ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
@@ -1531,11 +1535,11 @@ def main() -> int:
                                 zero=b50["rag10"]["zero"], tok=b50["rag10"]["tok"], part=b50["rag10"]["part"]),
                      "p3": dict(n=b50["graph3"]["n"], strict=b50["graph3"]["full"], judge=b50["graph3"]["judge"],
                                 zero=b50["graph3"]["zero"], tok=b50["graph3"]["tok"], part=b50["graph3"]["part"])},
-                    [("Accuracy / LLM judge", "judge", pct, "hi"),
+                    [("Tokens / question", "tok", tok, "lo"),
+                     ("Accuracy / LLM judge", "judge", pct, "hi"),
                      ("Strict pass (exact set)", "strict", frac, "hi"),
                      ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
-                     ("Complete failures (score 0)", "zero", lambda v, _: f"{int(v)}", "lo"),
-                     ("Tokens / question", "tok", tok, "lo")]))
+                     ("Complete failures (score 0)", "zero", lambda v, _: f"{int(v)}", "lo")]))
     else:
         A('<p class="budgetline">Context budget: <b>Basic RAG 10 chunks</b> vs '
           '<b>GraphRAG 3 chunks</b> &mdash; unequal, in the baseline&rsquo;s favour. '
