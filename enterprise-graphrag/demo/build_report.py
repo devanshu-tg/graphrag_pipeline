@@ -1636,21 +1636,13 @@ def main() -> int:
          'plain cosine and lost on strict pass, graded quality and BERTScore at once, so it was '
          'dropped. Either way the baseline is shown at its best measured configuration, not at '
          'a convenient one.'),
-        ('Both arms retrieve the same way &mdash; and the baseline is the reranked one',
-         '<b>The vector store is not the variable.</b> On the enterprise corpus Basic RAG and '
-         'GraphRAG both retrieve through <b>the same TigerGraph vector search</b>, at the same k '
-         'and the same context budget, so the only thing separating them is whether the graph is '
-         'consulted. On the SEC corpus the baseline retrieves from Chroma while GraphRAG '
-         'retrieves from TigerGraph &mdash; the enterprise build was written to close exactly '
-         'that gap, which is a further reason the enterprise result is the cleaner of the two '
-         'comparisons.'
-         '<br><br>'
-         '<b>And the baseline is the strong one.</b> Plain top-10 Basic RAG scores <b>0.301</b> '
-         'set-F1. A cross-encoder over a 50-candidate pool, keeping the best 10, takes it to '
-         '<b>0.506</b> at <i>the same</i> 10-chunk token cost &mdash; and that reranked arm is '
-         'the one shown on this page. Handing it 50 chunks instead reaches 0.531: five times the '
-         'context for 0.025 more. Beating a weak baseline would prove nothing, so the baseline '
-         'shown is the best one measured at its budget.')))
+        ('The baseline retrieves through TigerGraph too',
+         '<b>The baseline retrieves through TigerGraph too.</b> On the enterprise corpus both '
+         'arms use the same vector store, the same embedder and the same corpus, so the only '
+         'difference between them is whether the graph is consulted. And the baseline is the '
+         '<i>reranked</i> one &mdash; a cross-encoder over a 50-candidate pool, which took it '
+         'from 0.30 to 0.51 set-F1 at the same token cost. Beating a weak baseline would prove '
+         'nothing.')))
     A('</section>')
     A('<div class="pane pane-factual" id="paneF2">')
     A('<section>')
