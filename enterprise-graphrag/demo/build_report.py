@@ -1609,6 +1609,33 @@ def main() -> int:
         'three pipelines live; without one it replays the recorded run \u2014 the same measured '
         'answer either way, and the card says <code>recorded</code> when that is what '
         'happened.'))
+    # FAIRNESS CONTROLS. Every figure below is read off config constants, not the diagram: the
+    # architecture image claims "Pipeline 3 has no cross-encoder reranker that Pipeline 2 has",
+    # and that is not true of either corpus as shipped. On SEC neither arm reranks (P2_SEARCH
+    # defaults to "similarity" - pure cosine top-k, no MMR, no reranker - and P3 holds no
+    # cross-encoder at all); on enterprise BOTH do, the baseline over a 200-candidate pool and
+    # GraphRAG through retrieval_common.rerank on its vector path. Stating the diagram's version
+    # would hand a reader a discrepancy they could find in ten minutes.
+    A(drops(
+        ('Fairness controls &mdash; what is held identical across the three pipelines',
+         '<b>One generator, one setting.</b> All three arms call the same model '
+         '(<code>gemini-3.7-flash</code>) at <b>temperature 0</b>, with the same system prompt '
+         'and the same 8,192-token output budget. Nothing is sampled, so a rerun moves only '
+         'with the retrieval, never with the decoder.'
+         '<br><br>'
+         '<b>One retriever, one budget.</b> Basic RAG and GraphRAG share the embedder '
+         '(<code>BAAI/bge-small-en-v1.5</code>) and the same hard context cap &mdash; '
+         '<b>10 passages &times; 2,000 characters</b>, enforced on both. That cap is what makes '
+         'the token comparison mean anything: GraphRAG is not given less room, it simply does '
+         'not fill the room it has.'
+         '<br><br>'
+         '<b>And the asymmetry, stated rather than buried.</b> On the enterprise corpus the '
+         'baseline is the <i>reranked</i> one &mdash; a cross-encoder over a 200-candidate pool, '
+         'which is a stronger baseline than plain top-k and is deliberately the one shown. On '
+         'the SEC corpus neither arm reranks: the reranked variant was ablation-tested against '
+         'plain cosine and lost on strict pass, graded quality and BERTScore at once, so it was '
+         'dropped. Either way the baseline is shown at its best measured configuration, not at '
+         'a convenient one.')))
     A('</section>')
     A('<div class="pane pane-factual" id="paneF2">')
     A('<section>')
