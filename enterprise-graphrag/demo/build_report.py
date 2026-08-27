@@ -449,8 +449,27 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
     # the whole point of publishing the working. arms[-2] is the RAG baseline on both tabs
     # (p2 on SEC, p2rr on enterprise) and arms[-1] is GraphRAG.
     base_arm, graph_arm = arms[-2][0], arms[-1][0]
+
+    # "TIER" printed raw values - A, B, C, D on SEC - which name nothing a reader can act on.
+    # Where the run recorded which strategy the router picked, show THAT. The enterprise run
+    # recorded route=None on all 50 rows, so that table falls back to the question shape and its
+    # header says "QUESTION TYPE" rather than calling a shape a route.
+    SHAPE = {"single_doc": "single doc", "single_dir": "directory lookup",
+             "multi_hop": "multi-hop", "small_set": "small set", "basic": "benchmark"}
+
+    def _classify(q):
+        r = (q["arms"].get(graph_arm) or {}).get("route") or ""
+        if r and not r.startswith(("vector", "rerank", "no ")):
+            return r.replace("_", " ")
+        t = (q.get("tier") or "")
+        return SHAPE.get(t, t.replace("_", " "))
+
     base_lbl = _split_label(arms[-2][1])[0].upper()
-    out = [f'<div class="scroll"><table class="pq"><thead><tr><th>ID</th><th>TIER</th>{head}'
+    # name the column for what it actually holds in THIS table
+    _col = "ROUTE" if any((r["arms"].get(graph_arm) or {}).get("route", "").startswith(
+        ("lookup", "bridge", "aggregation", "compare", "temporal")) for r in by.values()) \
+        else "QUESTION TYPE"
+    out = [f'<div class="scroll"><table class="pq"><thead><tr><th>ID</th><th>{_col}</th>{head}'
            f'<th class="ml">QUESTION</th><th class="ml">GOLD</th>'
            f'<th>TOKENS<span class="cb">{esc(base_lbl)}</span></th>'
            f'<th>TOKENS<span class="cb">GRAPHRAG</span></th>'
@@ -462,7 +481,19 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
         return (r.get("prompt_tokens", 0) + r.get("completion_tokens", 0)
                 + r.get("planner_tokens", 0))
 
-    for qid in ids:
+    # Group by route so a reader can see a whole strategy at once - all 24 aggregation
+    # questions together rather than interleaved - and number the rows 1..N in display order.
+    # Sorting by question id scattered each route across the table, which made "aggregation is
+    # where the graph wins" impossible to see by scrolling.
+    _ORDER = ["aggregation", "bridge", "lookup", "compare", "temporal",
+              "single doc", "directory lookup", "multi-hop", "small set", "benchmark"]
+
+    def _sortkey(qid):
+        c = _classify(by[qid])
+        return (_ORDER.index(c) if c in _ORDER else len(_ORDER), c, qid)
+
+    ids = sorted(ids, key=_sortkey)
+    for _row, qid in enumerate(ids, 1):
         q = by[qid]
         cells = ""
         for a, _ in arms:
@@ -483,8 +514,8 @@ def per_question(rows: list[dict], arms: list[tuple[str, str]], limit: int | Non
         else:
             bcell = f'<td class="n mono">{bt:,}</td>' if bt else '<td class="n">—</td>'
             gcell = f'<td class="n mono">{gt:,}</td>' if gt else '<td class="n">—</td>'
-        out.append(f'<tr><td class="mono">{esc(qid)}</td>'
-                   f'<td class="tier">{esc((q["tier"] or "").replace("_", " "))}</td>{cells}'
+        out.append(f'<tr><td class="mono">{_row}</td>'
+                   f'<td class="tier">{esc(_classify(q))}</td>{cells}'
                    # data-q carries the FULL question: the cell is ellipsised at 34ch, so
                    # copying textContent would hand over whatever the browser rendered on a
                    # narrow screen. title= gives the untruncated text on hover as well.
