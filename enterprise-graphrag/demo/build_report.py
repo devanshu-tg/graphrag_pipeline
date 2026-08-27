@@ -251,8 +251,10 @@ def sec_budget_types(d: dict) -> str:
             best = max(b["full"], gr["full"])
             def cell(x):
                 w = " win" if x["full"] == best else ""
-                return (f'<td class="n{w}">{int(x["full"])}/{c["n"]}'
-                        f'<span class="sub2">{x["judge"]:.0f}% judged &middot; '
+                # Judged accuracy leads, the exact-set count sits underneath - same order as
+                # the scorecards, so a reader meets the headline metric first on both.
+                return (f'<td class="n{w}">{x["judge"]:.0f}% judged'
+                        f'<span class="sub2">{int(x["full"])}/{c["n"]} &middot; '
                         f'{x["tok"]:,} tokens</span></td>')
             g.append(f'<tr><td class="ml">{esc(blabel)}'
                      f'<span class="cb">{esc(note)}</span></td>{cell(b)}{cell(gr)}'
@@ -930,7 +932,7 @@ async function replay(q, arm){
   return {gold:hit.gold, qid:hit.qid, results: r?[r]:[]};
 }
 
-async function askArm(q, arm){
+async function askArms(q, arms){
   // Try every candidate backend, not just one. One build then works BOTH served from the
   // tunnel (its own origin IS the backend) and served from a static host like GitHub Pages
   // (own origin has no /api/query, so it falls through to the tunnel). Baking exactly one URL
@@ -942,13 +944,21 @@ async function askArm(q, arm){
     try{
       const res = await fetch(base+"/api/query", {method:"POST", signal:ctl.signal,
         headers:{"Content-Type":"application/json","X-Demo-Token":LIVE_TOKEN},
-        body:JSON.stringify({question:q, arms:[arm], dataset:view})});
+        body:JSON.stringify({question:q, arms:arms, dataset:view})});
       clearTimeout(t);
       if(res.ok){ const d = await res.json();
         if(!d.error && (d.results||[]).length){ LIVE_OK = base; return d; } }
     }catch(e){ clearTimeout(t); }
   }
-  return replay(q, arm);
+  // replay() is per-arm, so gather one recorded result for each arm that was asked for
+  const out = {results:[]};
+  for(const a of arms){
+    const r = await replay(q, a);
+    if(r.error) return r;
+    out.gold = out.gold || r.gold; out.qid = out.qid || r.qid;
+    (r.results||[]).forEach(x => { x.arm = a; out.results.push(x); });
+  }
+  return out;
 }
 
 function drawGold(g, qid, tier){
@@ -1112,10 +1122,21 @@ async function ask(){
     for(const x of Object.values(got)) drawCard(x, cheap, fewest);
   };
   st.innerHTML = '<span class="spin"></span> running '+arms.length+' pipelines - 0/'+arms.length+' done';
-  await Promise.all(arms.map(async a => {
+  // The SEC path ignores the requested arm and always runs all three on the worker, so asking
+  // per-arm meant 3 requests x 3 arms = 9 pipeline runs for ONE question, six of whose answers
+  // were discarded. On 2 vCPUs that is ~60s. One request returns the same three answers in a
+  // third of the time. The enterprise server DOES dispatch per arm, so it keeps the parallel
+  // path where the three arms genuinely run concurrently.
+  const groups = view === "factual" ? [arms] : arms.map(a => [a]);
+  await Promise.all(groups.map(async grp => {
+    const a = grp[0];
     try{
-      const d = await askArm(q, a);
-      if(d.error){ got[a] = {arm:a, answer:"could not run: "+d.error, tokens:0, route:"error"}; }
+      const d = await askArms(q, grp);
+      if(d.error){
+        for(const w of grp){
+          got[w] = {arm:w, answer:"could not run: "+d.error, tokens:0, route:"error"}; done++;
+        }
+      }
       else{
         // The SEC worker's reply carries no gold, so fall back to the key baked in at build
         // time. Without this the whole tab claimed to have no answer key while its keys sat
@@ -1123,12 +1144,20 @@ async function ask(){
         const meta = (PASSING[view]||[]).find(e => e.q === q) || {};
         const key = d.gold || meta.gold || "";
         if(key && !gold){ gold = key; drawGold(key, d.qid || meta.qid, meta.tier); }
-        const x = (d.results||[]).find(z=>z.arm===a) || (d.results||[])[0];
-        if(x){ x.arm = a; got[a] = x; }
+        for(const w of grp){
+          const x = (d.results||[]).find(z=>z.arm===w)
+                    || (grp.length===1 ? (d.results||[])[0] : null);
+          if(x){ x.arm = w; got[w] = x; }
+          done++;
+        }
       }
-    }catch(e){ got[a] = {arm:a, answer:"could not run: "+e, tokens:0, route:"error"}; }
-    done++; paint();
-    if(done === arms.length) drawQueryStats(got, arms);
+    }catch(e){
+      for(const w of grp){
+        got[w] = {arm:w, answer:"could not run: "+e, tokens:0, route:"error"}; done++;
+      }
+    }
+    paint();
+    if(done >= arms.length) drawQueryStats(got, arms);
     // One fact per line. This used to read "all 3 finished in 7.4s - question type single doc -
     // no answer key for this question", which is three unrelated statements competing for the
     // same sentence. Timing stays here; the question type and the key belong together on the
@@ -1333,9 +1362,11 @@ def main() -> int:
                 ("p2", "Basic RAG" + _B + "10 chunks"),
                 ("p3", "GraphRAG" + _B + "routed")]
 
+    # Judge first: it is the headline metric the page leads with, so it should be the row a
+    # reader hits before the stricter exact-set count that qualifies it.
     ent_metrics = [
+        ("Accuracy / LLM judge", "judge", pct, "hi"),
         ("Strict pass (exact set)", "strict", frac, "hi"),
-        ("LLM judge", "judge", pct, "hi"),
         ("BERTScore F1", "bert", dec, "hi"),
         ("Complete failures (score 0)", "zero", lambda v, d: f"{int(v)}", "lo"),
         ("Tokens / question", "tok", tok, "lo"),
@@ -1359,8 +1390,8 @@ def main() -> int:
         sec_sub["red"] = 100.0 * (sec_sub["p2"] - sec_sub["p3"]) / sec_sub["p2"]
 
     sec_metrics = [
+        ("Accuracy / LLM judge", "judge", pct, "hi"),
         ("Strict pass (exact)", "strict", frac, "hi"),
-        ("LLM judge", "judge", pct, "hi"),
         ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
         ("Wrong (answered, 0%)", "wrongc", lambda v, _: f"{int(v)}", "lo"),
         ("Declined / empty", "emptyc", lambda v, _: f"{int(v)}", "lo"),
@@ -1500,8 +1531,8 @@ def main() -> int:
                                 zero=b50["rag10"]["zero"], tok=b50["rag10"]["tok"], part=b50["rag10"]["part"]),
                      "p3": dict(n=b50["graph3"]["n"], strict=b50["graph3"]["full"], judge=b50["graph3"]["judge"],
                                 zero=b50["graph3"]["zero"], tok=b50["graph3"]["tok"], part=b50["graph3"]["part"])},
-                    [("Strict pass (exact set)", "strict", frac, "hi"),
-                     ("LLM judge", "judge", pct, "hi"),
+                    [("Accuracy / LLM judge", "judge", pct, "hi"),
+                     ("Strict pass (exact set)", "strict", frac, "hi"),
                      ("Partly correct", "part", lambda v, _: f"{int(v)}", None),
                      ("Complete failures (score 0)", "zero", lambda v, _: f"{int(v)}", "lo"),
                      ("Tokens / question", "tok", tok, "lo")]))
