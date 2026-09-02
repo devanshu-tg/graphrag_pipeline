@@ -235,6 +235,40 @@ def _patch_prompt(cfg) -> None:
 
 _lock = threading.Lock()
 _mods: dict = {}
+def _install_token_refresh(p3) -> None:
+    """Re-authenticate when Savanna's seven-day token lapses mid-process.
+
+    Their _connect() mints a token at first use, caches the connection for the life of the
+    process and never looks at it again; their _run_query retries transient 500s but not auth
+    failures. So on day eight every vector_search answers REST-10019, and because
+    factual_query's live path is all-or-nothing, one dead arm drops the whole SEC tab onto the
+    replay path - which only holds the 50 audited questions. Off-list questions then look
+    broken.
+
+    Patched here, not in their file: mastergraph-round3/ is frozen under 428 hashes. Every
+    TigerGraph call in their pipeline goes through _run_query and resolves it as a module
+    global, so replacing the attribute covers vector search, aggregation and traversal alike.
+    """
+    original = p3._run_query
+    EXPIRED = ("rest-10019", "is expired", "access denied because the input token")
+
+    def _run_query(conn, name, params, retries=4):
+        try:
+            return original(conn, name, params, retries=retries)
+        except Exception as e:
+            if not any(t in str(e).lower() for t in EXPIRED):
+                raise
+            print("[factual] TigerGraph token expired - re-authenticating")
+            p3._conn = None
+            fresh = p3._connect()
+            if fresh is None:
+                raise
+            return original(fresh, name, params, retries=retries)
+
+    p3._run_query = _run_query
+    print("[factual] TigerGraph token: auto-refresh on expiry installed")
+
+
 _state = {"state": "cold", "error": ""}
 
 
@@ -265,6 +299,7 @@ def warm() -> None:
                 _patch_prompt_rules(mg_config)
             _install_router(p3)
             _install_facts_capture(p3)
+            _install_token_refresh(p3)
             print(f"[factual] model={mg_config.GEMINI_MODEL} max_tokens={mg_config.MAX_TOKENS} "
                   f"no_refusal={NO_REFUSAL} prompt={os.getenv('SEC_PROMPT', 'v2')}")
             _state["config"] = {"model": mg_config.GEMINI_MODEL,

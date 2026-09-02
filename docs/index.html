@@ -453,6 +453,7 @@ async function askArms(q, arms){
   // (own origin has no /api/query, so it falls through to the tunnel). Baking exactly one URL
   // is what left the deployed copy calling a culled hostname while the local copy was fine.
   const cands = (LIVE_OK ? [LIVE_OK] : []).concat(LIVE_URLS.filter(u => u && u !== LIVE_OK));
+  let serverMsg = "";
   for(const base of cands){
     const ctl = new AbortController();
     const t = setTimeout(()=>ctl.abort(), LIVE_TIMEOUT_MS);
@@ -462,14 +463,17 @@ async function askArms(q, arms){
         body:JSON.stringify({question:q, arms:arms, dataset:view})});
       clearTimeout(t);
       if(res.ok){ const d = await res.json();
-        if(!d.error && (d.results||[]).length){ LIVE_OK = base; return d; } }
+        if(!d.error && (d.results||[]).length){ LIVE_OK = base; return d; }
+        // a reachable backend that declines the question still tells us WHY; keep it for the
+        // case where the recorded set cannot answer either
+        if(d.error){ LIVE_OK = base; serverMsg = d.error; } }
     }catch(e){ clearTimeout(t); }
   }
   // replay() is per-arm, so gather one recorded result for each arm that was asked for
   const out = {results:[]};
   for(const a of arms){
     const r = await replay(q, a);
-    if(r.error) return r;
+    if(r.error) return {error: serverMsg || r.error};
     out.gold = out.gold || r.gold; out.qid = out.qid || r.qid;
     (r.results||[]).forEach(x => { x.arm = a; out.results.push(x); });
   }
