@@ -625,6 +625,13 @@ def factual_query(question: str) -> dict:
         return {"error": "This question is not in the frozen SEC evaluation set. The factual "
                          "tab replays audited results, so only its 50 questions resolve. "
                          "Switch to Textual for live querying."}
+    # A deploy that ships the code but not _evidence/theirs.jsonl leaves `qs` populated from
+    # eval_set.jsonl while `ans` is empty, and ans[hit] then raised KeyError straight out of the
+    # handler as a bare HTTP 500. The frozen answers are the replay; without them say so.
+    if not ans.get(hit):
+        return {"error": "The recorded SEC answers are not available on this server "
+                         "(_evidence/theirs.jsonl is missing), so this question cannot be "
+                         "replayed. The page falls back to its own static copy."}
     out = []
     for arm, short in MG_ARMS:
         r = ans[hit].get(arm) or {}

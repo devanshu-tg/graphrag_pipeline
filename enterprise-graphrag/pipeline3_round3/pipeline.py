@@ -192,14 +192,44 @@ _TRANSIENT = ("500", "502", "503", "504", "timeout", "reset", "incompleteread",
               "connection broken", "connection aborted", "protocolerror", "remote end closed",
               "max retries", "temporarily unavailable")
 
+# Savanna hands out a SEVEN-DAY token. _connect() used to mint one at first use and cache the
+# connection for the life of the process, so a server left running past day seven answered every
+# graph query with REST-10019 and the demo showed error cards until someone restarted it. These
+# are the auth failures worth retrying: drop the cached connection, re-authenticate, try again.
+_AUTH_EXPIRED = ("rest-10019", "is expired", "token is expired", "access denied because the input token")
 
-def _run_query(conn, name, params, retries=4):
+
+def _is_auth_expired(e) -> bool:
+    m = str(e).lower()
+    return any(t in m for t in _AUTH_EXPIRED)
+
+
+def _reauth() -> None:
+    """Force the next _connect()/_connect_v2() to mint a fresh token."""
+    global _conn, _conn_v2
+    _conn = None
+    _conn_v2 = None
+    print("[p3] TigerGraph token expired - re-authenticating")
+
+
+def _run_query(conn, name, params, retries=4, usePost=False):
     last = None
     for attempt in range(retries):
         try:
-            return conn.runInstalledQuery(name, params)
+            return conn.runInstalledQuery(name, params, usePost=usePost)
         except Exception as e:
             last = e
+            if _is_auth_expired(e):
+                # The seven-day token lapsed mid-process. Work out WHICH connection this is
+                # before _reauth() nulls both globals, then rebind - the caller is still holding
+                # the stale object.
+                was_v2 = conn is _conn_v2
+                _reauth()
+                fresh = _connect_v2() if was_v2 else _connect()
+                if fresh is None:
+                    raise
+                conn = fresh
+                continue
             if any(t in str(e).lower() for t in _TRANSIENT):
                 time.sleep(1.5 * (attempt + 1))
                 continue
@@ -247,7 +277,7 @@ def _tg_hop(frontier: set, rel: str, direction: str) -> tuple[set, list[tuple[st
     for i in range(0, len(seeds), HOP_BATCH):
         batch = seeds[i:i + HOP_BATCH]
         try:
-            r = conn.runInstalledQuery(f"hop_{rel}_{direction}", {"seeds": batch}, usePost=True)
+            r = _run_query(conn, f"hop_{rel}_{direction}", {"seeds": batch}, usePost=True)
         except Exception as e:
             _hop_stats["errors"] += 1
             if REQUIRE_TG:
