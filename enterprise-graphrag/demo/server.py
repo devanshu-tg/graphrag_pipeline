@@ -23,6 +23,7 @@ import statistics as st
 import sys
 import threading
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -584,15 +585,30 @@ def _judge_factual(out: dict, question: str, gold: str) -> None:
     if not j or not gold:
         return
     out["gold"] = gold
-    for r in out.get("results", []):
+    rows = out.get("results", [])
+    if not rows:
+        return
+
+    # CONCURRENTLY. judge_one is a bare requests.post with no shared session and no module
+    # state, so the three calls are independent - and the judge is gemini-3.1-pro-preview, the
+    # slow half of this request. Three of them in series is what pushed the SEC tab past
+    # CloudFront's 60s cut-off, which showed up as recorded answers in the middle of a demo.
+    def _one(r):
         try:
-            score, why = j.judge_one(question, gold, r.get("answer", "") or "")
+            return r, j.judge_one(question, gold, r.get("answer", "") or "")
+        except Exception as e:
+            print(f"[sec-judge] {r.get('arm')}: {e}")
+            return r, None
+
+    with ThreadPoolExecutor(max_workers=len(rows)) as ex:
+        for r, res in ex.map(_one, rows):
+            if res is None:
+                continue
+            score, why = res
             if score < 0:                      # judge itself failed; stay silent
                 continue
             r["grade"] = {"score": round(score / 100.0, 2), "why": why,
                           "found": [], "missed": [], "wrong": [], "judged": True}
-        except Exception as e:
-            print(f"[sec-judge] {r.get('arm')}: {e}")
 
 
 def factual_query(question: str) -> dict:

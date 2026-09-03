@@ -31,6 +31,7 @@ import os
 import sys
 import threading
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
@@ -313,34 +314,45 @@ def warm() -> None:
             print(f"[factual] warm failed: {e}")
 
 
+def _run_arm(arm: str, question: str) -> dict:
+    """One arm, so the three can run at once. Errors stay scoped to their own card."""
+    try:
+        if arm == "p1":
+            m = _mods["p1"].run_single(question)
+            route = "no retrieval"
+        elif arm == "p2":
+            m = _mods["p2"].run_single(question, _mods["vs"])
+            route = "vector top-k"
+        else:
+            m = _mods["p3"].run_single(question)
+            route = getattr(m, "route", "")
+        pt, ct = getattr(m, "prompt_tokens", 0), getattr(m, "completion_tokens", 0)
+        return {"arm": arm, "answer": (m.answer or "").strip() or "(no answer)",
+                "prompt_tokens": pt, "completion_tokens": ct, "planner_tokens": 0,
+                "tokens": pt + ct, "route": route,
+                "latency": getattr(m, "latency_seconds", 0),
+                "chunks": getattr(m, "retrieved_chunks", 0),
+                # read after this arm's own run_single, so the capture dict is already written
+                "graph_facts": (_facts_count(question)[0] if arm == "p3" else 0),
+                "graph_trail": (_facts_count(question)[1] if arm == "p3" else "")}
+    except Exception as e:
+        return {"arm": arm, "answer": f"ERROR: {e}", "tokens": 0, "route": "error",
+                "prompt_tokens": 0, "completion_tokens": 0, "planner_tokens": 0,
+                "latency": 0, "chunks": 0}
+
+
 def run(question: str) -> dict:
+    """The three arms CONCURRENTLY. Serially they summed to 10-90s of Gemini round-trips, and
+    anything past 60s is cut off by CloudFront, which dropped the SEC tab onto recorded answers
+    mid-demo. The arms share nothing that a thread breaks: p1 holds no state, only p3 touches
+    the TigerGraph connection, and p2 and p3 share the sentence-transformer for inference only.
+    ThreadPoolExecutor.map preserves input order, so the cards stay p1, p2, p3.
+    """
     warm()
     if _state["state"] != "ready":
         return {"error": _state["error"] or "SEC pipelines not ready"}
-    out = []
-    for arm in ("p1", "p2", "p3"):
-        try:
-            if arm == "p1":
-                m = _mods["p1"].run_single(question)
-                route = "no retrieval"
-            elif arm == "p2":
-                m = _mods["p2"].run_single(question, _mods["vs"])
-                route = "vector top-k"
-            else:
-                m = _mods["p3"].run_single(question)
-                route = getattr(m, "route", "")
-            pt, ct = getattr(m, "prompt_tokens", 0), getattr(m, "completion_tokens", 0)
-            out.append({"arm": arm, "answer": (m.answer or "").strip() or "(no answer)",
-                        "prompt_tokens": pt, "completion_tokens": ct, "planner_tokens": 0,
-                        "tokens": pt + ct, "route": route,
-                        "latency": getattr(m, "latency_seconds", 0),
-                        "chunks": getattr(m, "retrieved_chunks", 0),
-                        "graph_facts": (_facts_count(question)[0] if arm == "p3" else 0),
-                        "graph_trail": (_facts_count(question)[1] if arm == "p3" else "")})
-        except Exception as e:
-            out.append({"arm": arm, "answer": f"ERROR: {e}", "tokens": 0, "route": "error",
-                        "prompt_tokens": 0, "completion_tokens": 0, "planner_tokens": 0,
-                        "latency": 0, "chunks": 0})
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        out = list(ex.map(lambda a: _run_arm(a, question), ("p1", "p2", "p3")))
     return {"results": out, "live": True}
 
 
